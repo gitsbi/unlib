@@ -67,20 +67,20 @@ TEST_CASE("unit type manipulations") {
 	using namespace unlib;
 
 	SUBCASE("power") {
-		using             time_0 = pow_unit_t<unlib::detail::            time,0>;
-		using             mass_1 = pow_unit_t<unlib::detail::            mass,1>;
-		using           length_2 = pow_unit_t<unlib::detail::          length,2>;
-		using          current_3 = pow_unit_t<unlib::detail::         current,3>;
-		using       luminosity_4 = pow_unit_t<unlib::detail::      luminosity,4>;
-		using      temperature_5 = pow_unit_t<unlib::detail::     temperature,5>;
-		using substance_amount_6 = pow_unit_t<unlib::detail::substance_amount,6>;
-		CHECK( typeid(            time_0) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
-		CHECK( typeid(            mass_1) == typeid(unit<exponent<0>,exponent<1>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
-		CHECK( typeid(          length_2) == typeid(unit<exponent<0>,exponent<0>,exponent<2>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
-		CHECK( typeid(         current_3) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<3>,exponent<0>,exponent<0>,exponent<0>>) );
-		CHECK( typeid(      luminosity_4) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<4>,exponent<0>,exponent<0>>) );
-		CHECK( typeid(     temperature_5) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<5>,exponent<0>>) );
-		CHECK( typeid(substance_amount_6) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<6>>) );
+		using             time_0 = pow_unit_t<unlib::detail::            time,1>;
+		using             mass_1 = pow_unit_t<unlib::detail::            mass,2>;
+		using           length_2 = pow_unit_t<unlib::detail::          length,3>;
+		using          current_3 = pow_unit_t<unlib::detail::         current,4>;
+		using       luminosity_4 = pow_unit_t<unlib::detail::      luminosity,5>;
+		using      temperature_5 = pow_unit_t<unlib::detail::     temperature,6>;
+		using substance_amount_6 = pow_unit_t<unlib::detail::substance_amount,7>;
+		CHECK( typeid(            time_0) == typeid(unit<exponent<1>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(            mass_1) == typeid(unit<exponent<0>,exponent<2>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(          length_2) == typeid(unit<exponent<0>,exponent<0>,exponent<3>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(         current_3) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<4>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(      luminosity_4) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<5>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(     temperature_5) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<6>,exponent<0>>) );
+		CHECK( typeid(substance_amount_6) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<7>>) );
 
 		using test_unit = unit< exponent<1>
 		                      , exponent<2>

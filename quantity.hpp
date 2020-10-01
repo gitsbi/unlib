@@ -165,6 +165,16 @@ template<typename ID, std::intmax_t N1, std::intmax_t D1
 struct div_tag<tag<ID,N1,D1>,tag<ID,N2,D2>>                     {using type = typename tag_subtract<tag<ID,N1,D1>,tag<ID,N2,D2>>::type;};
 
 
+template<typename Tag>
+struct sqrt_tag : create_tag<typename Tag::id, std::ratio_divide<typename Tag::exponent,std::ratio<2>>::num
+                                             , std::ratio_divide<typename Tag::exponent,std::ratio<2>>::den> {};
+
+
+template<typename Tag, int Power>
+struct  pow_tag : create_tag<typename Tag::id, std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::num
+                                             , std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::den > {};
+
+
 template<typename Tag1, typename Tag2>
 struct are_tags_compatible;
 template< typename ID1, std::intmax_t N1, std::intmax_t D1
@@ -222,7 +232,7 @@ constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
 /**
  * @{
  *
- * @brief Get tag resulting from quantity multiplying/dividing
+ * @brief Get tag resulting from multiplying/dividing quantities
  *
  * This will calculate the tags resulting from multiplying/dividing quantities.
  *
@@ -240,8 +250,16 @@ constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
  * the result will be reactive energy. If you divide reactive energy by
  * reactive power, you get time, with the reactive tag removed.
  */
-template<typename T1, typename T2> using mul_tag_t = typename detail::mul_tag<T1,T2>::type;
-template<typename T1, typename T2> using div_tag_t = typename detail::div_tag<T1,T2>::type;
+template<typename T1, typename T2> using  mul_tag_t = typename detail:: mul_tag<T1, T2   >::type;
+template<typename T1, typename T2> using  div_tag_t = typename detail:: div_tag<T1, T2   >::type;
+/** @} */
+/**
+ * @{
+ *
+ * @brief Get tag resulting from quantity sqrt/pow operations
+ */
+template<typename T              > using sqrt_tag_t = typename detail::sqrt_tag<T        >::type;
+template<typename T , int Power  > using  pow_tag_t = typename detail:: pow_tag<T , Power>::type;
 /** @} */
 
 /* quantities ****************************************************************/
@@ -627,22 +645,22 @@ private:
  *
  * Calculate the types needed when multiplying/dividing quantities.
  */
-template<typename Q1, typename Q2> using mul_quantity_t = quantity< mul_unit_t<typename Q1::unit_type, typename Q2::unit_type>
-                                                                  , std::ratio_multiply<typename Q1::scale_type, typename Q2::scale_type>
-                                                                  , decltype(typename Q1::value_type{}*typename Q2::value_type{})
-                                                                  , mul_tag_t<typename Q1::tag_type, typename Q2::tag_type> >;
-template<typename Q1, typename Q2> using div_quantity_t = quantity< div_unit_t<typename Q1::unit_type, typename Q2::unit_type>
-                                                                  , std::ratio_divide<typename Q1::scale_type, typename Q2::scale_type>
-                                                                  , decltype(typename Q1::value_type{}/typename Q2::value_type{})
-                                                                  , div_tag_t<typename Q1::tag_type, typename Q2::tag_type> >;
-template<typename Q> using sqrt_quantity_t = quantity< sqrt_unit_t<typename Q::unit_type>
-                                                     , typename Q::scale_type
-                                                     , typename Q::value_type
-                                                     , create_tag_t< typename Q::tag_type::id
-                                                                   , std::ratio_divide<typename Q::tag_type::exponent, std::ratio<2,1>>::num
-                                                                   , std::ratio_divide<typename Q::tag_type::exponent, std::ratio<2,1>>::den
-                                                                   >
-                                                     >;
+template<typename Q1, typename Q2> using  mul_quantity_t = quantity< mul_unit_t<typename Q1::unit_type, typename Q2::unit_type>
+                                                                   , std::ratio_multiply<typename Q1::scale_type, typename Q2::scale_type>
+                                                                   , decltype(typename Q1::value_type{}*typename Q2::value_type{})
+                                                                   , mul_tag_t<typename Q1::tag_type, typename Q2::tag_type> >;
+template<typename Q1, typename Q2> using  div_quantity_t = quantity< div_unit_t<typename Q1::unit_type, typename Q2::unit_type>
+                                                                   , std::ratio_divide<typename Q1::scale_type, typename Q2::scale_type>
+                                                                   , decltype(typename Q1::value_type{}/typename Q2::value_type{})
+                                                                   , div_tag_t<typename Q1::tag_type, typename Q2::tag_type> >;
+template<typename Q              > using sqrt_quantity_t = quantity< sqrt_unit_t<typename Q::unit_type>
+                                                                   , typename Q::scale_type
+                                                                   , typename Q::value_type
+                                                                   , sqrt_tag_t<typename Q::tag_type> >;
+template<typename Q , int Power  > using  pow_quantity_t = quantity< pow_unit_t<typename Q::unit_type, Power>
+                                                                   , typename Q::scale_type
+                                                                   , typename Q::value_type
+                                                                   , pow_tag_t<typename Q::tag_type, Power> >;
 /** @} */
 
 

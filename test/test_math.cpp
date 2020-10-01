@@ -45,4 +45,31 @@ TEST_CASE("math") {
 		CHECK(is_near(unlib::abs( z), z));
 		CHECK(is_near(unlib::abs(lt),gt));
 	}
+	SUBCASE("pow") {
+		quantity_a a{2};
+
+		const auto pow0 = unlib::pow<0>(a);
+		CHECK(unlib::unit_is_dimensionless<decltype(pow0)::unit_type>::value);
+		CHECK(pow0.get() == 1);
+
+		const quantity_a pow1 = unlib::pow<1>(a);
+		CHECK(pow1.get() == a.get());
+
+		using unit_pow2 = unit<exponent<1*2>
+		                      ,exponent<2*2>
+		                      ,exponent<3*2>
+		                      ,exponent<4*2>
+		                      ,exponent<5*2>
+		                      ,exponent<6*2>
+		                      ,exponent<7*2>>;
+		const auto pow2 = unlib::pow<2>(a);
+		CHECK(typeid(decltype(pow2)::unit_type) == typeid(unit_pow2));
+		CHECK(pow2.get() == std::pow(a.get(),2));
+
+		const auto pow_neg2 = unlib::pow<-2>(a);
+		using unit_pow_neg2 = unlib::reciprocal_unit_t<decltype(pow2)::unit_type>;
+		CHECK(typeid(unit_pow_neg2) == typeid(decltype(pow_neg2)::unit_type));
+		CHECK(pow_neg2.get() == std::pow(a.get(),-2));
+	}
+
 }

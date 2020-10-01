@@ -364,10 +364,22 @@ TEST_CASE("quantity mathematical operations") {
 		CHECK(typeid(decltype(a * b / b)::tag_type) == typeid(test_q::tag_type) );
 		CHECK(typeid(decltype(a / b * a)::tag_type) == typeid(test_q::tag_type) );
 
-		CHECK(typeid(                decltype(a*a    ) ::tag_type) == typeid(create_tag_t<struct test_tag,2,1>) );
-		CHECK(typeid(sqrt_quantity_t<decltype(a*a    )>::tag_type) == typeid(create_tag_t<struct test_tag,1,1>) );
-		CHECK(typeid(                decltype(a*a*a*a) ::tag_type) == typeid(create_tag_t<struct test_tag,4,1>) );
-		CHECK(typeid(sqrt_quantity_t<decltype(a*a*a*a)>::tag_type) == typeid(create_tag_t<struct test_tag,2,1>) );
+		REQUIRE(typeid(                decltype(a*a    ) ::tag_type) == typeid(create_tag_t<struct test_tag,2,1>) );
+		CHECK  (typeid(sqrt_quantity_t<decltype(a*a    )>::tag_type) == typeid(create_tag_t<struct test_tag,1,1>) );
+		REQUIRE(typeid(                decltype(a*a*a*a) ::tag_type) == typeid(create_tag_t<struct test_tag,4,1>) );
+		CHECK  (typeid(sqrt_quantity_t<decltype(a*a*a*a)>::tag_type) == typeid(create_tag_t<struct test_tag,2,1>) );
+
+		CHECK(typeid(pow_quantity_t<test_q, 5>::tag_type) == typeid(create_tag_t<struct test_tag, 5,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 4>::tag_type) == typeid(create_tag_t<struct test_tag, 4,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 3>::tag_type) == typeid(create_tag_t<struct test_tag, 3,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 2>::tag_type) == typeid(create_tag_t<struct test_tag, 2,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 1>::tag_type) == typeid(create_tag_t<struct test_tag, 1,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 0>::tag_type) == typeid(create_tag_t<struct test_tag, 0,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-1>::tag_type) == typeid(create_tag_t<struct test_tag,-1,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-2>::tag_type) == typeid(create_tag_t<struct test_tag,-2,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-3>::tag_type) == typeid(create_tag_t<struct test_tag,-3,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-4>::tag_type) == typeid(create_tag_t<struct test_tag,-4,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-5>::tag_type) == typeid(create_tag_t<struct test_tag,-5,1>));
 	}
 
 }

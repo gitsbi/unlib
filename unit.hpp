@@ -210,6 +210,8 @@ template<typename Unit, int Power, int Sign = sign<Power>::value> struct pow_uni
 template<typename Unit, int Power> struct pow_unit<Unit, Power,   +1> { using type = apply_binary_t<std::ratio_add     , Unit, typename pow_unit<Unit, Power-1>::type>; };
 template<typename Unit, int Power> struct pow_unit<Unit, Power,   -1> { using type = apply_binary_t<std::ratio_subtract, Unit, typename pow_unit<Unit,-Power+1>::type>; };
 template<typename Unit, int Sign > struct pow_unit<Unit,     0, Sign> { using type = unit<e0, e0, e0, e0, e0, e0, e0>; };
+
+using cube_unit = unit<exponent<2>, exponent<2>, exponent<2>, exponent<2>, exponent<2>, exponent<2>, exponent<2>>;
 /** @} */
 
 }
@@ -252,6 +254,7 @@ template<typename Unit , int Power>      using        pow_unit_t = typename deta
 template<typename Unit>                  using     square_unit_t = pow_unit_t<Unit,2>;
 template<typename Unit>                  using       cube_unit_t = pow_unit_t<Unit,3>;
 template<typename Unit>                  using reciprocal_unit_t = detail::apply_unary_t<detail::negate_exp_t,Unit>;
+template<typename Unit>                  using       sqrt_unit_t = detail::apply_binary_t<std::ratio_divide, Unit, detail::cube_unit>;
 /** @} */
 
 /**

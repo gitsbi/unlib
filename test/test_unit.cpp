@@ -1,12 +1,11 @@
 #include <unlib/unit.hpp>
 #include <string>
 
-#define CATCH_CONFIG_PREFIX_ALL
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 
 #include <unlib/test/unlib_test.hpp>
 
-CATCH_TEST_CASE("exponents", "[unit]") {
+TEST_CASE("exponents") {
 	using namespace unlib;
 	using unit_a = unit<exponent<1>
 	                   ,exponent<2>
@@ -16,29 +15,29 @@ CATCH_TEST_CASE("exponents", "[unit]") {
 	                   ,exponent<6>
 	                   ,exponent<7> >;
 
-	CATCH_SECTION("exponents propagate to unit") {
-		CATCH_CHECK( typeid(exponent<1>) == typeid(unit_a::            time_exponent) );
-		CATCH_CHECK( typeid(exponent<2>) == typeid(unit_a::            mass_exponent) );
-		CATCH_CHECK( typeid(exponent<3>) == typeid(unit_a::          length_exponent) );
-		CATCH_CHECK( typeid(exponent<4>) == typeid(unit_a::         current_exponent) );
-		CATCH_CHECK( typeid(exponent<5>) == typeid(unit_a::      luminosity_exponent) );
-		CATCH_CHECK( typeid(exponent<6>) == typeid(unit_a::     temperature_exponent) );
-		CATCH_CHECK( typeid(exponent<7>) == typeid(unit_a::substance_amount_exponent) );
+	SUBCASE("exponents propagate to unit") {
+		CHECK( typeid(exponent<1>) == typeid(unit_a::            time_exponent) );
+		CHECK( typeid(exponent<2>) == typeid(unit_a::            mass_exponent) );
+		CHECK( typeid(exponent<3>) == typeid(unit_a::          length_exponent) );
+		CHECK( typeid(exponent<4>) == typeid(unit_a::         current_exponent) );
+		CHECK( typeid(exponent<5>) == typeid(unit_a::      luminosity_exponent) );
+		CHECK( typeid(exponent<6>) == typeid(unit_a::     temperature_exponent) );
+		CHECK( typeid(exponent<7>) == typeid(unit_a::substance_amount_exponent) );
 	}
 
-	CATCH_SECTION("get_exponent gets correct exponent") {
-		CATCH_CHECK( typeid(exponent<1>) == typeid(detail::get_exponent<unit_a,unlib::detail::            time>::type) );
-		CATCH_CHECK( typeid(exponent<2>) == typeid(detail::get_exponent<unit_a,unlib::detail::            mass>::type) );
-		CATCH_CHECK( typeid(exponent<3>) == typeid(detail::get_exponent<unit_a,unlib::detail::          length>::type) );
-		CATCH_CHECK( typeid(exponent<4>) == typeid(detail::get_exponent<unit_a,unlib::detail::         current>::type) );
-		CATCH_CHECK( typeid(exponent<5>) == typeid(detail::get_exponent<unit_a,unlib::detail::      luminosity>::type) );
-		CATCH_CHECK( typeid(exponent<6>) == typeid(detail::get_exponent<unit_a,unlib::detail::     temperature>::type) );
-		CATCH_CHECK( typeid(exponent<7>) == typeid(detail::get_exponent<unit_a,unlib::detail::substance_amount>::type) );
+	SUBCASE("get_exponent gets correct exponent") {
+		CHECK( typeid(exponent<1>) == typeid(detail::get_exponent<unit_a,unlib::detail::            time>::type) );
+		CHECK( typeid(exponent<2>) == typeid(detail::get_exponent<unit_a,unlib::detail::            mass>::type) );
+		CHECK( typeid(exponent<3>) == typeid(detail::get_exponent<unit_a,unlib::detail::          length>::type) );
+		CHECK( typeid(exponent<4>) == typeid(detail::get_exponent<unit_a,unlib::detail::         current>::type) );
+		CHECK( typeid(exponent<5>) == typeid(detail::get_exponent<unit_a,unlib::detail::      luminosity>::type) );
+		CHECK( typeid(exponent<6>) == typeid(detail::get_exponent<unit_a,unlib::detail::     temperature>::type) );
+		CHECK( typeid(exponent<7>) == typeid(detail::get_exponent<unit_a,unlib::detail::substance_amount>::type) );
 	}
 
 	using unit_list = detail::unsorted_unit_list_from_unit<unit_a>::type;
 
-	CATCH_SECTION("unsorted_unit_list_from_unit creates unsorted list of all basic units") {
+	SUBCASE("unsorted_unit_list_from_unit creates unsorted list of all basic units") {
 		using list = detail::unsorted_unit_list<pow_unit_t<unlib::detail::            time,1>
 		                                       ,pow_unit_t<unlib::detail::            mass,2>
 		                                       ,pow_unit_t<unlib::detail::          length,3>
@@ -47,27 +46,27 @@ CATCH_TEST_CASE("exponents", "[unit]") {
 		                                       ,pow_unit_t<unlib::detail::     temperature,6>
 		                                       ,pow_unit_t<unlib::detail::substance_amount,7> >;
 
-		CATCH_REQUIRE( typeid(unit_list) == typeid(list) );
+		REQUIRE( typeid(unit_list) == typeid(list) );
 	}
 
-	CATCH_SECTION("find_first_exponent finds correct exponents") {
-		CATCH_CHECK( typeid(exponent<1>) == typeid(detail::find_first_exponent<unlib::detail::            time, unit_list>::type) );
-		CATCH_CHECK( typeid(exponent<2>) == typeid(detail::find_first_exponent<unlib::detail::            mass, unit_list>::type) );
-		CATCH_CHECK( typeid(exponent<3>) == typeid(detail::find_first_exponent<unlib::detail::          length, unit_list>::type) );
-		CATCH_CHECK( typeid(exponent<4>) == typeid(detail::find_first_exponent<unlib::detail::         current, unit_list>::type) );
-		CATCH_CHECK( typeid(exponent<5>) == typeid(detail::find_first_exponent<unlib::detail::      luminosity, unit_list>::type) );
-		CATCH_CHECK( typeid(exponent<6>) == typeid(detail::find_first_exponent<unlib::detail::     temperature, unit_list>::type) );
-		CATCH_CHECK( typeid(exponent<7>) == typeid(detail::find_first_exponent<unlib::detail::substance_amount, unit_list>::type) );
+	SUBCASE("find_first_exponent finds correct exponents") {
+		CHECK( typeid(exponent<1>) == typeid(detail::find_first_exponent<unlib::detail::            time, unit_list>::type) );
+		CHECK( typeid(exponent<2>) == typeid(detail::find_first_exponent<unlib::detail::            mass, unit_list>::type) );
+		CHECK( typeid(exponent<3>) == typeid(detail::find_first_exponent<unlib::detail::          length, unit_list>::type) );
+		CHECK( typeid(exponent<4>) == typeid(detail::find_first_exponent<unlib::detail::         current, unit_list>::type) );
+		CHECK( typeid(exponent<5>) == typeid(detail::find_first_exponent<unlib::detail::      luminosity, unit_list>::type) );
+		CHECK( typeid(exponent<6>) == typeid(detail::find_first_exponent<unlib::detail::     temperature, unit_list>::type) );
+		CHECK( typeid(exponent<7>) == typeid(detail::find_first_exponent<unlib::detail::substance_amount, unit_list>::type) );
 
-		CATCH_CHECK( typeid(exponent<2>) != typeid(detail::find_first_exponent<unlib::detail::            time, unit_list>::type) );
-		CATCH_CHECK( typeid(exponent<1>) != typeid(detail::find_first_exponent<unlib::detail::            mass, unit_list>::type) );
+		CHECK( typeid(exponent<2>) != typeid(detail::find_first_exponent<unlib::detail::            time, unit_list>::type) );
+		CHECK( typeid(exponent<1>) != typeid(detail::find_first_exponent<unlib::detail::            mass, unit_list>::type) );
 	}
 }
 
-CATCH_TEST_CASE("unit type manipulations", "[unit]") {
+TEST_CASE("unit type manipulations") {
 	using namespace unlib;
 
-	CATCH_SECTION("power") {
+	SUBCASE("power") {
 		using             time_0 = pow_unit_t<unlib::detail::            time,0>;
 		using             mass_1 = pow_unit_t<unlib::detail::            mass,1>;
 		using           length_2 = pow_unit_t<unlib::detail::          length,2>;
@@ -75,13 +74,13 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		using       luminosity_4 = pow_unit_t<unlib::detail::      luminosity,4>;
 		using      temperature_5 = pow_unit_t<unlib::detail::     temperature,5>;
 		using substance_amount_6 = pow_unit_t<unlib::detail::substance_amount,6>;
-		CATCH_CHECK( typeid(            time_0) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
-		CATCH_CHECK( typeid(            mass_1) == typeid(unit<exponent<0>,exponent<1>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
-		CATCH_CHECK( typeid(          length_2) == typeid(unit<exponent<0>,exponent<0>,exponent<2>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
-		CATCH_CHECK( typeid(         current_3) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<3>,exponent<0>,exponent<0>,exponent<0>>) );
-		CATCH_CHECK( typeid(      luminosity_4) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<4>,exponent<0>,exponent<0>>) );
-		CATCH_CHECK( typeid(     temperature_5) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<5>,exponent<0>>) );
-		CATCH_CHECK( typeid(substance_amount_6) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<6>>) );
+		CHECK( typeid(            time_0) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(            mass_1) == typeid(unit<exponent<0>,exponent<1>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(          length_2) == typeid(unit<exponent<0>,exponent<0>,exponent<2>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(         current_3) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<3>,exponent<0>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(      luminosity_4) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<4>,exponent<0>,exponent<0>>) );
+		CHECK( typeid(     temperature_5) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<5>,exponent<0>>) );
+		CHECK( typeid(substance_amount_6) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<6>>) );
 
 		using test_unit = unit< exponent<1>
 		                      , exponent<2>
@@ -113,7 +112,7 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		CHECK( typeid(pow_unit_t<test_unit,-3>) == typeid(reciprocal_unit_t<cube_unit>) );
 	}
 
-	CATCH_SECTION("square") {
+	SUBCASE("square") {
 		using unit_b = unit< exponent<1>
 		                   , exponent<2>
 		                   , exponent<3>
@@ -121,10 +120,10 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                   , exponent<5>
 		                   , exponent<6>
 		                   , exponent<7> >;
-		CATCH_CHECK( typeid(square_unit_t<unit_b>) == typeid(unit<exponent<2>,exponent<4>,exponent<6>,exponent<8>,exponent<10>,exponent<12>,exponent<14>>) );
+		CHECK( typeid(square_unit_t<unit_b>) == typeid(unit<exponent<2>,exponent<4>,exponent<6>,exponent<8>,exponent<10>,exponent<12>,exponent<14>>) );
 	}
 
-	CATCH_SECTION("cube") {
+	SUBCASE("cube") {
 		using unit_b = unit< exponent<1>
 		                   , exponent<2>
 		                   , exponent<3>
@@ -132,10 +131,10 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                   , exponent<5>
 		                   , exponent<6>
 		                   , exponent<7> >;
-		CATCH_CHECK( typeid(cube_unit_t<unit_b>) == typeid(unit<exponent<3>,exponent<6>,exponent<9>,exponent<12>,exponent<15>,exponent<18>,exponent<21>>) );
+		CHECK( typeid(cube_unit_t<unit_b>) == typeid(unit<exponent<3>,exponent<6>,exponent<9>,exponent<12>,exponent<15>,exponent<18>,exponent<21>>) );
 	}
 
-	CATCH_SECTION("reciprocal") {
+	SUBCASE("reciprocal") {
 		using unit_b = unit< exponent<1>
 		                   , exponent<2>
 		                   , exponent<3>
@@ -143,10 +142,10 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                   , exponent<5>
 		                   , exponent<6>
 		                   , exponent<7> >;
-		CATCH_CHECK( typeid(reciprocal_unit_t<unit_b>) == typeid(unit<exponent<-1>,exponent<-2>,exponent<-3>,exponent<-4>,exponent<-5>,exponent<-6>,exponent<-7>>) );
+		CHECK( typeid(reciprocal_unit_t<unit_b>) == typeid(unit<exponent<-1>,exponent<-2>,exponent<-3>,exponent<-4>,exponent<-5>,exponent<-6>,exponent<-7>>) );
 	}
 
-	CATCH_SECTION("create_unit_t") {
+	SUBCASE("create_unit_t") {
 		using unit_a = create_unit_t<unlib::detail::            time
 		                            ,unlib::detail::            mass
 		                            ,unlib::detail::          length
@@ -155,13 +154,13 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                            ,unlib::detail::     temperature
 		                            ,unlib::detail::substance_amount >;
 
-		CATCH_CHECK( typeid(exponent<1,1>) == typeid(unit_a::            time_exponent) );
-		CATCH_CHECK( typeid(exponent<1,1>) == typeid(unit_a::            mass_exponent) );
-		CATCH_CHECK( typeid(exponent<1,1>) == typeid(unit_a::          length_exponent) );
-		CATCH_CHECK( typeid(exponent<1,1>) == typeid(unit_a::         current_exponent) );
-		CATCH_CHECK( typeid(exponent<1,1>) == typeid(unit_a::      luminosity_exponent) );
-		CATCH_CHECK( typeid(exponent<1,1>) == typeid(unit_a::     temperature_exponent) );
-		CATCH_CHECK( typeid(exponent<1,1>) == typeid(unit_a::substance_amount_exponent) );
+		CHECK( typeid(exponent<1,1>) == typeid(unit_a::            time_exponent) );
+		CHECK( typeid(exponent<1,1>) == typeid(unit_a::            mass_exponent) );
+		CHECK( typeid(exponent<1,1>) == typeid(unit_a::          length_exponent) );
+		CHECK( typeid(exponent<1,1>) == typeid(unit_a::         current_exponent) );
+		CHECK( typeid(exponent<1,1>) == typeid(unit_a::      luminosity_exponent) );
+		CHECK( typeid(exponent<1,1>) == typeid(unit_a::     temperature_exponent) );
+		CHECK( typeid(exponent<1,1>) == typeid(unit_a::substance_amount_exponent) );
 
 		using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,1>
 		                            ,pow_unit_t<unlib::detail::            mass,2>
@@ -171,13 +170,13 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                            ,pow_unit_t<unlib::detail::     temperature,6>
 		                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
 
-		CATCH_CHECK( typeid(exponent<1>) == typeid(unit_b::            time_exponent) );
-		CATCH_CHECK( typeid(exponent<2>) == typeid(unit_b::            mass_exponent) );
-		CATCH_CHECK( typeid(exponent<3>) == typeid(unit_b::          length_exponent) );
-		CATCH_CHECK( typeid(exponent<4>) == typeid(unit_b::         current_exponent) );
-		CATCH_CHECK( typeid(exponent<5>) == typeid(unit_b::      luminosity_exponent) );
-		CATCH_CHECK( typeid(exponent<6>) == typeid(unit_b::     temperature_exponent) );
-		CATCH_CHECK( typeid(exponent<7>) == typeid(unit_b::substance_amount_exponent) );
+		CHECK( typeid(exponent<1>) == typeid(unit_b::            time_exponent) );
+		CHECK( typeid(exponent<2>) == typeid(unit_b::            mass_exponent) );
+		CHECK( typeid(exponent<3>) == typeid(unit_b::          length_exponent) );
+		CHECK( typeid(exponent<4>) == typeid(unit_b::         current_exponent) );
+		CHECK( typeid(exponent<5>) == typeid(unit_b::      luminosity_exponent) );
+		CHECK( typeid(exponent<6>) == typeid(unit_b::     temperature_exponent) );
+		CHECK( typeid(exponent<7>) == typeid(unit_b::substance_amount_exponent) );
 
 		using unit_c = create_unit_t<unlib::detail::            mass
 		                            ,unlib::detail::      luminosity
@@ -187,7 +186,7 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                            ,unlib::detail::     temperature
 		                            ,unlib::detail::         current >;
 
-		CATCH_CHECK( typeid(unit_a) == typeid(unit_c) );
+		CHECK( typeid(unit_a) == typeid(unit_c) );
 	}
 
 	using unit_a = create_unit_t<pow_unit_t<unlib::detail::            time,1>
@@ -206,7 +205,7 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 	                            ,pow_unit_t<unlib::detail::     temperature,2>
 	                            ,pow_unit_t<unlib::detail::substance_amount,1> >;
 
-	CATCH_SECTION("multiplication") {
+	SUBCASE("multiplication") {
 		using unit_mul = create_unit_t<pow_unit_t<unlib::detail::            time,8>
 		                              ,pow_unit_t<unlib::detail::            mass,8>
 		                              ,pow_unit_t<unlib::detail::          length,8>
@@ -215,10 +214,10 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                              ,pow_unit_t<unlib::detail::     temperature,8>
 		                              ,pow_unit_t<unlib::detail::substance_amount,8> >;
 		using mul_unit = mul_unit_t<unit_a,unit_b>;
-		CATCH_CHECK( typeid(mul_unit) == typeid(unit_mul) );
+		CHECK( typeid(mul_unit) == typeid(unit_mul) );
 	}
 
-	CATCH_SECTION("division") {
+	SUBCASE("division") {
 		using unit_div = create_unit_t<reciprocal_unit_t<pow_unit_t<unlib::detail::            time,6>>
 		                              ,reciprocal_unit_t<pow_unit_t<unlib::detail::            mass,4>>
 		                              ,reciprocal_unit_t<pow_unit_t<unlib::detail::          length,2>>
@@ -227,11 +226,11 @@ CATCH_TEST_CASE("unit type manipulations", "[unit]") {
 		                              ,                  pow_unit_t<unlib::detail::     temperature,4>
 		                              ,                  pow_unit_t<unlib::detail::substance_amount,6> >;
 
-		CATCH_CHECK( typeid(div_unit_t<unit_a,unit_b>) == typeid(unit_div) );
+		CHECK( typeid(div_unit_t<unit_a,unit_b>) == typeid(unit_div) );
 	}
 }
 
-CATCH_TEST_CASE("unit compatibility", "[unit]") {
+TEST_CASE("unit compatibility") {
 	using namespace unlib;
 	using unit_a = create_unit_t<pow_unit_t<unlib::detail::            time,1>
 	                            ,pow_unit_t<unlib::detail::            mass,2>
@@ -241,7 +240,7 @@ CATCH_TEST_CASE("unit compatibility", "[unit]") {
 	                            ,pow_unit_t<unlib::detail::     temperature,6>
 	                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
 
-	CATCH_SECTION("compatibility") {
+	SUBCASE("compatibility") {
 		using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,1>
 		                            ,pow_unit_t<unlib::detail::            mass,2>
 		                            ,pow_unit_t<unlib::detail::     temperature,6>
@@ -249,9 +248,9 @@ CATCH_TEST_CASE("unit compatibility", "[unit]") {
 		                            ,pow_unit_t<unlib::detail::          length,3>
 		                            ,pow_unit_t<unlib::detail::substance_amount,7>
 		                            ,pow_unit_t<unlib::detail::         current,4> >;
-		CATCH_CHECK( are_units_compatible<unit_a, unit_b>::value );
+		CHECK( are_units_compatible<unit_a, unit_b>::value );
 	}
-	CATCH_SECTION("incompatibility") {
+	SUBCASE("incompatibility") {
 		using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,0>
 		                            ,pow_unit_t<unlib::detail::            mass,2>
 		                            ,pow_unit_t<unlib::detail::          length,3>
@@ -259,16 +258,16 @@ CATCH_TEST_CASE("unit compatibility", "[unit]") {
 		                            ,pow_unit_t<unlib::detail::      luminosity,5>
 		                            ,pow_unit_t<unlib::detail::     temperature,6>
 		                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
-		CATCH_CHECK( not are_units_compatible<unit_a, unit_b>::value );
+		CHECK( not are_units_compatible<unit_a, unit_b>::value );
 	}
 }
 
-CATCH_TEST_CASE("dimensionlessness", "[unit]") {
+TEST_CASE("dimensionlessness") {
 	using namespace unlib;
-	CATCH_SECTION("dimensionless") {
-		CATCH_CHECK( typeid(dimensionless) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+	SUBCASE("dimensionless") {
+		CHECK( typeid(dimensionless) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
 	}
-	CATCH_SECTION("is_dimensionless") {
+	SUBCASE("is_dimensionless") {
 		using unit_b = create_unit_t<>;
 		using unit = create_unit_t<pow_unit_t<unlib::detail::            time,1>
 		                          ,pow_unit_t<unlib::detail::            mass,2>
@@ -278,7 +277,7 @@ CATCH_TEST_CASE("dimensionlessness", "[unit]") {
 		                          ,pow_unit_t<unlib::detail::     temperature,6>
 		                          ,pow_unit_t<unlib::detail::substance_amount,7> >;
 
-		CATCH_CHECK( unit_is_dimensionless<unit_b>::value );
-		CATCH_CHECK( not unit_is_dimensionless<unit>::value );
+		CHECK( unit_is_dimensionless<unit_b>::value );
+		CHECK( not unit_is_dimensionless<unit>::value );
 	}
 }

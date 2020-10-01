@@ -1,11 +1,11 @@
-#define CATCH_CONFIG_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <unlib/test/unlib_test.hpp>
 
 #include <memory>
 
 #include <cxxabi.h>
 
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 
 namespace test {
 

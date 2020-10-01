@@ -4,7 +4,7 @@
 #include <string>
 #include <typeinfo>
 
-#include <catch2/catch.hpp>
+#include <doctest/doctest.h>
 
 namespace test {
 
@@ -16,12 +16,12 @@ template<typename T> std::string demangle(const T& o)         {return demangle(t
 
 }
 
-namespace Catch {
+namespace doctest {
 
 template<>
 struct StringMaker<std::type_info> {
-	static std::string convert(const std::type_info& mangled_symbol) {
-		return test::demangle(mangled_symbol);
+	static String convert(const std::type_info& mangled_symbol) {
+		return test::demangle(mangled_symbol).c_str();
 	}
 };
 

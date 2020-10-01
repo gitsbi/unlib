@@ -248,19 +248,29 @@ public:
 	constexpr quantity& operator=(const quantity& rhs)                  = default;
 
 	/**
+	 * @{
+	 *
 	 * @brief get value
 	 *
 	 * This retrieves the quantity's underlying value
 	 */
 	constexpr value_type get() const                                      {return value;}
+	friend constexpr value_type get(const quantity& q)                    {return q.get();}
+	/** @} */
 
 	/**
+	 * @{
+	 *
 	 * @brief get scaled value
 	 *
 	 * This retrieves the quantity's underlying value at the specified scale
 	 */
 	template<typename NewScale>
 	constexpr value_type get_scaled(NewScale = NewScale{}) const          {return detail::rescale_value<NewScale,scale_type>(value);}
+	template<typename NewScale, typename U, typename S, typename V, typename T, typename E>
+	constexpr value_type get_scaled(const quantity<U,S,V,T>& q, NewScale = NewScale{})
+	                                                                      {return q.template get_scaled<NewScale>();}
+	/** @} */
 
 	/**
 	 * @{
@@ -339,6 +349,8 @@ public:
 	constexpr quantity operator+() const                                  {return *this;}
 
 	/**
+	 * @{
+	 *
 	 * @brief Check whether two floating point quantities are almost equal
 	 *
 	 * Checks whether two floating point quantities are almost equal. For
@@ -348,16 +360,22 @@ public:
 	 *
 	 * @return true, if near zero
 	 */
-	template<typename U, typename S, typename V, typename T>
-	constexpr bool is_near(const quantity<U,S,V,T>& rhs, const ValueType epsilon = std::numeric_limits<value_type>::epsilon()) const
+	template<typename U, typename S, typename V, typename T, typename E = value_type>
+	constexpr bool is_near(const quantity<U,S,V,T>& rhs, const E epsilon = get_epsilon<V>()) const
 	                                                                      {
 		                                                                      static_assert( are_units_compatible<unit_type , U>::value, "fundamentally incompatible units");
 		                                                                      static_assert( std::is_same        <value_type, V>::value, "different value types (use value_cast)");
 		                                                                      static_assert( std::is_same        <tag_type  , T>::value, "incompatible tags (use tag_cast)"      );
 		                                                                      return std::abs(value - rhs.template get_scaled<scale_type>()) <= epsilon;
 	                                                                      }
+	template<typename U, typename S, typename V, typename T, typename E = value_type>
+	friend constexpr bool is_near(const quantity& lhs, const quantity<U,S,V,T>& rhs, const E epsilon = get_epsilon<value_type>())
+	                                                                      {return lhs.is_near(rhs,epsilon);}
+	/** @} */
 
 	/**
+	 * @{
+	 *
 	 * @brief Check whether a floating point quantity is near zero
 	 *
 	 * Checks whether a floating point value is near zero. For integer types,
@@ -367,10 +385,18 @@ public:
 	 *
 	 * @return true, if near zero
 	 */
-	constexpr bool is_near_zero(const ValueType epsilon = std::numeric_limits<value_type>::epsilon()) const
+	 template<typename E = value_type>
+	constexpr bool is_near_zero(const E epsilon = get_epsilon<value_type>()) const
 	                                                                      {return std::abs(value) <= epsilon;}
+	template<typename E = value_type>
+	friend constexpr bool is_near_zero(const quantity& q, const E epsilon = get_epsilon<value_type>())
+	                                                                      {return q.is_near_zero(epsilon);}
+	/** @} */
 
 private:
+	template<typename V>
+	static constexpr V get_epsilon()                                      {return std::numeric_limits<V>::epsilon() > V{} ? 100*std::numeric_limits<V>::epsilon() : V{};}
+
 	value_type                                        value;
 };
 

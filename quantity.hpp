@@ -418,49 +418,78 @@ template<typename Q> using sqrt_quantity_t = quantity< sqrt_unit_t<typename Q::u
                                                      , typename Q::tag_type >;
 /** @} */
 
+namespace detail {
+
+template<typename NewScale, typename ScaleOrQuantity> struct scale_by;
+template<typename NewScale, typename ScaleOrQuantity> struct scale_to;
+
+template<typename NewScale, typename U, typename S, typename V, typename T>
+struct scale_by<NewScale, quantity<U,S,V,T>>   { using result = typename quantity<U,S,V,T>::template rescale_by<NewScale>; };
+template<typename NewScale, typename U, typename S, typename V, typename T>
+struct scale_to<NewScale, quantity<U,S,V,T>>   { using result = typename quantity<U,S,V,T>::template rescale_to<NewScale>; };
+
+template<typename NewScale, std::intmax_t Num, std::intmax_t Den >
+struct scale_by<NewScale, std::ratio<Num,Den>> { using result = std::ratio_multiply<NewScale,std::ratio<Num,Den>>; };
+template<typename NewScale, std::intmax_t Num, std::intmax_t Den >
+struct scale_to<NewScale, std::ratio<Num,Den>> { using result = NewScale; };
+
+}
 
 /**
  * @{
  *
  * Meta functions to get the type of a specifically scaled quantity.
  *
- * @note to_micro<to_kilo<meter>> will result in micro<meter>.
+ * @note micro<kilo<meter>> will result in milli<meter>,
+ *       to_micro<to_kilo<meter>> will result in micro<meter>.
  */
-template<typename Quantity> using no_scale = Quantity;
+template<typename ScaleOrQuantity> using no_scale = ScaleOrQuantity;
 
-template<typename Quantity> using    atto  = typename Quantity::template rescale_by< atto_scaling>;
-template<typename Quantity> using    femto = typename Quantity::template rescale_by<femto_scaling>;
-template<typename Quantity> using    pico  = typename Quantity::template rescale_by< pico_scaling>;
-template<typename Quantity> using    nano  = typename Quantity::template rescale_by< nano_scaling>;
-template<typename Quantity> using    micro = typename Quantity::template rescale_by<micro_scaling>;
-template<typename Quantity> using    milli = typename Quantity::template rescale_by<milli_scaling>;
-template<typename Quantity> using    centi = typename Quantity::template rescale_by<centi_scaling>;
-template<typename Quantity> using    deci  = typename Quantity::template rescale_by< deci_scaling>;
-template<typename Quantity> using    deca  = typename Quantity::template rescale_by< deca_scaling>;
-template<typename Quantity> using    hecto = typename Quantity::template rescale_by<hecto_scaling>;
-template<typename Quantity> using    kilo  = typename Quantity::template rescale_by< kilo_scaling>;
-template<typename Quantity> using    mega  = typename Quantity::template rescale_by< mega_scaling>;
-template<typename Quantity> using    giga  = typename Quantity::template rescale_by< giga_scaling>;
-template<typename Quantity> using    tera  = typename Quantity::template rescale_by< tera_scaling>;
-template<typename Quantity> using    peta  = typename Quantity::template rescale_by< peta_scaling>;
-template<typename Quantity> using    exa   = typename Quantity::template rescale_by<  exa_scaling>;
+template<typename ScaleOrQuantity> using second_scale = no_scale<ScaleOrQuantity>;
+template<typename ScaleOrQuantity> using minute_scale = typename detail::scale_by<minute_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using   hour_scale = typename detail::scale_by<  hour_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using    day_scale = typename detail::scale_by<   day_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using   week_scale = typename detail::scale_by<  week_scaling,ScaleOrQuantity>::result;
 
-template<typename Quantity> using to_atto  = typename Quantity::template rescale_to< atto_scaling>;
-template<typename Quantity> using to_femto = typename Quantity::template rescale_to<femto_scaling>;
-template<typename Quantity> using to_pico  = typename Quantity::template rescale_to< pico_scaling>;
-template<typename Quantity> using to_nano  = typename Quantity::template rescale_to< nano_scaling>;
-template<typename Quantity> using to_micro = typename Quantity::template rescale_to<micro_scaling>;
-template<typename Quantity> using to_milli = typename Quantity::template rescale_to<milli_scaling>;
-template<typename Quantity> using to_centi = typename Quantity::template rescale_to<centi_scaling>;
-template<typename Quantity> using to_deci  = typename Quantity::template rescale_to< deci_scaling>;
-template<typename Quantity> using to_deca  = typename Quantity::template rescale_to< deca_scaling>;
-template<typename Quantity> using to_hecto = typename Quantity::template rescale_to<hecto_scaling>;
-template<typename Quantity> using to_kilo  = typename Quantity::template rescale_to< kilo_scaling>;
-template<typename Quantity> using to_mega  = typename Quantity::template rescale_to< mega_scaling>;
-template<typename Quantity> using to_giga  = typename Quantity::template rescale_to< giga_scaling>;
-template<typename Quantity> using to_tera  = typename Quantity::template rescale_to< tera_scaling>;
-template<typename Quantity> using to_peta  = typename Quantity::template rescale_to< peta_scaling>;
-template<typename Quantity> using to_exa   = typename Quantity::template rescale_to<  exa_scaling>;
+template<typename ScaleOrQuantity> using  atto        = typename detail::scale_by<  atto_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  femto       = typename detail::scale_by< femto_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  pico        = typename detail::scale_by<  pico_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  nano        = typename detail::scale_by<  nano_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  micro       = typename detail::scale_by< micro_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  milli       = typename detail::scale_by< milli_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  centi       = typename detail::scale_by< centi_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  deci        = typename detail::scale_by<  deci_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  deca        = typename detail::scale_by<  deca_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  hecto       = typename detail::scale_by< hecto_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  kilo        = typename detail::scale_by<  kilo_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  mega        = typename detail::scale_by<  mega_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  giga        = typename detail::scale_by<  giga_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  tera        = typename detail::scale_by<  tera_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  peta        = typename detail::scale_by<  peta_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  exa         = typename detail::scale_by<   exa_scaling,ScaleOrQuantity>::result;
+
+template<typename ScaleOrQuantity> using to_second_scale = no_scale<ScaleOrQuantity>;
+template<typename ScaleOrQuantity> using to_minute_scale = typename detail::scale_to<minute_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_hour_scale   = typename detail::scale_to<  hour_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_day_scale    = typename detail::scale_to<   day_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_week_scale   = typename detail::scale_to<  week_scaling,ScaleOrQuantity>::result;
+
+template<typename ScaleOrQuantity> using to_atto         = typename detail::scale_to<  atto_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_femto        = typename detail::scale_to< femto_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_pico         = typename detail::scale_to<  pico_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_nano         = typename detail::scale_to<  nano_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_micro        = typename detail::scale_to< micro_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_milli        = typename detail::scale_to< milli_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_centi        = typename detail::scale_to< centi_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_deci         = typename detail::scale_to<  deci_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_deca         = typename detail::scale_to<  deca_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_hecto        = typename detail::scale_to< hecto_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_kilo         = typename detail::scale_to<  kilo_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_mega         = typename detail::scale_to<  mega_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_giga         = typename detail::scale_to<  giga_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_tera         = typename detail::scale_to<  tera_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_peta         = typename detail::scale_to<  peta_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_exa          = typename detail::scale_to<   exa_scaling,ScaleOrQuantity>::result;
 /** @} */
 
 /**

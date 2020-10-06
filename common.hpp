@@ -89,10 +89,10 @@ using         pressure = div_unit_t< mass
  * time quantities
  */
 template<typename V> using second = quantity<time, no_scaling, V>;                                       UNLIB_DEFINE_LITERAL(second, s   )      UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(second, s)
-template<typename V> using minute = typename second<V>::template rescale_by<minute_scaling>;             UNLIB_DEFINE_LITERAL(minute, min )
-template<typename V> using   hour = typename second<V>::template rescale_by<  hour_scaling>;             UNLIB_DEFINE_LITERAL(  hour, h   )
-template<typename V> using    day = typename second<V>::template rescale_by<   day_scaling>;             UNLIB_DEFINE_LITERAL(   day, d   )
-template<typename V> using   week = typename second<V>::template rescale_by<  week_scaling>;             UNLIB_DEFINE_LITERAL(  week, week)
+template<typename V> using minute = minute_scale<second<V>>;                                             UNLIB_DEFINE_LITERAL(minute, min )
+template<typename V> using   hour =   hour_scale<second<V>>;                                             UNLIB_DEFINE_LITERAL(  hour, h   )
+template<typename V> using    day =    day_scale<second<V>>;                                             UNLIB_DEFINE_LITERAL(   day, d   )
+template<typename V> using   week =   week_scale<second<V>>;                                             UNLIB_DEFINE_LITERAL(  week, week)
 /** @} */
 
 /** @{

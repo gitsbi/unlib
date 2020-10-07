@@ -263,20 +263,17 @@ template<typename Unit>                  using       sqrt_unit_t = detail::apply
  * Units are compatible if all their dimensions have matching exponents.
  */
 template<typename Unit1, typename Unit2>
-struct are_units_compatible {
-	static constexpr bool value = std::ratio_equal<typename Unit1::            time_exponent, typename Unit2::            time_exponent>::value
-	                           && std::ratio_equal<typename Unit1::            mass_exponent, typename Unit2::            mass_exponent>::value
-	                           && std::ratio_equal<typename Unit1::          length_exponent, typename Unit2::          length_exponent>::value
-	                           && std::ratio_equal<typename Unit1::         current_exponent, typename Unit2::         current_exponent>::value
-	                           && std::ratio_equal<typename Unit1::      luminosity_exponent, typename Unit2::      luminosity_exponent>::value
-	                           && std::ratio_equal<typename Unit1::     temperature_exponent, typename Unit2::     temperature_exponent>::value
-	                           && std::ratio_equal<typename Unit1::substance_amount_exponent, typename Unit2::substance_amount_exponent>::value;
-};
-template<typename Unit1, typename Unit2>
-constexpr bool are_units_compatible<Unit1,Unit2>::value;
+using are_units_compatible = std::integral_constant< bool
+                                                   , std::ratio_equal<typename Unit1::            time_exponent, typename Unit2::            time_exponent>::value
+                                                  && std::ratio_equal<typename Unit1::            mass_exponent, typename Unit2::            mass_exponent>::value
+                                                  && std::ratio_equal<typename Unit1::          length_exponent, typename Unit2::          length_exponent>::value
+                                                  && std::ratio_equal<typename Unit1::         current_exponent, typename Unit2::         current_exponent>::value
+                                                  && std::ratio_equal<typename Unit1::      luminosity_exponent, typename Unit2::      luminosity_exponent>::value
+                                                  && std::ratio_equal<typename Unit1::     temperature_exponent, typename Unit2::     temperature_exponent>::value
+                                                  && std::ratio_equal<typename Unit1::substance_amount_exponent, typename Unit2::substance_amount_exponent>::value>;
 
 template<typename Unit1, typename Unit2>
-const bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value;
+constexpr bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value;
 
 /**
  * @brief check if a unit is dimensionless
@@ -284,15 +281,10 @@ const bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value;
  * A unit has no dimensions when all its basics' exponents' numerators are zero.
  */
 template<typename Unit>
-struct unit_is_dimensionless {
-	static const bool value = std::is_same<Unit,create_unit_t<>>::value;
-};
+using unit_is_dimensionless = std::is_same<Unit,create_unit_t<>>;
 
 template<typename Unit>
-const bool unit_is_dimensionless<Unit>::value;
-
-template<typename Unit>
-const bool unit_is_dimensionless_v = unit_is_dimensionless<Unit>::value;
+constexpr bool unit_is_dimensionless_v = unit_is_dimensionless<Unit>::value;
 
 }
 

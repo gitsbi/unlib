@@ -54,7 +54,7 @@ TEST_CASE("common quantities") {
 
 		const unlib::kilo<unlib::gram<VT>> kg{ 1}; REQUIRE(kg.get() ==  1);
 
-		             unlib::gram<VT>   g{kg}; REQUIRE(kg.get()); CHECK( g.get() == kg.get() * 1000);
+		                unlib::gram<VT>   g{kg}; REQUIRE(kg.get()); CHECK( g.get() == kg.get() * 1000);
 		unlib::milli<unlib::gram<VT>> mg{ g}; REQUIRE( g.get()); CHECK(mg.get() ==  g.get() * 1000);
 		unlib::micro<unlib::gram<VT>> ug{mg}; REQUIRE(mg.get()); CHECK(ug.get() == mg.get() * 1000);
 		unlib::nano <unlib::gram<VT>> ng{ug}; REQUIRE(ug.get()); CHECK(ng.get() == ug.get() * 1000);
@@ -125,6 +125,40 @@ TEST_CASE("common quantities") {
 		CHECK( 100_cm == 1_m  ); CHECK(is_near( 100._cm,1._m ) );
 		CHECK(  10_dm == 1_m  ); CHECK(is_near(  10._dm,1._m ) );
 		CHECK(1000_m  == 1_km ); CHECK(is_near(1000._m ,1._km) );
+	}
+
+	SUBCASE("area") {
+		using VT = long long;
+
+		CHECK(test::is_same_unit<unlib::area, unlib::square_meter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::area, unlib::square_kilometer<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::area, unlib::hectare<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::area, unlib::square_centimeter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::area, unlib::square_millimeter<VT>::unit_type>() );
+
+		using namespace unlib::literals;
+		CHECK(10000_cm2 == 1_m2);
+		CHECK(1_ha == 10000_m2);
+		CHECK(1_cm2 == 100_mm2);
+		CHECK(1_m2 == 1000000_mm2);
+	}
+
+	SUBCASE("volume") {
+		using VT = long long;
+
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_meter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_kilometer<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::volume, unlib::liter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_centimeter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::volume, unlib::milliliter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_millimeter<VT>::unit_type>() );
+
+		using namespace unlib::literals;
+		CHECK(1_km3 == 1000000000_m3);
+		CHECK(1_m3  == 1000_l);
+		CHECK(1_l   == 1000_ml);
+		CHECK(1_l   == 1000_cm3);
+		CHECK(1_ml  == 1000_mm3);
 	}
 
 	SUBCASE("temperature") {
@@ -632,4 +666,17 @@ TEST_CASE("common quantities") {
 
 		CHECK(10_m_per_s == 36_km_per_h); CHECK(is_near(1.0_m_per_s,3.6_km_per_h));
 	}
+
+	SUBCASE("volumetric flow rate") {
+		using VT = long long;
+
+		using volumetric_flow = unlib::create_unit_t< unlib::cube_unit_t<unlib::length>, unlib::reciprocal_unit_t<unlib::time> >;
+
+		CHECK(test::is_same_unit<unlib::liter_per_hour<VT>::unit_type, volumetric_flow>);
+
+		using namespace unlib::literals;
+		CHECK(test::is_same_unit<unlib::liter_per_hour<double>>(1._l / 1._h) );
+		CHECK(test::is_same_unit<unlib::liter_per_hour<VT>>(1_l_per_h));
+		CHECK(1_l_per_h == unlib::liter_per_hour<VT>{1} );
 	}
+}

@@ -57,6 +57,10 @@ using       resistance = div_unit_t<voltage,current>;
 using         pressure = div_unit_t< mass
                                    , mul_unit_t< length
                                                , square_unit_t<time> > >;
+using             area = square_unit_t<length>;
+
+using           volume = cube_unit_t<length>;
+
 /** @} */
 
 #define UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,OpT_, R_)       inline constexpr auto operator""_##UnitShort_(OpT_ v) noexcept {return Sc_<Qty_<R_>>{static_cast<R_>(v)};}
@@ -106,6 +110,27 @@ template<typename V> using      ton = to_mega<gram<V>>;                         
  * length quantities
  */
 template<typename V> using    meter = quantity<length, no_scaling, V>;                                   UNLIB_DEFINE_LITERAL(meter, m)          UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(meter, m)
+/** @} */
+
+/** @{
+ * area quantities
+ */
+template<typename V> using            square_meter = quantity<area, no_scaling, V>;                      UNLIB_DEFINE_LITERAL(     square_meter, m2)
+template<typename V> using        square_kilometer = quantity<area, mega_scaling, V>;                    UNLIB_DEFINE_LITERAL( square_kilometer, km2)
+template<typename V> using                 hectare = quantity<area, std::ratio<10000,1>, V>;             UNLIB_DEFINE_LITERAL(          hectare, ha)
+template<typename V> using       square_centimeter = quantity<area, std::ratio<1,10000>, V>;             UNLIB_DEFINE_LITERAL(square_centimeter, cm2)
+template<typename V> using       square_millimeter = quantity<area, micro_scaling, V>;                   UNLIB_DEFINE_LITERAL(square_millimeter, mm2)
+/** @} */
+
+/** @{
+ * volume quantities
+ */
+template<typename V> using             cubic_meter = quantity<volume, no_scaling, V>;                    UNLIB_DEFINE_LITERAL(      cubic_meter, m3)
+template<typename V> using         cubic_kilometer = quantity<volume, giga_scaling, V>;                  UNLIB_DEFINE_LITERAL(  cubic_kilometer, km3)
+template<typename V> using                   liter = quantity<volume, milli_scaling, V>;                 UNLIB_DEFINE_LITERAL(            liter, l)
+template<typename V> using        cubic_centimeter = quantity<volume, micro_scaling, V>;                 UNLIB_DEFINE_LITERAL( cubic_centimeter, cm3)
+template<typename V> using              milliliter = cubic_centimeter<V>;                                UNLIB_DEFINE_LITERAL(       milliliter, ml)
+template<typename V> using        cubic_millimeter = quantity<volume, nano_scaling, V>;                  UNLIB_DEFINE_LITERAL( cubic_millimeter, mm3)
 /** @} */
 
 /** @{
@@ -167,6 +192,12 @@ template<typename V> using     bar = quantity<pressure, scale<100000>, V>;      
  */
 template<typename V> using     meter_per_second = div_quantity_t< meter<V>, second<V> >;                 UNLIB_DEFINE_LITERAL(    meter_per_second, m_per_s )
 template<typename V> using kilometer_per_hour   = div_quantity_t< to_kilo<meter<V>>, hour<V> >;          UNLIB_DEFINE_LITERAL(kilometer_per_hour  , km_per_h)
+/** @} */
+
+/** @{
+ * volumetric flow rate
+ */
+template<typename V> using       liter_per_hour = div_quantity_t< liter<V>, hour<V> >;                   UNLIB_DEFINE_LITERAL(    liter_per_hour, l_per_h )
 /** @} */
 
 }

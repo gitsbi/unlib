@@ -18,3 +18,7 @@ add_executable(unlib_test
         test/test_math.cpp)
 
 target_compile_features(unlib_test PRIVATE cxx_std_14)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  add_compile_options("/permissive-" "/std:c++14")
+endif()

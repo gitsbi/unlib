@@ -130,35 +130,37 @@ TEST_CASE("common quantities") {
 	SUBCASE("area") {
 		using VT = long long;
 
-		CHECK(test::is_same_unit<unlib::area, unlib::square_meter<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::area, unlib::square_kilometer<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::area, unlib::hectare<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::area, unlib::square_centimeter<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::area, unlib::square_millimeter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::area, unlib::square_meter     <VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::area, unlib::square_kilometer <VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::area, unlib::             are <VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::area, unlib::         hectare <VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::area, unlib::square_centimeter<VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::area, unlib::square_millimeter<VT>::unit_type>());
 
 		using namespace unlib::literals;
-		CHECK(10000_cm2 == 1_m2);
-		CHECK(1_ha == 10000_m2);
-		CHECK(1_cm2 == 100_mm2);
-		CHECK(1_m2 == 1000000_mm2);
+		CHECK(10000_cm2 ==       1_m2         ); CHECK(is_near(10000._cm2,      1._m2            ));
+		CHECK(    1_ha  ==   10000_m2         ); CHECK(is_near(    1._ha ,  10000._m2            ));
+		CHECK(    1_cm2 ==     100_mm2        ); CHECK(is_near(    1._cm2,    100._mm2           ));
+		CHECK(    1_m2  == 1000000_mm2        ); CHECK(is_near(    1._m2 ,1000000._mm2           ));
+		CHECK(    1_ha  == unlib::are<VT>{100}); CHECK(is_near(    1._ha ,unlib::are<double>{100}));
 	}
 
 	SUBCASE("volume") {
 		using VT = long long;
 
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_meter<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_kilometer<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::volume, unlib::liter<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_centimeter<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::volume, unlib::milliliter<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_millimeter<VT>::unit_type>() );
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_millimeter<VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_centimeter<VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_meter     <VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_kilometer <VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::volume, unlib::           liter<VT>::unit_type>());
+		CHECK(test::is_same_unit<unlib::volume, unlib::      milliliter<VT>::unit_type>());
 
 		using namespace unlib::literals;
-		CHECK(1_km3 == 1000000000_m3);
-		CHECK(1_m3  == 1000_l);
-		CHECK(1_l   == 1000_ml);
-		CHECK(1_l   == 1000_cm3);
-		CHECK(1_ml  == 1000_mm3);
+		CHECK(1_km3 == 1000000000_m3 ); CHECK(is_near(1._km3, 1000000000._m3 ));
+		CHECK(1_m3  ==       1000_l  ); CHECK(is_near(1._m3 ,       1000._l  ));
+		CHECK(1_l   ==       1000_ml ); CHECK(is_near(1._l  ,       1000._ml ));
+		CHECK(1_l   ==       1000_cm3); CHECK(is_near(1._l  ,       1000._cm3));
+		CHECK(1_ml  ==       1000_mm3); CHECK(is_near(1._ml ,       1000._mm3));
 	}
 
 	SUBCASE("temperature") {
@@ -676,7 +678,8 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 		CHECK(test::is_same_unit<unlib::liter_per_hour<double>>(1._l / 1._h) );
-		CHECK(test::is_same_unit<unlib::liter_per_hour<VT>>(1_l_per_h));
-		CHECK(1_l_per_h == unlib::liter_per_hour<VT>{1} );
+		CHECK(test::is_same_unit<unlib::liter_per_hour<VT    >>(1_l_per_h));
+
+		CHECK(1_l_per_h == unlib::liter_per_hour<VT>{1}); CHECK(is_near(1._l_per_h,unlib::liter_per_hour<VT>{1}));
 	}
 }

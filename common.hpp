@@ -117,6 +117,7 @@ template<typename V> using    meter = quantity<length, no_scaling, V>;          
  */
 template<typename V> using            square_meter = quantity<area, no_scaling, V>;                      UNLIB_DEFINE_LITERAL(     square_meter, m2)
 template<typename V> using        square_kilometer = quantity<area, mega_scaling, V>;                    UNLIB_DEFINE_LITERAL( square_kilometer, km2)
+template<typename V> using                     are = quantity<area, std::ratio<100,1>, V>;
 template<typename V> using                 hectare = quantity<area, std::ratio<10000,1>, V>;             UNLIB_DEFINE_LITERAL(          hectare, ha)
 template<typename V> using       square_centimeter = quantity<area, std::ratio<1,10000>, V>;             UNLIB_DEFINE_LITERAL(square_centimeter, cm2)
 template<typename V> using       square_millimeter = quantity<area, micro_scaling, V>;                   UNLIB_DEFINE_LITERAL(square_millimeter, mm2)

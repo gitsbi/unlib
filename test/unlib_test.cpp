@@ -3,7 +3,9 @@
 
 #include <memory>
 
+#ifndef _MSC_VER
 #include <cxxabi.h>
+#endif
 
 #include <doctest/doctest.h>
 
@@ -24,12 +26,18 @@ inline std::string filter_type_name(std::string name) {
 	return name;
 }
 
+#ifndef _MSC_VER
 std::string demangle(const char* mangled_symbol) {
 	int status = 0;
-	std::shared_ptr<char> demangled(abi::__cxa_demangle(mangled_symbol, 0, 0, &status), std::free);
+	std::shared_ptr<char> demangled(abi::__cxa_demangle(mangled_symbol, nullptr, nullptr, &status), std::free);
 
 	return (demangled && status == 0) ? filter_type_name(demangled.get()) : mangled_symbol;
 }
+#else
+std::string demangle(const char* symbol) {
+	return filter_type_name(symbol);
+}
+#endif
 std::string demangle(const std::type_info& type_info) {
 	return demangle(type_info.name());
 }

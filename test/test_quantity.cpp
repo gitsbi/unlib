@@ -98,14 +98,14 @@ TEST_CASE("quantity values") {
 		const value_type v = 42.;
 
 		const test_quantity q1{v};
-		CHECK( v == q1.get() );
+		CHECK( v == doctest::Approx(q1.get()) );
 		const test_quantity q2(q1);
-		CHECK( v == q2.get() );
+		CHECK( v == doctest::Approx(q2.get()) );
 		test_quantity q3;
 		CHECK( q3.is_near_zero() );     CHECK( is_near_zero(q3) );
 		q3 = q1;
 		CHECK( not q3.is_near_zero() ); CHECK( not is_near_zero(q3) );
-		CHECK( v == q3.get() );
+		CHECK( v == doctest::Approx(q3.get()) );
 	}
 
 	SUBCASE("is_near_zero") {
@@ -146,41 +146,41 @@ TEST_CASE("quantity values") {
 	SUBCASE("values can be re-scaled implicitly through constructors") {
 		const value_type v = 42;
 
-		         test_quantity   q1{  v*1000000000000000000}; CHECK( v*1000000000000000000 ==  q1.get() );
-		to_deca <test_quantity> daq{ q1                    }; CHECK( v*100000000000000000  == daq.get() );
-		to_hecto<test_quantity>  hq{daq                    }; CHECK( v*10000000000000000   ==  hq.get() );
-		to_kilo <test_quantity>  kq{ hq                    }; CHECK( v*1000000000000000    ==  kq.get() );
-		to_mega <test_quantity>  Mq{ kq                    }; CHECK( v*1000000000000       ==  Mq.get() );
-		to_giga <test_quantity>  Gq{ Mq                    }; CHECK( v*1000000000          ==  Gq.get() );
+		         test_quantity   q1{  v*1000000000000000000}; CHECK( v*1000000000000000000 == doctest::Approx( q1.get()) );
+		to_deca <test_quantity> daq{ q1                    }; CHECK( v*100000000000000000  == doctest::Approx(daq.get()) );
+		to_hecto<test_quantity>  hq{daq                    }; CHECK( v*10000000000000000   == doctest::Approx( hq.get()) );
+		to_kilo <test_quantity>  kq{ hq                    }; CHECK( v*1000000000000000    == doctest::Approx( kq.get()) );
+		to_mega <test_quantity>  Mq{ kq                    }; CHECK( v*1000000000000       == doctest::Approx( Mq.get()) );
+		to_giga <test_quantity>  Gq{ Mq                    }; CHECK( v*1000000000          == doctest::Approx( Gq.get()) );
 
-//		to_exa  <test_quantity>  Eq{ v }; CHECK( v                     ==  Eq.get() );
-//		to_peta <test_quantity>  Pq{ Eq}; CHECK( v*1000                ==  Pq.get() );
-//		to_tera <test_quantity>  Tq{ Pq}; CHECK( v*1000000             ==  Tq.get() );
-//		to_giga <test_quantity>  Gq{ Tq}; CHECK( v*1000000000          ==  Gq.get() );
-//		to_mega <test_quantity>  Mq{ Gq}; CHECK( v*1000000000000       ==  Mq.get() );
-//		to_kilo <test_quantity>  kq{ Mq}; CHECK( v*1000000000000000    ==  kq.get() );
-//		to_hecto<test_quantity>  hq{ kq}; CHECK( v*10000000000000000   ==  hq.get() );
-//		to_deca <test_quantity> daq{ hq}; CHECK( v*100000000000000000  == daq.get() );
-//		         test_quantity   q1{daq}; CHECK( v*1000000000000000000 ==  q1.get() );
-		         test_quantity   q2{ v }; CHECK( v                     ==  q2.get() );
-		to_deci <test_quantity>  dq{ q2}; CHECK( v*10                  ==  dq.get() );
-		to_centi<test_quantity>  cq{ dq}; CHECK( v*100                 ==  cq.get() );
-		to_milli<test_quantity>  mq{ dq}; CHECK( v*1000                ==  mq.get() );
-		to_micro<test_quantity>  uq{ mq}; CHECK( v*1000000             ==  uq.get() );
-		to_nano <test_quantity>  nq{ uq}; CHECK( v*1000000000          ==  nq.get() );
-//		to_pico <test_quantity>  pq{ nq}; CHECK( v*1000000000000       ==  pq.get() );
-//		to_femto<test_quantity>  fq{ pq}; CHECK( v*1000000000000000    ==  fq.get() );
-//		to_atto <test_quantity>  aq{ fq}; CHECK( v*1000000000000000000 ==  aq.get() );
+//		to_exa  <test_quantity>  Eq{ v }; CHECK( v                     == doctest::Approx( Eq.get()) );
+//		to_peta <test_quantity>  Pq{ Eq}; CHECK( v*1000                == doctest::Approx( Pq.get()) );
+//		to_tera <test_quantity>  Tq{ Pq}; CHECK( v*1000000             == doctest::Approx( Tq.get()) );
+//		to_giga <test_quantity>  Gq{ Tq}; CHECK( v*1000000000          == doctest::Approx( Gq.get()) );
+//		to_mega <test_quantity>  Mq{ Gq}; CHECK( v*1000000000000       == doctest::Approx( Mq.get()) );
+//		to_kilo <test_quantity>  kq{ Mq}; CHECK( v*1000000000000000    == doctest::Approx( kq.get()) );
+//		to_hecto<test_quantity>  hq{ kq}; CHECK( v*10000000000000000   == doctest::Approx( hq.get()) );
+//		to_deca <test_quantity> daq{ hq}; CHECK( v*100000000000000000  == doctest::Approx(daq.get()) );
+//		         test_quantity   q1{daq}; CHECK( v*1000000000000000000 == doctest::Approx( q1.get()) );
+		         test_quantity   q2{ v }; CHECK( v                     == doctest::Approx( q2.get()) );
+		to_deci <test_quantity>  dq{ q2}; CHECK( v*10                  == doctest::Approx( dq.get()) );
+		to_centi<test_quantity>  cq{ dq}; CHECK( v*100                 == doctest::Approx( cq.get()) );
+		to_milli<test_quantity>  mq{ dq}; CHECK( v*1000                == doctest::Approx( mq.get()) );
+		to_micro<test_quantity>  uq{ mq}; CHECK( v*1000000             == doctest::Approx( uq.get()) );
+		to_nano <test_quantity>  nq{ uq}; CHECK( v*1000000000          == doctest::Approx( nq.get()) );
+//		to_pico <test_quantity>  pq{ nq}; CHECK( v*1000000000000       == doctest::Approx( pq.get()) );
+//		to_femto<test_quantity>  fq{ pq}; CHECK( v*1000000000000000    == doctest::Approx( fq.get()) );
+//		to_atto <test_quantity>  aq{ fq}; CHECK( v*1000000000000000000 == doctest::Approx( aq.get()) );
 	}
 
 	SUBCASE("values can be re-scaled through get") {
 		const value_type v = 42000;
 
 		test_quantity q1{v};
-		CHECK( v*1000  == q1.get_scaled<milli_scaling>() );
+		CHECK( v*1000  == doctest::Approx(q1.get_scaled<milli_scaling>()) );
 
 		test_quantity q2{v};
-		CHECK( v/1000. == q2.get_scaled<kilo_scaling>() );
+		CHECK( v/1000. == doctest::Approx(q2.get_scaled<kilo_scaling>()) );
 	}
 
 	SUBCASE("quantities can be compared") {
@@ -193,36 +193,36 @@ TEST_CASE("quantity values") {
 		test_quantity q3{v*2};
 		test_mq mq1{q1};
 
-		CHECK( q1 == q1 );
-		CHECK( q1 == q2 );
-		CHECK( q2 == q1 );
-		CHECK( q2 == q2 );
+		CHECK( q1.is_near(q1) );
+		CHECK( q1.is_near(q2) );
+		CHECK( q2.is_near(q1) );
+		CHECK( q2.is_near(q2) );
 
 		CHECK( q1 <= q2 );
 		CHECK( q1 >= q2 );
 		CHECK( q2 <= q1 );
 		CHECK( q2 >= q1 );
 
-		CHECK( q1 != q3 );
-		CHECK( q3 != q1 );
+		CHECK( not q1.is_near(q3) );
+		CHECK( not q3.is_near(q1) );
 
 		CHECK( q1 <  q3 );
 		CHECK( q3 >  q1 );
 		CHECK( q1 <= q3 );
 		CHECK( q3 >= q1 );
 
-		CHECK( mq1 ==  q1 );
-		CHECK(  q1 == mq1 );
-		CHECK( mq1 ==  q2 );
-		CHECK(  q2 == mq1 );
+		CHECK( mq1.is_near( q1) );
+		CHECK(  q1.is_near(mq1) );
+		CHECK( mq1.is_near( q2) );
+		CHECK(  q2.is_near(mq1) );
 
 		CHECK( mq1 <=  q2 );
 		CHECK( mq1 >=  q2 );
 		CHECK(  q2 <= mq1 );
 		CHECK(  q2 >= mq1 );
 
-		CHECK( mq1 !=  q3 );
-		CHECK(  q3 != mq1 );
+		CHECK( not mq1.is_near( q3) );
+		CHECK( not  q3.is_near(mq1) );
 
 		CHECK( mq1 <   q3 );
 		CHECK(  q3 >  mq1 );
@@ -231,10 +231,10 @@ TEST_CASE("quantity values") {
 	}
 
 	SUBCASE("is_near") {
-			using value_type = double;
+			using local_value_type = double;
 			using test_q = test_quantity::rescale_to<scale<1,2>>;
 
-			const value_type epsilon = std::numeric_limits<value_type>::epsilon();
+			const local_value_type epsilon = std::numeric_limits<local_value_type>::epsilon();
 
 			const test_q q0{}, q1{epsilon}, q2{42}, q3{42}, q4{42 + epsilon}, q5{2 * 42.};
 
@@ -266,9 +266,9 @@ TEST_CASE("quantity values") {
 		test_quantity q1{v};
 		test_quantity q2{-v};
 
-		CHECK(+q1 == q1);
-		CHECK(-q1 == q2);
-		CHECK(-q2 == q1);
+		CHECK((+q1).is_near(q1));
+		CHECK((-q1).is_near(q2));
+		CHECK((-q2).is_near(q1));
 	}
 }
 
@@ -289,27 +289,27 @@ TEST_CASE("quantities can be added and subtracted") {
 		q1 += q2;
 		q3 += q1;
 
-		CHECK( q1.get() == 3*v );
-		CHECK( q2.get() == 2*v );
-		CHECK( q3.get() == 4*v );
+		CHECK( q1.get() == doctest::Approx(3*v) );
+		CHECK( q2.get() == doctest::Approx(2*v) );
+		CHECK( q3.get() == doctest::Approx(4*v) );
 
-		CHECK( (q1+q2).get() == 5*v );
+		CHECK( (q1+q2).get() == doctest::Approx(5*v) );
 
 		test_mq mqu1{q1};
 		mqu1 += q1;
-		CHECK( mqu1.get() == 6000*v );
+		CHECK( mqu1.get() == doctest::Approx(6000*v) );
 
 		q1 += mqu1;
-		CHECK( q1.get() == 9*v );
+		CHECK( q1.get() == doctest::Approx(9*v) );
 
 
 		q1 -= mqu1;
-		CHECK( q1.get() == 3*v );
+		CHECK( q1.get() == doctest::Approx(3*v) );
 
 		q1 -= q2;
-		CHECK( q1.get() == v );
+		CHECK( q1.get() == doctest::Approx(v) );
 
-		CHECK( (q2-q1).get() == v );
+		CHECK( (q2-q1).get() == doctest::Approx(v) );
 	}
 
 	SUBCASE("quantities can be multiplied and divided") {
@@ -349,11 +349,11 @@ TEST_CASE("quantities can be added and subtracted") {
 
 		const auto a_mul_b = ua * ub;
 		CHECK( test::demangle(a_mul_b) == test::demangle<quantity<test_q_mul_ab>>() );
-		CHECK( a_mul_b.get() == ua.get()*ub.get() );
+		CHECK( a_mul_b.get() == doctest::Approx(ua.get()*ub.get()) );
 
 		const auto a_div_b = ua / ub;
 		CHECK( test::demangle(a_div_b) == test::demangle<quantity<test_q_div_ab, std::ratio<1,1000000>>>() );
-		CHECK( a_div_b.get() == ua.get()/ub.get() );
+		CHECK( a_div_b.get() == doctest::Approx(ua.get()/ub.get()) );
 	}
 
 }
@@ -377,9 +377,9 @@ TEST_CASE("quantity casts") {
 
 		//qd = qi1; // doesn't compile
 		qd = value_cast<double>(qi2);
-		CHECK(qd.get() == static_cast<double>(qi2.get()));
+		CHECK(qd.get() == doctest::Approx(qi2.get()));
 		qd = value_cast(qi3);
-		CHECK(qd.get() == static_cast<double>(qi3.get()));
+		CHECK(qd.get() == doctest::Approx(qi3.get()));
 	}
 
 	SUBCASE("testing scale_cast") {
@@ -389,15 +389,15 @@ TEST_CASE("quantity casts") {
 
 		test_q qk1{q}; // scales can be converted implicitly
 		to_kilo<test_quantity> qk2{ scale_cast<kilo_scaling>(q)};
-		CHECK(q.get() == qk2.get()*1000);
+		CHECK(q.get() == doctest::Approx(qk2.get()*1000));
 		to_kilo<test_quantity> qk3{ scale_cast(q)};
-		CHECK(q.get() == qk3.get()*1000);
+		CHECK(q.get() == doctest::Approx(qk3.get()*1000));
 
 		q = qk2; // scales can be converted
 		q = scale_cast<no_scaling>(qk2);
-		CHECK(q.get() == qk2.get()*1000);
+		CHECK(q.get() == doctest::Approx(qk2.get()*1000));
 		q = scale_cast(qk3);
-		CHECK(q.get() == qk3.get()*1000);
+		CHECK(q.get() == doctest::Approx(qk3.get()*1000));
 	}
 
 	SUBCASE("testing tag_cast") {
@@ -409,15 +409,15 @@ TEST_CASE("quantity casts") {
 
 		//test_qb qb1{qa}; // doesn't compile
 		test_qb qb2{ tag_cast<struct tag_b>(qa)};
-		CHECK(qa.get() == qb2.get());
+		CHECK(qa.get() == doctest::Approx(qb2.get()));
 		test_qb qb3{ tag_cast(qa)};
-		CHECK(qa.get() == qb3.get());
+		CHECK(qa.get() == doctest::Approx(qb3.get()));
 
 		//qa = qb2; // doesn't compile
 		qa = tag_cast<struct tag_a>(qb2);
-		CHECK(qa.get() == qb2.get());
+		CHECK(qa.get() == doctest::Approx(qb2.get()));
 		qa = tag_cast(qb3);
-		CHECK(qa.get() == qb3.get());
+		CHECK(qa.get() == doctest::Approx(qb3.get()));
 	}
 
 	SUBCASE("testing quantity_cast") {
@@ -434,14 +434,14 @@ TEST_CASE("quantity casts") {
 		//test_qdkb qdkb1{qdka}; // doesn't compile
 		//test_qimb qimb1{qdka}; // doesn't compile
 
-		test_qika qika2{ quantity_cast<test_qika>(qdka)}; CHECK(qika2.get() == qdka.get());
-		test_qdma qdma2{ quantity_cast<test_qdma>(qdka)}; CHECK(qdma2.get() == qdka.get()*1000*1000);
-		test_qdkb qdkb2{ quantity_cast<test_qdkb>(qdka)}; CHECK(qdkb2.get() == qdka.get());
-		test_qimb qimb2{ quantity_cast<test_qimb>(qdka)}; CHECK(qimb2.get() == qdka.get()*1000*1000);
+		test_qika qika2{ quantity_cast<test_qika>(qdka)}; CHECK(qika2.get() == doctest::Approx(qdka.get()          ));
+		test_qdma qdma2{ quantity_cast<test_qdma>(qdka)}; CHECK(qdma2.get() == doctest::Approx(qdka.get()*1000*1000));
+		test_qdkb qdkb2{ quantity_cast<test_qdkb>(qdka)}; CHECK(qdkb2.get() == doctest::Approx(qdka.get()          ));
+		test_qimb qimb2{ quantity_cast<test_qimb>(qdka)}; CHECK(qimb2.get() == doctest::Approx(qdka.get()*1000*1000));
 
-		test_qika qika3{ quantity_cast(qdka)}; CHECK(qika3.get() == qdka.get());
-		test_qdma qdma3{ quantity_cast(qdka)}; CHECK(qdma3.get() == qdka.get()*1000*1000);
-		test_qdkb qdkb3{ quantity_cast(qdka)}; CHECK(qdkb3.get() == qdka.get());
-		test_qimb qimb3{ quantity_cast(qdka)}; CHECK(qimb3.get() == qdka.get()*1000*1000);
+		test_qika qika3{ quantity_cast(qdka)}; CHECK(qika3.get() == doctest::Approx(qdka.get()          ));
+		test_qdma qdma3{ quantity_cast(qdka)}; CHECK(qdma3.get() == doctest::Approx(qdka.get()*1000*1000));
+		test_qdkb qdkb3{ quantity_cast(qdka)}; CHECK(qdkb3.get() == doctest::Approx(qdka.get()          ));
+		test_qimb qimb3{ quantity_cast(qdka)}; CHECK(qimb3.get() == doctest::Approx(qdka.get()*1000*1000));
 	}
 }

@@ -33,15 +33,15 @@ TEST_CASE("math") {
 		const auto sqroot = unlib::sqrt(quantity_a{81});
 		CHECK(typeid(sqroot) == typeid(quantity_sqrt));
 
-		CHECK(sqroot.get() == 9);
+		CHECK(sqroot.get() == doctest::Approx(9));
 	}
 	SUBCASE("abs") {
 		quantity_a gt{ 42};
 		quantity_a z {  0};
 		quantity_a lt{-gt.get()};
 
-		CHECK(unlib::abs(gt) == gt);
-		CHECK(unlib::abs( z) ==  z);
-		CHECK(unlib::abs(lt) == gt);
+		CHECK(unlib::abs(gt).is_near(gt));
+		CHECK(unlib::abs( z).is_near( z));
+		CHECK(unlib::abs(lt).is_near(gt));
 	}
 }

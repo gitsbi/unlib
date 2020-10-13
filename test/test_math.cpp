@@ -40,8 +40,8 @@ TEST_CASE("math") {
 		quantity_a z {  0};
 		quantity_a lt{-gt.get()};
 
-		CHECK(unlib::abs(gt).is_near(gt));
-		CHECK(unlib::abs( z).is_near( z));
-		CHECK(unlib::abs(lt).is_near(gt));
+		CHECK(is_near(unlib::abs(gt),gt));
+		CHECK(is_near(unlib::abs( z), z));
+		CHECK(is_near(unlib::abs(lt),gt));
 	}
 }

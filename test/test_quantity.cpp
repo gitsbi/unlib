@@ -193,36 +193,36 @@ TEST_CASE("quantity values") {
 		test_quantity q3{v*2};
 		test_mq mq1{q1};
 
-		CHECK( q1.is_near(q1) );
-		CHECK( q1.is_near(q2) );
-		CHECK( q2.is_near(q1) );
-		CHECK( q2.is_near(q2) );
+		CHECK( is_near(q1,q1) );
+		CHECK( is_near(q1,q2) );
+		CHECK( is_near(q2,q1) );
+		CHECK( is_near(q2,q2) );
 
 		CHECK( q1 <= q2 );
 		CHECK( q1 >= q2 );
 		CHECK( q2 <= q1 );
 		CHECK( q2 >= q1 );
 
-		CHECK( not q1.is_near(q3) );
-		CHECK( not q3.is_near(q1) );
+		CHECK( not is_near(q1,q3) );
+		CHECK( not is_near(q3,q1) );
 
 		CHECK( q1 <  q3 );
 		CHECK( q3 >  q1 );
 		CHECK( q1 <= q3 );
 		CHECK( q3 >= q1 );
 
-		CHECK( mq1.is_near( q1) );
-		CHECK(  q1.is_near(mq1) );
-		CHECK( mq1.is_near( q2) );
-		CHECK(  q2.is_near(mq1) );
+		CHECK( is_near(mq1, q1) );
+		CHECK( is_near( q1,mq1) );
+		CHECK( is_near(mq1, q2) );
+		CHECK( is_near( q2,mq1) );
 
 		CHECK( mq1 <=  q2 );
 		CHECK( mq1 >=  q2 );
 		CHECK(  q2 <= mq1 );
 		CHECK(  q2 >= mq1 );
 
-		CHECK( not mq1.is_near( q3) );
-		CHECK( not  q3.is_near(mq1) );
+		CHECK( not is_near(mq1, q3) );
+		CHECK( not is_near( q3,mq1) );
 
 		CHECK( mq1 <   q3 );
 		CHECK(  q3 >  mq1 );
@@ -266,9 +266,9 @@ TEST_CASE("quantity values") {
 		test_quantity q1{v};
 		test_quantity q2{-v};
 
-		CHECK((+q1).is_near(q1));
-		CHECK((-q1).is_near(q2));
-		CHECK((-q2).is_near(q1));
+		CHECK(q1.is_near(+q1));
+		CHECK(q2.is_near(-q1));
+		CHECK(q1.is_near(-q2));
 	}
 }
 

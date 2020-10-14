@@ -165,17 +165,15 @@ public:
 	template<typename T, typename R>
 	using if_integer = std::enable_if_t< std::numeric_limits<T>::is_integer, R>;
 
-	/** create a quantity type */
-	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , NewTag  >;
+	/** create a quantity type with a different tag */
+	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , NewTag   >;
+	                                using    untag   = quantity< unit_type, scale_type, value_type  , void     >;
 
-	/** re-define a quantity value type */
-	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, tag_type>;
+	/** create a quantity with a different value type */
+	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, tag_type >;
 
-	/**
-	 * @{
-	 * re-scale a quantity type
-	 */
-	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , tag_type>;
+	/** @{ create a quantity with a different value type */
+	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , tag_type >;
 	template<typename NewScale>     using rescale_by = rescale_to<std::ratio_multiply<NewScale,scale_type>>;
 	/** @} */
 

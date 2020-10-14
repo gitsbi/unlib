@@ -1,0 +1,28 @@
+Changes
+=======
+
+0.6.3
+* ...
+
+0.6.2
+* added area, volume, and volumetric flow units
+
+0.6.1
+* test improvements
+
+0.6
+* compiles with VC now
+* eliminated most GCC/clang warnings
+
+0.5.4
+* fixed link errors with some compilers/compiler versions
+* test improvements
+
+0.5.3
+* improvements in scaling
+
+0.5.2
+* added math header with abs and sqrt
+
+older
+<-detailled history shrouded by the mists of time->

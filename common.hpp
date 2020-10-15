@@ -18,6 +18,11 @@ namespace unlib {
 /**
  * @{
  * @brief the units representing the seven basic SI units
+ *
+ * @note They can be use to create other units:
+ * @code
+using velocity = create_unit_t<length, reciprocal_unit_t<time>>;
+ * @endcode
  */
 using             time = unit<exponent<1>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>>;
 using             mass = unit<exponent<0>, exponent<1>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>>;
@@ -40,34 +45,37 @@ using substance_amount = unit<exponent<0>, exponent<0>, exponent<0>, exponent<0>
  *
  */
 using        frequency = reciprocal_unit_t< time >;
+using         velocity =        div_unit_t< length , time >;
+using             area =     square_unit_t< length >;
+using           volume =       cube_unit_t< length >;
+using         pressure =        div_unit_t< mass   , mul_unit_t<length, square_unit_t<time>> >;
 
-using         velocity = div_unit_t<length, time>;
-
-using          voltage = div_unit_t< mul_unit_t<mass   , square_unit_t<length>>
-                                   , mul_unit_t<current,   cube_unit_t<time  >> >;
-
-using            power = mul_unit_t<current,voltage>;
-
-using           energy = mul_unit_t<power,time>;
-
-using  electric_charge = mul_unit_t<current,time>;
-
-using       resistance = div_unit_t<voltage,current>;
-
-using         pressure = div_unit_t< mass
-                                   , mul_unit_t< length
-                                               , square_unit_t<time> > >;
-using             area = square_unit_t<length>;
-
-using           volume = cube_unit_t<length>;
-
+using          voltage =        div_unit_t< mul_unit_t<mass   , square_unit_t<length>>
+                                          , mul_unit_t<current,   cube_unit_t<time  >> >;
+using            power =        mul_unit_t< current, voltage >;
+using           energy =        mul_unit_t< power  , time >;
+using  electric_charge =        mul_unit_t< current, time >;
+using       resistance =        div_unit_t< voltage, current >;
 /** @} */
 
+/** @{
+ *
+ * Macros to define literal operators for units and for their prefixed versions
+ *
+ * @param       Qty_  Quantity (e.g., meter)
+ * @param        Sc_  Scale (e.g., kilo)
+ * @param UnitShort_  Unit's short name (e.g., m)
+ * @param       OpT_  Operand type for literal operator (e.g., unsigned long long or long double)
+ * @param         R_  Return type of literal operator (e.g., long long or double)
+ */
+/** defines a literal operator; do not call this directly */
 #define UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,OpT_, R_)       inline constexpr auto operator""_##UnitShort_(OpT_ v) noexcept {return Sc_<Qty_<R_>>{static_cast<R_>(v)};}
+/** defines a set of literal operators for a unit return double and long long */
 #define UNLIB_DEFINE_SCALED_LITERAL(Qty_,Sc_,UnitShort_)                  namespace literals {                                                             \
                                                                           UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,long double       , double   ) \
                                                                           UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,unsigned long long, long long) \
                                                                           }
+/** define the literal operators for all the micro unit prefixes (atto-deci) */
 #define UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL(Qty_,UnitShort_)       UNLIB_DEFINE_SCALED_LITERAL(Qty_,atto , a##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,femto, f##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,pico , p##UnitShort_) \
@@ -76,6 +84,7 @@ using           volume = cube_unit_t<length>;
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,milli, m##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,centi, c##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,deci , d##UnitShort_)
+/** define the literal operators for all the macro unit prefixes (deca-tera) */
 #define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL(Qty_,UnitShort_)       UNLIB_DEFINE_SCALED_LITERAL(Qty_,deca ,dk##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,hecto, h##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,kilo , k##UnitShort_) \
@@ -84,54 +93,47 @@ using           volume = cube_unit_t<length>;
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,tera , T##UnitShort_)
                                                                         //UNLIB_DEFINE_SCALED_LITERAL(Qty_,peta , P##UnitShort_)
                                                                         //UNLIB_DEFINE_SCALED_LITERAL(Qty_,exa  , E##UnitShort_)
+/** define the literal operators for all unit prefixes (atto-tera) */
 #define UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(Qty_,UnitShort_)            UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL(Qty_,UnitShort_) \
                                                                           UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL(Qty_,UnitShort_)
+/** define the literal operators for a physical unit (nor prefixes) */
 #define UNLIB_DEFINE_LITERAL(Qty_,UnitShort_)                             UNLIB_DEFINE_SCALED_LITERAL(Qty_,no_scale,UnitShort_)
-
-
-/** @{
- * time quantities
- */
-template<typename V> using second = quantity<time, no_scaling, V>;                                               UNLIB_DEFINE_LITERAL(second, s   )      UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(second, s)
-template<typename V> using minute = minute_scale<second<V>>;                                                     UNLIB_DEFINE_LITERAL(minute, min )
-template<typename V> using   hour =   hour_scale<second<V>>;                                                     UNLIB_DEFINE_LITERAL(  hour, h   )
-template<typename V> using    day =    day_scale<second<V>>;                                                     UNLIB_DEFINE_LITERAL(   day, d   )
-template<typename V> using   week =   week_scale<second<V>>;                                                     UNLIB_DEFINE_LITERAL(  week, week)
 /** @} */
 
-/** @{
- * mass quantities
- */
-template<typename V> using     gram = quantity<mass, no_scaling, V>;                                             UNLIB_DEFINE_LITERAL(gram, g)           UNLIB_DEFINE_METRIC_PREFIXED_LITERALS     (gram, g)
-template<typename V> using      ton = to_mega<gram<V>>;                                                          UNLIB_DEFINE_LITERAL( ton, t)           UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL(ton, t)
+
+/** @{ time quantities */
+template<typename V> using   second = quantity<time, no_scaling, V>;                                             UNLIB_DEFINE_LITERAL(second, s   )            UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(second, s)
+template<typename V> using   minute = minute_scale<second<V>>;                                                   UNLIB_DEFINE_LITERAL(minute, min )
+template<typename V> using     hour =   hour_scale<second<V>>;                                                   UNLIB_DEFINE_LITERAL(  hour, h   )
+template<typename V> using      day =    day_scale<second<V>>;                                                   UNLIB_DEFINE_LITERAL(   day, d   )
+template<typename V> using     week =   week_scale<second<V>>;                                                   UNLIB_DEFINE_LITERAL(  week, week)
 /** @} */
 
-/** @{
- * length quantities
- */
-template<typename V> using    meter = quantity<length, no_scaling, V>;                                           UNLIB_DEFINE_LITERAL(meter, m)          UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(meter, m)
+/** @{ mass quantities */
+template<typename V> using     gram = quantity<mass, no_scaling, V>;                                             UNLIB_DEFINE_LITERAL(gram, g)                 UNLIB_DEFINE_METRIC_PREFIXED_LITERALS     (gram, g)
+template<typename V> using      ton = to_mega<gram<V>>;                                                          UNLIB_DEFINE_LITERAL( ton, t)                 UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL(ton, t)
 /** @} */
 
-/** @{
- * area quantities
- */
-template<typename V> using            square_meter = quantity<area, no_scaling, V>;                              UNLIB_DEFINE_LITERAL(     square_meter, m2)
-template<typename V> using        square_kilometer = quantity<area, mega_scaling, V>;                            UNLIB_DEFINE_LITERAL( square_kilometer, km2)
-template<typename V> using                     are = quantity<area, std::ratio<100,1>, V>;
-template<typename V> using                 hectare = quantity<area, std::ratio<10000,1>, V>;                     UNLIB_DEFINE_LITERAL(          hectare, ha)
-template<typename V> using       square_centimeter = quantity<area, std::ratio<1,10000>, V>;                     UNLIB_DEFINE_LITERAL(square_centimeter, cm2)
-template<typename V> using       square_millimeter = quantity<area, micro_scaling, V>;                           UNLIB_DEFINE_LITERAL(square_millimeter, mm2)
+/** @{ length quantities */
+template<typename V> using    meter = quantity<length, no_scaling, V>;                                           UNLIB_DEFINE_LITERAL(meter, m)                UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(meter, m)
 /** @} */
 
-/** @{
- * volume quantities
- */
-template<typename V> using             cubic_meter = quantity<volume, no_scaling, V>;                            UNLIB_DEFINE_LITERAL(      cubic_meter, m3)
-template<typename V> using         cubic_kilometer = quantity<volume, giga_scaling, V>;                          UNLIB_DEFINE_LITERAL(  cubic_kilometer, km3)
-template<typename V> using                   liter = quantity<volume, milli_scaling, V>;                         UNLIB_DEFINE_LITERAL(            liter, l)
-template<typename V> using        cubic_centimeter = quantity<volume, micro_scaling, V>;                         UNLIB_DEFINE_LITERAL( cubic_centimeter, cm3)
-template<typename V> using              milliliter = cubic_centimeter<V>;                                        UNLIB_DEFINE_LITERAL(       milliliter, ml)
-template<typename V> using        cubic_millimeter = quantity<volume, nano_scaling, V>;                          UNLIB_DEFINE_LITERAL( cubic_millimeter, mm3)
+/** @{ area quantities */
+template<typename V> using  square_millimeter = quantity<area, micro_scaling, V>;                                UNLIB_DEFINE_LITERAL(square_millimeter, mm2)
+template<typename V> using  square_centimeter = quantity<area, std::ratio<1,10000>, V>;                          UNLIB_DEFINE_LITERAL(square_centimeter, cm2)
+template<typename V> using       square_meter = quantity<area,    no_scaling, V>;                                UNLIB_DEFINE_LITERAL(     square_meter,  m2)
+template<typename V> using   square_kilometer = quantity<area,  mega_scaling, V>;                                UNLIB_DEFINE_LITERAL( square_kilometer, km2)
+template<typename V> using                are = quantity<area, std::ratio<100,1>, V>;
+template<typename V> using            hectare = quantity<area, std::ratio<10000,1>, V>;                          UNLIB_DEFINE_LITERAL(          hectare,  ha)
+/** @} */
+
+/** @{ volume quantities */
+template<typename V> using   cubic_millimeter = quantity<volume,  nano_scaling, V>;                              UNLIB_DEFINE_LITERAL( cubic_millimeter, mm3)
+template<typename V> using   cubic_centimeter = quantity<volume, micro_scaling, V>;                              UNLIB_DEFINE_LITERAL( cubic_centimeter, cm3)
+template<typename V> using   cubic_meter      = quantity<volume,    no_scaling, V>;                              UNLIB_DEFINE_LITERAL(      cubic_meter,  m3)
+template<typename V> using   cubic_kilometer  = quantity<volume,  giga_scaling, V>;                              UNLIB_DEFINE_LITERAL(  cubic_kilometer, km3)
+template<typename V> using         milliliter = cubic_centimeter<V>;                                             UNLIB_DEFINE_LITERAL(       milliliter,  ml)
+template<typename V> using              liter = quantity<volume, milli_scaling, V>;                              UNLIB_DEFINE_LITERAL(            liter,   l)
 /** @} */
 
 /** @{
@@ -142,31 +144,23 @@ template<typename V> using  degree_celsius    = quantity<temperature, no_scaling
 template<typename V> using  degree_fahrenheit = quantity<temperature, std::ratio<5,9>, V>;
 /** @} */
 
-/** @{
- * frequency quantities
- */
-template<typename V> using    hertz = quantity<frequency, no_scaling, V>;                                        UNLIB_DEFINE_LITERAL(hertz, Hz)         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(hertz, Hz)
+/** @{  frequency quantities */
+template<typename V> using    hertz = quantity<frequency, no_scaling, V>;                                        UNLIB_DEFINE_LITERAL(hertz, Hz)               UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(hertz, Hz)
 /** @} */
 
-/** @{
- * electrical quantities
- */
-template<typename V> using     ampere = quantity<current   , no_scaling, V>;                                     UNLIB_DEFINE_LITERAL(ampere, A)         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ampere, A)
-template<typename V> using       volt = quantity<voltage   , no_scaling, V>;                                     UNLIB_DEFINE_LITERAL(  volt, V)         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(volt  , V)
-template<typename V> using        ohm = quantity<resistance, no_scaling, V>;                                     UNLIB_DEFINE_LITERAL(   ohm, O)         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ohm   , O)
+/** @{ electrical quantities */
+template<typename V> using     ampere = quantity<current   , no_scaling, V>;                                     UNLIB_DEFINE_LITERAL(ampere, A)               UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ampere, A)
+template<typename V> using       volt = quantity<voltage   , no_scaling, V>;                                     UNLIB_DEFINE_LITERAL(  volt, V)               UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(volt  , V)
+template<typename V> using        ohm = quantity<resistance, no_scaling, V>;                                     UNLIB_DEFINE_LITERAL(   ohm, O)               UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ohm   , O)
 /** @} */
 
-/** @{
- * power quantities
- */
-template<typename V> using       watt = quantity<power, no_scaling, V>;                                          UNLIB_DEFINE_LITERAL(      watt, W  )   UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(watt      , W  )
-template<typename V> using        var = typename watt<V>::template retag<struct reactive_power_tag>;             UNLIB_DEFINE_LITERAL(       var, VAr)   UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(var       , VAr)
-template<typename V> using voltampere = typename watt<V>::template retag<struct apparent_power_tag>;             UNLIB_DEFINE_LITERAL(voltampere, VA )   UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere, VA )
+/** @{ power quantities */
+template<typename V> using       watt = quantity<power, no_scaling, V>;                                          UNLIB_DEFINE_LITERAL(      watt, W  )         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(watt      , W  )
+template<typename V> using        var = typename watt<V>::template retag<struct reactive_power_tag>;             UNLIB_DEFINE_LITERAL(       var, VAr)         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(var       , VAr)
+template<typename V> using voltampere = typename watt<V>::template retag<struct apparent_power_tag>;             UNLIB_DEFINE_LITERAL(voltampere, VA )         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere, VA )
 /** @} */
 
-/** @{
- * energy quantities
- */
+/** @{ energy quantities */
 template<typename V> using             joule = quantity<energy, no_scaling, V, struct joule_tag>;                UNLIB_DEFINE_LITERAL(            joule, J   ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      joule      , J   )
 template<typename V> using       watt_second = typename joule<V>::untag;                                         UNLIB_DEFINE_LITERAL(      watt_second, Ws  ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      watt_second, Ws  )
 template<typename V> using        var_second = typename joule<V>::template retag<struct reactive_power_tag>;     UNLIB_DEFINE_LITERAL(       var_second, VArs) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(       var_second, VArs)
@@ -176,32 +170,25 @@ template<typename V> using        var_hour   = typename        var_second<V>::te
 template<typename V> using voltampere_hour   = typename voltampere_second<V>::template rescale_by<hour_scaling>; UNLIB_DEFINE_LITERAL(voltampere_hour  , VAh ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere_hour  , VAh )
 /** @} */
 
-/** @{
- * electric charge quantities
- */
-template<typename V> using ampere_second = quantity<electric_charge, no_scaling, V>;                             UNLIB_DEFINE_LITERAL(ampere_second, As) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ampere_second, As)
-template<typename V> using ampere_hour   = typename ampere_second<V>::template rescale_by<hour_scaling>;         UNLIB_DEFINE_LITERAL(ampere_hour  , Ah) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ampere_hour  , Ah)
+/** @{ electric charge quantities */
+template<typename V> using ampere_second = quantity<electric_charge, no_scaling, V>;                             UNLIB_DEFINE_LITERAL(ampere_second, As)       UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ampere_second, As)
+template<typename V> using ampere_hour   = typename ampere_second<V>::template rescale_by<hour_scaling>;         UNLIB_DEFINE_LITERAL(ampere_hour  , Ah)       UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(ampere_hour  , Ah)
 /** @} */
 
 /** @{
- * pressure quantities
- *
+ * pressure quantities *
  * @note Sadly, `pascal` is a keyword/macro on Windows; hence `pascal_`.
  */
-template<typename V> using pascal_ = quantity<pressure, no_scaling   , V>;                                       UNLIB_DEFINE_LITERAL(pascal_, Pa )      UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(pascal_, Pa )
-template<typename V> using     bar = quantity<pressure, scale<100000>, V>;                                       UNLIB_DEFINE_LITERAL(bar    , bar)      UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(bar    , bar)
+template<typename V> using pascal_ = quantity<pressure, no_scaling   , V>;                                       UNLIB_DEFINE_LITERAL(pascal_, Pa )            UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(pascal_, Pa )
+template<typename V> using     bar = quantity<pressure, scale<100000>, V>;                                       UNLIB_DEFINE_LITERAL(bar    , bar)            UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(bar    , bar)
 /** @} */
 
-/** @{
- * velocity quantities
- */
-template<typename V> using     meter_per_second = div_quantity_t< meter<V>, second<V> >;                         UNLIB_DEFINE_LITERAL(    meter_per_second, m_per_s )
-template<typename V> using kilometer_per_hour   = div_quantity_t< to_kilo<meter<V>>, hour<V> >;                  UNLIB_DEFINE_LITERAL(kilometer_per_hour  , km_per_h)
+/** @{ velocity quantities */
+template<typename V> using     meter_per_second = div_quantity_t<meter<V>, second<V>>;                           UNLIB_DEFINE_LITERAL(    meter_per_second, m_per_s )
+template<typename V> using kilometer_per_hour   = div_quantity_t<to_kilo<meter<V>>, hour<V>>;                    UNLIB_DEFINE_LITERAL(kilometer_per_hour  , km_per_h)
 /** @} */
 
-/** @{
- * volumetric flow rate
- */
+/** @{ volumetric flow rate */
 template<typename V> using       liter_per_hour = div_quantity_t<liter<V>, hour<V>>;                             UNLIB_DEFINE_LITERAL(liter_per_hour, l_per_h)
 /** @} */
 

@@ -441,15 +441,13 @@ struct scale_to<NewScale, std::ratio<Num,Den>> { using result = NewScale; };
  * @note micro<kilo<meter>> will result in milli<meter>,
  *       to_micro<to_kilo<meter>> will result in micro<meter>.
  */
-template<typename ScaleOrQuantity> using        no_scale = ScaleOrQuantity;
-
-template<typename ScaleOrQuantity> using    second_scale = no_scale<ScaleOrQuantity>;
+template<typename ScaleOrQuantity> using    second_scale = ScaleOrQuantity;
 template<typename ScaleOrQuantity> using    minute_scale = typename detail::scale_by<minute_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using      hour_scale = typename detail::scale_by<  hour_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using       day_scale = typename detail::scale_by<   day_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using      week_scale = typename detail::scale_by<  week_scaling,ScaleOrQuantity>::result;
-
 template<typename ScaleOrQuantity> using      atto       = typename detail::scale_by<  atto_scaling,ScaleOrQuantity>::result;
+
 template<typename ScaleOrQuantity> using     femto       = typename detail::scale_by< femto_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using      pico       = typename detail::scale_by<  pico_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using      nano       = typename detail::scale_by<  nano_scaling,ScaleOrQuantity>::result;
@@ -457,6 +455,7 @@ template<typename ScaleOrQuantity> using     micro       = typename detail::scal
 template<typename ScaleOrQuantity> using     milli       = typename detail::scale_by< milli_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using     centi       = typename detail::scale_by< centi_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using      deci       = typename detail::scale_by<  deci_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using  no_scale       = ScaleOrQuantity;
 template<typename ScaleOrQuantity> using      deca       = typename detail::scale_by<  deca_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using     hecto       = typename detail::scale_by< hecto_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using      kilo       = typename detail::scale_by<  kilo_scaling,ScaleOrQuantity>::result;
@@ -480,6 +479,7 @@ template<typename ScaleOrQuantity> using to_micro        = typename detail::scal
 template<typename ScaleOrQuantity> using to_milli        = typename detail::scale_to< milli_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using to_centi        = typename detail::scale_to< centi_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using to_deci         = typename detail::scale_to<  deci_scaling,ScaleOrQuantity>::result;
+template<typename ScaleOrQuantity> using to_no_scale     = no_scale<ScaleOrQuantity>;
 template<typename ScaleOrQuantity> using to_deca         = typename detail::scale_to<  deca_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using to_hecto        = typename detail::scale_to< hecto_scaling,ScaleOrQuantity>::result;
 template<typename ScaleOrQuantity> using to_kilo         = typename detail::scale_to<  kilo_scaling,ScaleOrQuantity>::result;

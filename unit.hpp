@@ -30,22 +30,22 @@ using exponent = std::ratio<Num,Den>;
 /**
  * @brief A physical unit
  *
- * A unit is a set of exponents representing the seven basic physical
- * units. If a basic unit is not present in a unit, the exponent's
+ * A unit is a set of exponents (std::ratio<>) representing the seven basic
+ * physical units. If a basic unit is not present in a unit, the exponent's
  * numerator is zero.
  *
- * @tparam            TimeExp  Exponent (std::ratio<>) representing the            Time basic unit
- * @tparam            MassExp  Exponent (std::ratio<>) representing the            Mass basic unit
- * @tparam          LengthExp  Exponent (std::ratio<>) representing the          Length basic unit
- * @tparam         CurrentExp  Exponent (std::ratio<>) representing the         Current basic unit
- * @tparam      LuminosityExp  Exponent (std::ratio<>) representing the      Luminosity basic unit
- * @tparam     TemperatureExp  Exponent (std::ratio<>) representing the     Temperature basic unit
- * @tparam SubstanceAmountExp  Exponent (std::ratio<>) representing the SubstanceAmount basic unit
+ * @tparam            TimeExp  Exponent representing the            Time basic unit
+ * @tparam            MassExp  Exponent representing the            Mass basic unit
+ * @tparam          LengthExp  Exponent representing the          Length basic unit
+ * @tparam         CurrentExp  Exponent representing the         Current basic unit
+ * @tparam      LuminosityExp  Exponent representing the      Luminosity basic unit
+ * @tparam     TemperatureExp  Exponent representing the     Temperature basic unit
+ * @tparam SubstanceAmountExp  Exponent representing the SubstanceAmount basic unit
  *
  * @note Use create_unit_t to define units rather than using this template
  *       directly. The create_unit_t meta function creates instances of this
  *       template with all the basic units always in the same order, no
- *       matter in which order they are specified.
+ *       matter in which order they are specified and how many are provided.
  */
 template< typename            TimeExp
         , typename            MassExp
@@ -150,7 +150,7 @@ struct find_first_exponent<BasicUnit,unsorted_unit_list<Head,Tail...>> {
 };
 /** @} */
 
-/** create a compile-time list of basic units from a unit */
+/** create an unsorted compile-time list of basic units from a unit */
 template<typename Unit>
 struct unsorted_unit_list_from_unit;
 template<typename E1, typename E2, typename E3, typename E4, typename E5, typename E6, typename E7>
@@ -164,9 +164,7 @@ struct unsorted_unit_list_from_unit<unit<E1,E2,E3,E4,E5,E6,E7>> {
 	                               , unit< e0, e0, e0, e0, e0, e0, E7 > >;
 };
 
-/**
- * create a unit with the basic units being sorted into the correct order from a unsorted_unit_list
- */
+/** create a unit with the basic units being sorted into the correct order from a unsorted_unit_list */
 template< typename UnsortedUnitList >
 using unit_from_unsorted_list_t = unit< typename find_first_exponent<            time, UnsortedUnitList>::type
                                       , typename find_first_exponent<            mass, UnsortedUnitList>::type
@@ -281,7 +279,7 @@ constexpr bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value
  * A unit has no dimensions when all its basics' exponents' numerators are zero.
  */
 template<typename Unit>
-using unit_is_dimensionless = std::is_same<Unit,create_unit_t<>>;
+using unit_is_dimensionless = std::is_same<Unit,dimensionless>;
 
 template<typename Unit>
 constexpr bool unit_is_dimensionless_v = unit_is_dimensionless<Unit>::value;

@@ -680,6 +680,6 @@ TEST_CASE("common quantities") {
 		CHECK(test::is_same_unit<unlib::liter_per_hour<double>>(1._l / 1._h) );
 		CHECK(test::is_same_unit<unlib::liter_per_hour<VT    >>(1_l_per_h));
 
-		CHECK(1_l_per_h == unlib::liter_per_hour<VT>{1}); CHECK(is_near(1._l_per_h,unlib::liter_per_hour<VT>{1}));
+		CHECK(1_l_per_h == unlib::liter_per_hour<VT>{1}); CHECK(is_near(1._l_per_h,unlib::liter_per_hour<double>{1}));
 	}
 }

@@ -356,6 +356,15 @@ TEST_CASE("quantities can be added and subtracted") {
 		CHECK( a_div_b.get() == doctest::Approx(ua.get()/ub.get()) );
 	}
 
+	SUBCASE("division and multiplication preserves tag") {
+		using test_q = test_quantity::retag<struct test_tag>;
+		test_q a{42};
+		test_q b{23};
+
+		CHECK( std::is_same<decltype(a / b)::tag_type, test_q::tag_type>::value );
+		CHECK( std::is_same<decltype(a * b)::tag_type, test_q::tag_type>::value );
+	}
+
 }
 
 TEST_CASE("quantity casts") {

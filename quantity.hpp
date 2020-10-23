@@ -406,10 +406,12 @@ private:
  */
 template<typename Q1, typename Q2> using mul_quantity_t = quantity< mul_unit_t<typename Q1::unit_type, typename Q2::unit_type>
                                                                   , std::ratio_multiply<typename Q1::scale_type, typename Q2::scale_type>
-                                                                  , decltype(typename Q1::value_type{}*typename Q2::value_type{}) >;
+                                                                  , decltype(typename Q1::value_type{}*typename Q2::value_type{})
+                                                                  , typename std::enable_if<std::is_same<typename Q1::tag_type, typename Q2::tag_type>::value, typename Q1::tag_type>::type>;
 template<typename Q1, typename Q2> using div_quantity_t = quantity< div_unit_t<typename Q1::unit_type, typename Q2::unit_type>
                                                                   , std::ratio_divide<typename Q1::scale_type, typename Q2::scale_type>
-                                                                  , decltype(typename Q1::value_type{}/typename Q2::value_type{}) >;
+                                                                  , decltype(typename Q1::value_type{}/typename Q2::value_type{})
+                                                                  , typename std::enable_if<std::is_same<typename Q1::tag_type, typename Q2::tag_type>::value, typename Q1::tag_type>::type>;
 template<typename Q> using sqrt_quantity_t = quantity< sqrt_unit_t<typename Q::unit_type>
                                                      , typename Q::scale_type
                                                      , typename Q::value_type

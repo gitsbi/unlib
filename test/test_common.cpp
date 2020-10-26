@@ -672,9 +672,7 @@ TEST_CASE("common quantities") {
 	SUBCASE("volumetric flow rate") {
 		using VT = long long;
 
-		using volumetric_flow = unlib::create_unit_t< unlib::cube_unit_t<unlib::length>, unlib::reciprocal_unit_t<unlib::time> >;
-
-		CHECK(test::is_same_unit<unlib::liter_per_hour<VT>::unit_type, volumetric_flow>);
+		CHECK(test::is_same_unit<unlib::liter_per_hour<VT>::unit_type, unlib::volumetric_flow_rate>);
 
 		using namespace unlib::literals;
 		CHECK(test::is_same_unit<unlib::liter_per_hour<double>>(1._l / 1._h) );

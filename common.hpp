@@ -44,18 +44,19 @@ using substance_amount = unit<exponent<0>, exponent<0>, exponent<0>, exponent<0>
  * void f(unlib::quantity<unlib::velocity, Scale, double, void>);
  *
  */
-using        frequency = reciprocal_unit_t< time >;
-using         velocity =        div_unit_t< length , time >;
-using             area =     square_unit_t< length >;
-using           volume =       cube_unit_t< length >;
-using         pressure =        div_unit_t< mass   , mul_unit_t<length, square_unit_t<time>> >;
+using            frequency = reciprocal_unit_t< time >;
+using             velocity =        div_unit_t< length , time >;
+using                 area =     square_unit_t< length >;
+using               volume =       cube_unit_t< length >;
+using             pressure =        div_unit_t< mass   , mul_unit_t<length, square_unit_t<time>> >;
 
-using          voltage =        div_unit_t< mul_unit_t<mass   , square_unit_t<length>>
-                                          , mul_unit_t<current,   cube_unit_t<time  >> >;
-using            power =        mul_unit_t< current, voltage >;
-using           energy =        mul_unit_t< power  , time >;
-using  electric_charge =        mul_unit_t< current, time >;
-using       resistance =        div_unit_t< voltage, current >;
+using              voltage =        div_unit_t< mul_unit_t<mass   , square_unit_t<length>>
+                                              , mul_unit_t<current,   cube_unit_t<time  >> >;
+using                power =        mul_unit_t< current, voltage >;
+using               energy =        mul_unit_t< power  , time >;
+using      electric_charge =        mul_unit_t< current, time >;
+using           resistance =        div_unit_t< voltage, current >;
+using volumetric_flow_rate =        div_unit_t< volume, time >;
 /** @} */
 
 /** @{

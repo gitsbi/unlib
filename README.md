@@ -81,7 +81,7 @@ f(some_mass.get_scaled<unlib::kilo>()); // will return kg no matter what scale s
 ```
 
 In engineering, sometimes different quantities that must not be confused are represented by the same physical unit. For example, in electrical engineering, when it comes to AC, there is active power, reactive power, and apparent power. All three are units of power and can be represented by the physical unit _Watt_. Nevertheless, in engineering they must not be confused. In order to allow this, quantities also have an optional template parameter `Tag` (which defaults to `void`). Quantities of different tags are considered of different type and cannot be assigned to each other.   
-(The library provides the three incompatible units `watt` for active power, `var` for reactive power, and `voltampere` for apparent power.)
+(The library provides the three incompatible quantities `watt` for active power, `var` for reactive power, and `voltampere` for apparent power.)
 
 ## Scales
 
@@ -100,7 +100,7 @@ Besides those, noteworthy scales supported are `no_scaling`, as well as `minute_
 There are four different kind of casts available: 
 
  1. `value_cast` allows casting between units with different value types, e.g., seconds in `int` vs. seconds in `long long`.
- 1. `scale_cast` allows casting between units with different scales, e.g., seconds and minutes. 
+ 1. `scale_cast` allows casting between units with different scales, e.g., seconds and minutes. (_Note:_ Quantities that only differ in their scaling can implicitly be constructed from each other:)
  1. `tag_cast` allows casting between units with different tags, e.g., active and reactive power.
  1. `quantity_cast` allows casting between units where value types, scales, and tags might be different. 
 
@@ -116,8 +116,4 @@ The other does not need this. It returns a temporary object from which a quantit
   unlib::kilovoltampere reactive_power = unlib::tag_cast(some_active_power_in_kW);
 ```
 
-_Note:_ Quantities that only differ in their scaling can implicitly be constructed from each other: 
-
-```c++
-  unlib::gram = any_weight;
-```
+Remember that this cast returns a temporary object which is not a quantity, and must be assigned to a quantity in order to be used.  

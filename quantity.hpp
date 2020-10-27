@@ -67,14 +67,14 @@ namespace detail {
 
 template<typename NewScale, typename OldScale>
 struct value_rescaler {
-	using conversion_scale = std::ratio_divide<OldScale , NewScale>;
+	using conversion_scale = std::ratio_divide<OldScale, NewScale>;
 
 	template<typename ValueType>
 	constexpr static ValueType rescale_value(ValueType v) {
 		const auto num = conversion_scale::num;
 		const auto den = conversion_scale::den;
-		const auto factor = static_cast<double>(num) / den;
-		return static_cast<ValueType>( v * factor );
+		const auto result = static_cast<ValueType>((v*num)/den);
+		return result;
 	}
 };
 template<typename Scale>

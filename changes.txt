@@ -1,11 +1,21 @@
 Changes
 =======
 
+0.6.5
+* fixed rounding errors when scaling
+* added common unit volumetric_flow_rate
+* improved documentation
+
+0.6.4
+* added meta function to untag quantities
+* added to_no_scale meta function
+* added reactive and apparent energy
+
 0.6.3
-* ...
+* fixed test for volumetric flow
 
 0.6.2
-* added area, volume, and volumetric flow units
+* added area, volume, and volumetric flow quantities
 
 0.6.1
 * test improvements
@@ -25,4 +35,4 @@ Changes
 * added math header with abs and sqrt
 
 older
-<-detailled history shrouded by the mists of time->
+<-detailed history shrouded by the mists of time->

@@ -29,7 +29,7 @@ TEST_CASE("quantities type operations") {
 		CHECK( typeid(value_type)        == typeid(test_quantity::value_type) );
 
 		CHECK( typeid(scale_type)        == typeid(test_quantity::scale_type) );
-		CHECK( typeid(void)              == typeid(test_quantity::tag_type)   );
+		CHECK( typeid(no_tag)            == typeid(test_quantity::tag_type)   );
 
 		CHECK( typeid(exponent<1>)       == typeid(test_quantity::            time_exponent) );
 		CHECK( typeid(exponent<2>)       == typeid(test_quantity::            mass_exponent) );
@@ -41,14 +41,12 @@ TEST_CASE("quantities type operations") {
 	}
 
 	SUBCASE("quantities can be retagged") {
-		struct foo_tag {};
-		struct bar_tag {};
-		using test_q_foo = test_quantity::retag<foo_tag>;
-		using test_q_bar = test_q_foo::retag<bar_tag>;
+		using test_q_foo = test_quantity::retag<struct foo_tag>;
+		using test_q_bar = test_q_foo   ::retag<struct bar_tag>;
 
-		REQUIRE( typeid(test_quantity::tag_type) == typeid(void   ) );
-		CHECK  ( typeid(test_q_foo::tag_type)    == typeid(foo_tag) );
-		CHECK  ( typeid(test_q_bar::tag_type)    == typeid(bar_tag) );
+		REQUIRE( typeid(test_quantity::tag_type) == typeid(create_tag_t<        no_tag>) );
+		CHECK  ( typeid(test_q_foo::tag_type)    == typeid(create_tag_t<struct foo_tag>) );
+		CHECK  ( typeid(test_q_bar::tag_type)    == typeid(create_tag_t<struct bar_tag>) );
 	}
 
 	SUBCASE("quantities can be rescaled") {
@@ -276,7 +274,7 @@ TEST_CASE("quantities can be added and subtracted") {
 	using namespace unlib;
 
 	using value_type = double;
-	using test_quantity  = quantity<default_test_unit,    no_scaling, value_type>;
+	using test_quantity  = quantity<default_test_unit, no_scaling, value_type>;
 
 	SUBCASE("quantities can be added and subtracted") {
 		using test_mq = test_quantity::rescale_to<milli_scaling>;
@@ -354,6 +352,22 @@ TEST_CASE("quantities can be added and subtracted") {
 		const auto a_div_b = ua / ub;
 		CHECK( test::demangle(a_div_b) == test::demangle<quantity<test_q_div_ab, std::ratio<1,1000000>>>() );
 		CHECK( a_div_b.get() == doctest::Approx(ua.get()/ub.get()) );
+	}
+
+	SUBCASE("math operations preserve tag and correctly calculate ratio") {
+		using test_q = test_quantity::retag<struct test_tag>;
+		test_q a{42};
+		test_q b{23};
+
+		CHECK( test::demangle<decltype(a / b    )::tag_type>() == test::demangle<no_tag>() );
+		CHECK( test::demangle<decltype(a * b    )::tag_type>() == test::demangle<create_tag_t<struct test_tag,2,1>>() );
+		CHECK( test::demangle<decltype(a * b / b)::tag_type>() == test::demangle<test_q::tag_type>() );
+		CHECK( test::demangle<decltype(a / b * a)::tag_type>() == test::demangle<test_q::tag_type>() );
+
+		CHECK( test::demangle<                decltype(a*a    ) ::tag_type>() == test::demangle<create_tag_t<struct test_tag,2,1>>() );
+		CHECK( test::demangle<sqrt_quantity_t<decltype(a*a    )>::tag_type>() == test::demangle<create_tag_t<struct test_tag,1,1>>() );
+		CHECK( test::demangle<                decltype(a*a*a*a) ::tag_type>() == test::demangle<create_tag_t<struct test_tag,4,1>>() );
+		CHECK( test::demangle<sqrt_quantity_t<decltype(a*a*a*a)>::tag_type>() == test::demangle<create_tag_t<struct test_tag,2,1>>() );
 	}
 
 }

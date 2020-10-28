@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.7
+* allowed quantity multiplication and division of units with different tags under specific circumstances
+
 0.6.6
 * added scalar types
 

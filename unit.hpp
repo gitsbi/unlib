@@ -256,6 +256,8 @@ template<typename Unit>                  using       sqrt_unit_t = detail::apply
 /** @} */
 
 /**
+ * @{
+ *
  * @brief check if two units are compatible
  *
  * Units are compatible if all their dimensions have matching exponents.
@@ -272,8 +274,11 @@ using are_units_compatible = std::integral_constant< bool
 
 template<typename Unit1, typename Unit2>
 constexpr bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value;
+/** @} */
 
 /**
+ * @{
+ *
  * @brief check if a unit is dimensionless
  *
  * A unit has no dimensions when all its basics' exponents' numerators are zero.
@@ -283,6 +288,7 @@ using unit_is_dimensionless = std::is_same<Unit,dimensionless>;
 
 template<typename Unit>
 constexpr bool unit_is_dimensionless_v = unit_is_dimensionless<Unit>::value;
+/** @} */
 
 }
 

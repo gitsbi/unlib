@@ -22,6 +22,14 @@
 
 namespace unlib {
 
+namespace detail {
+/* workaround for C++14 lacking this */
+template<typename T1, typename T2>
+constexpr bool is_same_v = std::is_same<T1,T1>::value;
+}
+
+/* scalings ******************************************************************/
+
 /** represents a quantity's scale */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >
@@ -63,6 +71,200 @@ using    day_scaling = std::ratio_multiply<  hour_scaling, scale<24>>;
 using   week_scaling = std::ratio_multiply<   day_scaling, scale< 7>>;
 /** @} */
 
+
+/* tags **********************************************************************/
+
+/**
+ * @brief Quantity tag
+ *
+ * Tagged quantities are tagged with a tag, which consists of an ID and an
+ * exponent. The ID is used to tell tags from each other. Any type, even an
+ * incomplete type, will do for the ID. The exponent is used to track
+ * multiplication and division of tagged quantities so that tags can be
+ * canceled automatically when divided.
+ *
+ * @tparam  ID  tag ID
+ * @tparam Num  tag ratio numerator
+ * @tparam Den  tag ratio denominator
+ *
+ * @note Do not this type directly. Use the create_tag_t meta function instead.
+ */
+template<typename ID, std::intmax_t Num, std::intmax_t Den>
+struct tag {
+	using id        = ID;
+	using is_no_tag = std::is_same<id,void>;
+	using exponent  = typename std::conditional<is_no_tag::value, exponent<0,1>, exponent<Num,Den>>::type;
+};
+
+/**
+ * @brief No tag
+ *
+ * This signifies that a quantity has no tag
+ */
+using no_tag = tag<void,0,1>;
+
+namespace detail {
+
+template<typename ID, std::intmax_t N=0, std::intmax_t D=0>
+struct create_tag                                               {using type = tag<ID,N,D>;};
+template<             std::intmax_t N  , std::intmax_t D  >
+struct create_tag<void,N,D>                                     {using type = no_tag;};
+template<typename ID                   , std::intmax_t D  >
+struct create_tag<ID,0,D>                                       {using type = no_tag;};
+template<                                std::intmax_t D  >
+struct create_tag<void,0,D>                                     {using type = no_tag;};
+template<typename ID, std::intmax_t N  , std::intmax_t D  >
+struct create_tag<tag<ID,N,D>,0,0>                              {using type = typename create_tag<ID,N ,D >::type;};
+template<typename ID, std::intmax_t N1 , std::intmax_t D1
+                    , std::intmax_t N2 , std::intmax_t D2 >
+struct create_tag<tag<ID,N1,D1>,N2,D2>                          {using type = typename create_tag<ID,N1,D1>::type;};
+
+
+template<typename Tag1, typename Tag2>
+struct tag_add;
+template<typename ID, std::intmax_t N1, std::intmax_t D1, std::intmax_t N2, std::intmax_t D2>
+struct tag_add<tag<ID,N1,D1>,tag<ID,N2,D2>> {
+	using type = typename create_tag<tag<ID, std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
+	                                       , std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::den>>::type;
+};
+
+template<typename Tag1, typename Tag2>
+struct tag_subtract;
+template<typename ID, std::intmax_t N1, std::intmax_t D1, std::intmax_t N2, std::intmax_t D2>
+struct tag_subtract<tag<ID,N1,D1>,tag<ID,N2,D2>> {
+	using type = typename create_tag<tag<ID, std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
+	                                       , std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::den>>::type;
+};
+
+
+template<typename Tag1, typename Tag2>
+struct mul_tag;
+
+template<>
+struct mul_tag<no_tag,no_tag>                                   {using type = no_tag;};
+template<typename ID, std::intmax_t N, std::intmax_t D>
+struct mul_tag<no_tag,tag<ID,N,D>>                              {using type = tag<ID,N,D>;};
+template<typename ID, std::intmax_t N, std::intmax_t D>
+struct mul_tag<tag<ID,N,D>,no_tag>                              {using type = tag<ID,N,D>;};
+template<typename ID, std::intmax_t N1, std::intmax_t D1
+                    , std::intmax_t N2, std::intmax_t D2>
+struct mul_tag<tag<ID,N1,D1>,tag<ID,N2,D2>>                     {using type = typename tag_add<tag<ID,N1,D1>,tag<ID,N2,D2>>::type;};
+
+
+template<typename Tag1, typename Tag2>
+struct div_tag;
+
+template<>
+struct div_tag<no_tag,no_tag>                                   {using type = no_tag;};
+template<typename ID, std::intmax_t N, std::intmax_t D>
+struct div_tag<no_tag,tag<ID,N,D>>                              {using type = tag<ID,N,D>;};
+template<typename ID, std::intmax_t N, std::intmax_t D>
+struct div_tag<tag<ID,N,D>,no_tag>                              {using type = tag<ID,N,D>;};
+template<typename ID, std::intmax_t N1, std::intmax_t D1
+                    , std::intmax_t N2, std::intmax_t D2>
+struct div_tag<tag<ID,N1,D1>,tag<ID,N2,D2>>                     {using type = typename tag_subtract<tag<ID,N1,D1>,tag<ID,N2,D2>>::type;};
+
+
+template<typename Tag1, typename Tag2>
+struct are_tags_compatible;
+template< typename ID1, std::intmax_t N1, std::intmax_t D1
+        , typename ID2, std::intmax_t N2, std::intmax_t D2 >
+struct are_tags_compatible<tag<ID1,N1,D1>,tag<ID2,N2,D2>> : std::integral_constant<bool, tag<ID1,N1,D1>::is_no_tag::value
+	                                                                                  or tag<ID2,N2,D2>::is_no_tag::value
+	                                                                                  or detail::is_same_v<ID1,ID2> > {
+};
+template<typename Tag1, typename Tag2>
+struct are_tags_compatible : are_tags_compatible< typename create_tag<Tag1>::type
+	                                            , typename create_tag<Tag2>::type > {};
+
+}
+
+/**
+ * @brief Tag creation
+ *
+ * This creates a tag from an ID and a ratio.
+ *
+ * @tparam  ID  tag ID
+ * @tparam Num  tag ratio numerator
+ * @tparam Den  tag ratio denominator
+ *
+ * @note If you pass a tag as the ID parameter, Num and Dem will be ignored
+ *       and the tag returned instead. This allows this meta function to be
+ *       called with either a tag ID or a tag and always return a valid tag,
+ *       in turn allowing users to provide tag names only, rather than to
+ *       create tags each time.
+ */
+template<typename ID, std::intmax_t Num = 1, std::intmax_t Den = 1>
+using create_tag_t = typename detail::create_tag<ID,Num,Den>::type;
+
+/**
+ * @{
+ *
+ * @brief Tag compatibility
+ *
+ * Check whether two tags are compatible. If either or both parameters are tag
+ * names, rather than tags, tags will be created from them before checking
+ * them.
+ *
+ * @tparam Tag1  tag to check for compatibility
+ * @tparam Tag2  tag to check for compatibility
+ *
+ * @note Two tags are compatible if they have the same ID or if either is
+ *       the no_name tag.
+ */
+template<typename Tag1, typename Tag2>
+using are_tags_compatible = detail::are_tags_compatible<Tag1, Tag2>;
+template<typename Tag1, typename Tag2>
+constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
+/** @} */
+
+
+/**
+ * @{
+ *
+ * @brief Get tag resulting from quantity multiplying/dividing
+ *
+ * This will calculate the tags resulting from multiplying/dividing quantities.
+ *
+ * The resulting tag is defined thus:
+ *
+ *  1. If both tags are the `no_tag`, then that is the resulting tag, too.
+ *  2. If either of the tags is `no_tag`, the resulting tag will be the other
+ *     tag.
+ *  3. If both tags are equal, the resulting tag ID will be the same, their
+ *     ratios added/subtracted.
+ *  4. If both units have differing tags and neither is `no_tag`, the
+ *     operation is not possible and will not compile.
+ *
+ * This means that, for example, you can multiply reactive power with time and
+ * the result will be reactive energy. If you divide reactive energy by
+ * reactive power, you get time, with the reactive tag removed.
+ */
+template<typename T1, typename T2> using mul_tag_t = typename detail::mul_tag<T1,T2>::type;
+template<typename T1, typename T2> using div_tag_t = typename detail::div_tag<T1,T2>::type;
+/** @} */
+
+/* quantities ****************************************************************/
+
+/**
+ * @brief Quantity type
+ *
+ * This is a container for a value of ValueType, of the physical unit Unit,
+ * with the scale Scale, and the tag Tag. It is meant to be used mostly like
+ * ValueType would be used. For that, it overrides the necessary operators of
+ * the built-in numeric types.
+ *
+ * @tparam       Unit   the quantity's unit type
+ * @tparam      Scale   the quantity's scale
+ * @tparam  ValueType   the quantity's value type
+ * @tparam        Tag   the quantity's tag
+ */
+template< typename Unit
+        , typename Scale     = no_scaling
+        , typename ValueType = double
+        , typename Tag       = no_tag >
+class quantity;
+
 namespace detail {
 
 template<typename NewScale, typename OldScale>
@@ -89,20 +291,6 @@ constexpr ValueType rescale_value(ValueType v)                            {retur
 }
 
 /**
- * @brief Quantity type
- *
- * This is a container for a value of ValueType, of the physical unit Unit,
- * with the scale Scale, and the tag Tag. It is meant to be used mostly like
- * ValueType would be used. For that, it overrides the appropriate operators
- * of the built-in numeric types.
- */
-template< typename Unit
-        , typename Scale      = no_scaling
-        , typename ValueType  = double
-        , typename Tag        = void >
-class quantity;
-
-/**
  * @brief Quantity wrapper to allow specific implicit conversions.
  *
  * This type can be passed to a quantity and initiates the appropriate
@@ -126,26 +314,59 @@ public:
 
 	template<typename NewUnit, typename NewScale, typename NewValueType, typename NewTag>
 	constexpr NewValueType cast_to() const {
-		static_assert( are_units_compatible<U, NewUnit>::value              , "fundamentally incompatible units"      );
-		static_assert( ImplicitScale || std::is_same<S, NewScale    >::value, "different unit scales (use scale_cast)");
-		static_assert( ImplicitValue || std::is_same<V, NewValueType>::value, "different value types (use value_cast)");
-		static_assert( ImplicitTag   || std::is_same<T, NewTag      >::value, "different unit tags (use tag_cast)"    );
+		static_assert(                 are_units_compatible_v<U, NewUnit>     , "fundamentally incompatible units"      );
+		static_assert(ImplicitScale || detail::is_same_v     <S, NewScale    >, "different unit scales (use scale_cast)");
+		static_assert(ImplicitValue || detail::is_same_v     <V, NewValueType>, "different value types (use value_cast)");
+		static_assert(ImplicitTag   || are_tags_compatible_v <T, NewTag>      , "different unit tags (use tag_cast)"    );
 
 		return detail::rescale_value<NewScale, S>( static_cast<NewValueType>(this->get()) );
 	}
 };
 
 
+/**
+ * @brief Quantity instantiated with tag name
+ *
+ * This specialization allows the creation of quantities passing only a tag
+ * name, rather than a real tag (which consists of the name and a ratio).
+ *
+ * @tparam       Unit   the quantity's unit type
+ * @tparam      Scale   the quantity's scale
+ * @tparam  ValueType   the quantity's value type
+ * @tparam      TagID   the quantity's tag ID
+ */
 template< typename Unit
         , typename Scale
         , typename ValueType
-        , typename Tag >
-class quantity {
+        , typename TagID >
+class quantity : public quantity<Unit, Scale, ValueType, create_tag_t<TagID>> {
 public:
-	using unit_type    = Unit     ; /**< the quantity's unit type  */
-	using scale_type   = Scale    ; /**< the quantity's scale      */
-	using value_type   = ValueType; /**< the quantity's value type */
-	using tag_type     = Tag      ; /**< the quantity's unique tag */
+	using quantity<Unit, Scale, ValueType, create_tag_t<TagID>>::quantity;
+};
+
+/**
+ * @brief Quantity instantiated with tag
+ *
+ * This specialization allows the creation of quantities with a real tag,
+ * rather than just a tag name.
+ *
+ * @tparam       Unit   the quantity's unit type
+ * @tparam      Scale   the quantity's scale
+ * @tparam  ValueType   the quantity's value type
+ * @tparam        Tag   the quantity's tag
+ */
+template< typename Unit
+        , typename Scale
+        , typename ValueType
+        , typename TagID
+        , std::intmax_t TagNum
+        , std::intmax_t TagDen >
+class quantity<Unit, Scale, ValueType, tag<TagID,TagNum,TagDen>> {
+public:
+	using unit_type  = Unit;                      /**< the quantity's unit type  */
+	using scale_type = Scale;                     /**< the quantity's scale      */
+	using value_type = ValueType;                 /**< the quantity's value type */
+	using tag_type   = tag<TagID,TagNum,TagDen>;  /**< the quantity's tag        */
 
 	/**
 	 * @{
@@ -163,17 +384,17 @@ public:
 
 	/** result in R if T is an integer type, SFINAE otherwise */
 	template<typename T, typename R>
-	using if_integer = std::enable_if_t< std::numeric_limits<T>::is_integer, R>;
+	using if_integer = std::enable_if_t<std::numeric_limits<T>::is_integer, R>;
 
 	/** create a quantity type with a different tag */
-	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , NewTag   >;
-	                                using    untag   = quantity< unit_type, scale_type, value_type  , void     >;
+	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , create_tag_t<NewTag>   >;
+	                                using    untag   = quantity< unit_type, scale_type, value_type  , no_tag                 >;
 
 	/** create a quantity with a different value type */
-	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, tag_type >;
+	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, create_tag_t<tag_type> >;
 
 	/** @{ create a quantity with a different value type */
-	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , tag_type >;
+	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , create_tag_t<tag_type> >;
 	template<typename NewScale>     using rescale_by = rescale_to<std::ratio_multiply<NewScale,scale_type>>;
 	/** @} */
 
@@ -208,9 +429,9 @@ public:
 	constexpr quantity(const quantity<OtherUnit, OtherScale, OtherValueType, OtherTag>& rhs)
 	: value{detail::rescale_value<scale_type,OtherScale>(rhs.get())}
 	{
-		static_assert( are_units_compatible<unit_type, OtherUnit>::value, "fundamentally incompatible units"      );
-		static_assert( std::is_same<value_type  , OtherValueType>::value, "different value types (use value_cast)");
-		static_assert( std::is_same<tag_type    , OtherTag      >::value, "different unit tags (use tag_cast)"    );
+		static_assert(are_units_compatible_v<unit_type, OtherUnit      >, "fundamentally incompatible units"      );
+		static_assert(detail::is_same_v     <value_type, OtherValueType>, "different value types (use value_cast)");
+		static_assert(are_tags_compatible_v <tag_type  , OtherTag      >, "different unit tags (use tag_cast)"    );
 	}
 
 	/**
@@ -292,36 +513,36 @@ public:
 	 */
 	template<typename U, typename S, typename V, typename T>
 	constexpr quantity& operator+=(const quantity<U,S,V,T>& rhs)          {
-		                                                                      static_assert( are_units_compatible<unit_type , U>::value, "fundamentally incompatible units"      );
-		                                                                      static_assert( std::is_same        <value_type, V>::value, "different value types (use value_cast)");
-		                                                                      static_assert( std::is_same        <tag_type  , T>::value, "incompatible tags (use tag_cast)"      );
+		                                                                      static_assert(are_units_compatible_v<unit_type , U>, "fundamentally incompatible units"      );
+		                                                                      static_assert(detail::is_same_v     <value_type, V>, "different value types (use value_cast)");
+		                                                                      static_assert(are_tags_compatible_v <tag_type  , T>, "incompatible tags (use tag_cast)"      );
 		                                                                      value += rhs.template get_scaled<scale_type>();
 		                                                                      return *this;
 	                                                                      }
 	template<typename U, typename S, typename V, typename T>
 	constexpr quantity& operator-=(const quantity<U,S,V,T>& rhs)          {
-		                                                                      static_assert( are_units_compatible<unit_type , U>::value, "fundamentally incompatible units"      );
-		                                                                      static_assert( std::is_same        <value_type, V>::value, "different value types (use value_cast)");
-		                                                                      static_assert( std::is_same        <tag_type  , T>::value, "incompatible tags (use tag_cast)"      );
+		                                                                      static_assert(are_units_compatible_v<unit_type , U>, "fundamentally incompatible units"      );
+		                                                                      static_assert(detail::is_same_v     <value_type, V>, "different value types (use value_cast)");
+		                                                                      static_assert(are_tags_compatible_v <tag_type  , T>, "incompatible tags (use tag_cast)"      );
 		                                                                      value -= rhs.template get_scaled<scale_type>();
 		                                                                      return *this;
 	                                                                      }
 
 	template<typename V>
 	constexpr quantity& operator*=(const V& rhs)                          {
-		                                                                      static_assert( std::is_same<value_type, V>::value, "different value types");
+		                                                                      static_assert(detail::is_same_v<value_type, V>, "different value types");
 		                                                                      value *= rhs;
 		                                                                      return *this;
 	                                                                      }
 	template<typename V>
 	constexpr quantity& operator/=(const V& rhs)                          {
-		                                                                      static_assert( std::is_same<value_type, V>::value, "different value types");
+		                                                                      static_assert(detail::is_same_v<value_type, V>, "different value types");
 		                                                                      value /= rhs;
 		                                                                      return *this;
 	                                                                      }
 	template<typename V>
 	constexpr if_integer<V,quantity>& operator%=(const V& rhs)            {
-		                                                                      static_assert( std::is_same<value_type, V>::value, "different value types");
+		                                                                      static_assert(detail::is_same_v<value_type, V>, "different value types");
 		                                                                      value %= rhs;
 		                                                                      return *this;
 	                                                                      }
@@ -361,9 +582,9 @@ public:
 	template<typename U, typename S, typename V, typename T, typename E = value_type>
 	constexpr bool is_near(const quantity<U,S,V,T>& rhs, const E epsilon = get_epsilon<V>()) const
 	                                                                      {
-		                                                                      static_assert( are_units_compatible<unit_type , U>::value, "fundamentally incompatible units");
-		                                                                      static_assert( std::is_same        <value_type, V>::value, "different value types (use value_cast)");
-		                                                                      static_assert( std::is_same        <tag_type  , T>::value, "incompatible tags (use tag_cast)"      );
+		                                                                      static_assert(are_units_compatible_v<unit_type , U>, "fundamentally incompatible units"      );
+		                                                                      static_assert(detail::is_same_v     <value_type, V>, "different value types (use value_cast)");
+		                                                                      static_assert(are_tags_compatible_v <tag_type  , T>, "incompatible tags (use tag_cast)"      );
 		                                                                      return std::abs(value - rhs.template get_scaled<scale_type>()) <= epsilon;
 	                                                                      }
 	template<typename U, typename S, typename V, typename T, typename E = value_type>
@@ -399,6 +620,8 @@ private:
 };
 
 
+/* quantity multiplication/division type manipulations ***********************/
+
 /**
  * @{
  *
@@ -406,15 +629,24 @@ private:
  */
 template<typename Q1, typename Q2> using mul_quantity_t = quantity< mul_unit_t<typename Q1::unit_type, typename Q2::unit_type>
                                                                   , std::ratio_multiply<typename Q1::scale_type, typename Q2::scale_type>
-                                                                  , decltype(typename Q1::value_type{}*typename Q2::value_type{}) >;
+                                                                  , decltype(typename Q1::value_type{}*typename Q2::value_type{})
+                                                                  , mul_tag_t<typename Q1::tag_type, typename Q2::tag_type> >;
 template<typename Q1, typename Q2> using div_quantity_t = quantity< div_unit_t<typename Q1::unit_type, typename Q2::unit_type>
                                                                   , std::ratio_divide<typename Q1::scale_type, typename Q2::scale_type>
-                                                                  , decltype(typename Q1::value_type{}/typename Q2::value_type{}) >;
+                                                                  , decltype(typename Q1::value_type{}/typename Q2::value_type{})
+                                                                  , div_tag_t<typename Q1::tag_type, typename Q2::tag_type> >;
 template<typename Q> using sqrt_quantity_t = quantity< sqrt_unit_t<typename Q::unit_type>
                                                      , typename Q::scale_type
                                                      , typename Q::value_type
-                                                     , typename Q::tag_type >;
+                                                     , create_tag_t< typename Q::tag_type::id
+                                                                   , std::ratio_divide<typename Q::tag_type::exponent, std::ratio<2,1>>::num
+                                                                   , std::ratio_divide<typename Q::tag_type::exponent, std::ratio<2,1>>::den
+                                                                   >
+                                                     >;
 /** @} */
+
+
+/* quantity scaling **********************************************************/
 
 namespace detail {
 
@@ -422,14 +654,14 @@ template<typename NewScale, typename ScaleOrQuantity> struct scale_by;
 template<typename NewScale, typename ScaleOrQuantity> struct scale_to;
 
 template<typename NewScale, typename U, typename S, typename V, typename T>
-struct scale_by<NewScale, quantity<U,S,V,T>>   { using result = typename quantity<U,S,V,T>::template rescale_by<NewScale>; };
+struct scale_by<NewScale, quantity<U,S,V,T>>                    {using result = typename quantity<U,S,V,T>::template rescale_by<NewScale>;};
 template<typename NewScale, typename U, typename S, typename V, typename T>
-struct scale_to<NewScale, quantity<U,S,V,T>>   { using result = typename quantity<U,S,V,T>::template rescale_to<NewScale>; };
+struct scale_to<NewScale, quantity<U,S,V,T>>                    {using result = typename quantity<U,S,V,T>::template rescale_to<NewScale>;};
 
 template<typename NewScale, std::intmax_t Num, std::intmax_t Den >
-struct scale_by<NewScale, std::ratio<Num,Den>> { using result = std::ratio_multiply<NewScale,std::ratio<Num,Den>>; };
+struct scale_by<NewScale, std::ratio<Num,Den>>                  {using result = std::ratio_multiply<NewScale,std::ratio<Num,Den>>;};
 template<typename NewScale, std::intmax_t Num, std::intmax_t Den >
-struct scale_to<NewScale, std::ratio<Num,Den>> { using result = NewScale; };
+struct scale_to<NewScale, std::ratio<Num,Den>>                  {using result = NewScale;};
 
 }
 
@@ -490,6 +722,9 @@ template<typename ScaleOrQuantity> using to_peta         = typename detail::scal
 template<typename ScaleOrQuantity> using to_exa          = typename detail::scale_to<   exa_scaling,ScaleOrQuantity>::result;
 /** @} */
 
+
+/* quantity operators ********************************************************/
+
 /**
  * @brief Stream output operator
  *
@@ -543,8 +778,8 @@ constexpr auto operator-(quantity<U1,S1,V1,T1> lhs, const quantity<U2,S2,V2,T2>&
 
 template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator*( const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	static_assert( std::is_same<V1, V2>::value, "different value types (use value_cast)");
-	static_assert( std::is_same<T1, T2>::value, "incompatible tags (use tag_cast)"      );
+	static_assert(detail::is_same_v    <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v<T1, T2>, "incompatible tags (use tag_cast)"      );
 	return mul_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>{lhs.get() * rhs.get()};
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
@@ -558,8 +793,8 @@ constexpr auto operator*( const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
 
 template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator/( const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	static_assert( std::is_same<V1, V2>::value, "different value types (use value_cast)");
-	static_assert( std::is_same<T1, T2>::value, "incompatible tags (use tag_cast)");
+	static_assert(detail::is_same_v    <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v<T1, T2>, "incompatible tags (use tag_cast)"      );
 	return div_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>{lhs.get() / rhs.get()};
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
@@ -573,8 +808,8 @@ constexpr auto operator/( const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
 
 template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator%( const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	static_assert( std::is_same<V1, V2>::value, "different value types (use value_cast)");
-	static_assert( std::is_same<T1, T2>::value, "incompatible tags (use tag_cast)"      );
+	static_assert(detail::is_same_v    <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v<T1, T2>, "incompatible tags (use tag_cast)"      );
 	return div_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>{lhs.get() % rhs.get()};
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
@@ -586,6 +821,9 @@ constexpr auto operator%( const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
 	return quantity<reciprocal_unit_t<U2>,S2,decltype(V1{}%V2{}),T2>{lhs % rhs.get()};
 }
 /** @} */
+
+
+/* quantity casts ************************************************************/
 
 /**
  * @{
@@ -670,7 +908,7 @@ constexpr auto scale_cast(const quantity<U,S,ValueType,T>& q)             {retur
 template<typename U, typename S, typename ValueType, typename T>
 constexpr auto tag_cast(const quantity<U,S,ValueType,T>& q)               {return implicit_quantity_caster<U,S,ValueType,T,false,false,true>{q};}
 template<typename NewTag, typename U, typename S, typename ValueType, typename T>
-constexpr auto tag_cast(const quantity<U,S,ValueType,T>& q)               {return quantity<U,S,ValueType,NewTag>{tag_cast(q)};}
+constexpr auto tag_cast(const quantity<U,S,ValueType,T>& q)               {return quantity<U,S,ValueType,create_tag_t<NewTag>>{tag_cast(q)};}
 /** @} */
 
 

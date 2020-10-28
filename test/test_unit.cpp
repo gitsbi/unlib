@@ -238,7 +238,7 @@ TEST_CASE("unit compatibility") {
 		                            ,pow_unit_t<unlib::detail::          length,3>
 		                            ,pow_unit_t<unlib::detail::substance_amount,7>
 		                            ,pow_unit_t<unlib::detail::         current,4> >;
-		CHECK( are_units_compatible<unit_a, unit_b>::value );
+		CHECK( are_units_compatible_v<unit_a, unit_b> );
 	}
 	SUBCASE("incompatibility") {
 		using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,0>
@@ -248,7 +248,7 @@ TEST_CASE("unit compatibility") {
 		                            ,pow_unit_t<unlib::detail::      luminosity,5>
 		                            ,pow_unit_t<unlib::detail::     temperature,6>
 		                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
-		CHECK( not are_units_compatible<unit_a, unit_b>::value );
+		CHECK( not are_units_compatible_v<unit_a, unit_b> );
 	}
 }
 

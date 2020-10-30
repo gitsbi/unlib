@@ -177,16 +177,6 @@ TEST_CASE("unit type manipulations") {
 		CHECK( typeid(exponent<5>) == typeid(unit_b::      luminosity_exponent) );
 		CHECK( typeid(exponent<6>) == typeid(unit_b::     temperature_exponent) );
 		CHECK( typeid(exponent<7>) == typeid(unit_b::substance_amount_exponent) );
-
-		using unit_c = create_unit_t<unlib::detail::            mass
-		                            ,unlib::detail::      luminosity
-		                            ,unlib::detail::            time
-		                            ,unlib::detail::          length
-		                            ,unlib::detail::substance_amount
-		                            ,unlib::detail::     temperature
-		                            ,unlib::detail::         current >;
-
-		CHECK( typeid(unit_a) == typeid(unit_c) );
 	}
 
 	using unit_a = create_unit_t<pow_unit_t<unlib::detail::            time,1>

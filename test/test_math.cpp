@@ -19,11 +19,11 @@ TEST_CASE("math") {
 
 	SUBCASE("sqrt") {
 		using unit_sqrt = unit<exponent<1,2>
-		                      ,exponent<1,1>
+		                      ,exponent<2,2>
 		                      ,exponent<3,2>
-		                      ,exponent<2,1>
+		                      ,exponent<4,2>
 		                      ,exponent<5,2>
-		                      ,exponent<3,1>
+		                      ,exponent<6,2>
 		                      ,exponent<7,2>>;
 		CHECK(typeid(unlib::sqrt_unit_t<unit_a>) == typeid(unit_sqrt));
 
@@ -35,6 +35,7 @@ TEST_CASE("math") {
 
 		CHECK(sqroot.get() == doctest::Approx(9));
 	}
+
 	SUBCASE("abs") {
 		quantity_a gt{ 42};
 		quantity_a z {  0};

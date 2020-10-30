@@ -25,14 +25,14 @@ namespace unlib {
  */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >
-using exponent = std::ratio<Num,Den>;
+using exponent = std::ratio<std::ratio<Num,Den>::num,std::ratio<Num,Den>::den>;
 
 /**
  * @brief A physical unit
  *
  * A unit is a set of exponents (std::ratio<>) representing the seven basic
- * physical units. If a basic unit is not present in a unit, the exponent's
- * numerator is zero.
+ * physical units of the SI unit system. If a basic unit is not present in a
+ * unit, the exponent's numerator is zero.
  *
  * @tparam            TimeExp  Exponent representing the            Time basic unit
  * @tparam            MassExp  Exponent representing the            Mass basic unit

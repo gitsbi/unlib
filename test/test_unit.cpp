@@ -230,26 +230,27 @@ TEST_CASE("unit compatibility") {
 	                            ,pow_unit_t<unlib::detail::     temperature,6>
 	                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
 
-	SUBCASE("compatibility") {
-		using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,1>
-		                            ,pow_unit_t<unlib::detail::            mass,2>
-		                            ,pow_unit_t<unlib::detail::     temperature,6>
-		                            ,pow_unit_t<unlib::detail::      luminosity,5>
-		                            ,pow_unit_t<unlib::detail::          length,3>
-		                            ,pow_unit_t<unlib::detail::substance_amount,7>
-		                            ,pow_unit_t<unlib::detail::         current,4> >;
-		CHECK( are_units_compatible_v<unit_a, unit_b> );
-	}
-	SUBCASE("incompatibility") {
-		using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,0>
-		                            ,pow_unit_t<unlib::detail::            mass,2>
-		                            ,pow_unit_t<unlib::detail::          length,3>
-		                            ,pow_unit_t<unlib::detail::         current,4>
-		                            ,pow_unit_t<unlib::detail::      luminosity,5>
-		                            ,pow_unit_t<unlib::detail::     temperature,6>
-		                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
-		CHECK( not are_units_compatible_v<unit_a, unit_b> );
-	}
+	using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,1>
+	                            ,pow_unit_t<unlib::detail::            mass,2>
+	                            ,pow_unit_t<unlib::detail::     temperature,6>
+	                            ,pow_unit_t<unlib::detail::      luminosity,5>
+	                            ,pow_unit_t<unlib::detail::          length,3>
+	                            ,pow_unit_t<unlib::detail::substance_amount,7>
+	                            ,pow_unit_t<unlib::detail::         current,4> >;
+
+	using unit_c = create_unit_t<pow_unit_t<unlib::detail::            time,0>
+	                            ,pow_unit_t<unlib::detail::            mass,2>
+	                            ,pow_unit_t<unlib::detail::          length,3>
+	                            ,pow_unit_t<unlib::detail::         current,4>
+	                            ,pow_unit_t<unlib::detail::      luminosity,5>
+	                            ,pow_unit_t<unlib::detail::     temperature,6>
+	                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
+
+	CHECK(    are_units_compatible_v<unit_a, unit_b>);
+	CHECK(not are_units_compatible_v<unit_a, unit_c>);
+	CHECK(not are_units_compatible_v<unit_a, dimensionless>);
+	CHECK(not are_units_compatible_v<unit_b, dimensionless>);
+	CHECK(not are_units_compatible_v<unit_c, dimensionless>);
 }
 
 TEST_CASE("dimensionlessness") {
@@ -257,8 +258,9 @@ TEST_CASE("dimensionlessness") {
 	SUBCASE("dimensionless") {
 		CHECK( typeid(dimensionless) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
 	}
-	SUBCASE("is_dimensionless") {
-		using unit_b = create_unit_t<>;
+	using unit_a = create_unit_t<>;
+	REQUIRE( typeid(unit_a) == typeid(unit<exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>,exponent<0>>) );
+	SUBCASE("unit_is_dimensionless") {
 		using unit = create_unit_t<pow_unit_t<unlib::detail::            time,1>
 		                          ,pow_unit_t<unlib::detail::            mass,2>
 		                          ,pow_unit_t<unlib::detail::          length,3>
@@ -267,7 +269,18 @@ TEST_CASE("dimensionlessness") {
 		                          ,pow_unit_t<unlib::detail::     temperature,6>
 		                          ,pow_unit_t<unlib::detail::substance_amount,7> >;
 
-		CHECK( unit_is_dimensionless<unit_b>::value );
+		CHECK( unit_is_dimensionless<unit_a>::value );
 		CHECK( not unit_is_dimensionless<unit>::value );
+	}
+
+	SUBCASE("type comparison") {
+		using unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,1>
+		                            ,pow_unit_t<unlib::detail::            mass,2>
+		                            ,pow_unit_t<unlib::detail::          length,3>
+		                            ,pow_unit_t<unlib::detail::         current,4>
+		                            ,pow_unit_t<unlib::detail::      luminosity,5>
+		                            ,pow_unit_t<unlib::detail::     temperature,6>
+		                            ,pow_unit_t<unlib::detail::substance_amount,7> >;
+		CHECK(not are_units_compatible_v<unit_a , unit_b>);
 	}
 }

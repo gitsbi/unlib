@@ -270,7 +270,7 @@ TEST_CASE("quantity values") {
 	}
 }
 
-TEST_CASE("quantities can be added and subtracted") {
+TEST_CASE("quantity mathematical operations") {
 	using namespace unlib;
 
 	using value_type = double;
@@ -346,11 +346,11 @@ TEST_CASE("quantities can be added and subtracted") {
 		test_qb ub{110};
 
 		const auto a_mul_b = ua * ub;
-		CHECK( test::demangle(a_mul_b) == test::demangle<quantity<test_q_mul_ab>>() );
+		CHECK( typeid(a_mul_b) == typeid(quantity<test_q_mul_ab>) );
 		CHECK( a_mul_b.get() == doctest::Approx(ua.get()*ub.get()) );
 
 		const auto a_div_b = ua / ub;
-		CHECK( test::demangle(a_div_b) == test::demangle<quantity<test_q_div_ab, std::ratio<1,1000000>>>() );
+		CHECK( typeid(a_div_b) == typeid(quantity<test_q_div_ab, std::ratio<1,1000000>>) );
 		CHECK( a_div_b.get() == doctest::Approx(ua.get()/ub.get()) );
 	}
 
@@ -359,15 +359,15 @@ TEST_CASE("quantities can be added and subtracted") {
 		test_q a{42};
 		test_q b{23};
 
-		CHECK( test::demangle<decltype(a / b    )::tag_type>() == test::demangle<no_tag>() );
-		CHECK( test::demangle<decltype(a * b    )::tag_type>() == test::demangle<create_tag_t<struct test_tag,2,1>>() );
-		CHECK( test::demangle<decltype(a * b / b)::tag_type>() == test::demangle<test_q::tag_type>() );
-		CHECK( test::demangle<decltype(a / b * a)::tag_type>() == test::demangle<test_q::tag_type>() );
+		CHECK(typeid(decltype(a / b    )::tag_type) == typeid(no_tag) );
+		CHECK(typeid(decltype(a * b    )::tag_type) == typeid(create_tag_t<struct test_tag,2,1>) );
+		CHECK(typeid(decltype(a * b / b)::tag_type) == typeid(test_q::tag_type) );
+		CHECK(typeid(decltype(a / b * a)::tag_type) == typeid(test_q::tag_type) );
 
-		CHECK( test::demangle<                decltype(a*a    ) ::tag_type>() == test::demangle<create_tag_t<struct test_tag,2,1>>() );
-		CHECK( test::demangle<sqrt_quantity_t<decltype(a*a    )>::tag_type>() == test::demangle<create_tag_t<struct test_tag,1,1>>() );
-		CHECK( test::demangle<                decltype(a*a*a*a) ::tag_type>() == test::demangle<create_tag_t<struct test_tag,4,1>>() );
-		CHECK( test::demangle<sqrt_quantity_t<decltype(a*a*a*a)>::tag_type>() == test::demangle<create_tag_t<struct test_tag,2,1>>() );
+		CHECK(typeid(                decltype(a*a    ) ::tag_type) == typeid(create_tag_t<struct test_tag,2,1>) );
+		CHECK(typeid(sqrt_quantity_t<decltype(a*a    )>::tag_type) == typeid(create_tag_t<struct test_tag,1,1>) );
+		CHECK(typeid(                decltype(a*a*a*a) ::tag_type) == typeid(create_tag_t<struct test_tag,4,1>) );
+		CHECK(typeid(sqrt_quantity_t<decltype(a*a*a*a)>::tag_type) == typeid(create_tag_t<struct test_tag,2,1>) );
 	}
 
 }

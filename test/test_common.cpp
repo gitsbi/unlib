@@ -130,12 +130,12 @@ TEST_CASE("common quantities") {
 	SUBCASE("area") {
 		using VT = long long;
 
-		CHECK(test::is_same_unit<unlib::area, unlib::square_meter     <VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::area, unlib::square_kilometer <VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::area, unlib::             are <VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::area, unlib::         hectare <VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::area, unlib::square_centimeter<VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::area, unlib::square_millimeter<VT>::unit_type>());
+		CHECK(typeid(unlib::area) == typeid(unlib::square_meter     <VT>::unit_type));
+		CHECK(typeid(unlib::area) == typeid(unlib::square_kilometer <VT>::unit_type));
+		CHECK(typeid(unlib::area) == typeid(unlib::             are <VT>::unit_type));
+		CHECK(typeid(unlib::area) == typeid(unlib::         hectare <VT>::unit_type));
+		CHECK(typeid(unlib::area) == typeid(unlib::square_centimeter<VT>::unit_type));
+		CHECK(typeid(unlib::area) == typeid(unlib::square_millimeter<VT>::unit_type));
 
 		using namespace unlib::literals;
 		CHECK(10000_cm2 ==       1_m2         ); CHECK(is_near(10000._cm2,      1._m2            ));
@@ -148,12 +148,12 @@ TEST_CASE("common quantities") {
 	SUBCASE("volume") {
 		using VT = long long;
 
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_millimeter<VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_centimeter<VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_meter     <VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::volume, unlib::cubic_kilometer <VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::volume, unlib::           liter<VT>::unit_type>());
-		CHECK(test::is_same_unit<unlib::volume, unlib::      milliliter<VT>::unit_type>());
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_millimeter<VT>::unit_type));
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_centimeter<VT>::unit_type));
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_meter     <VT>::unit_type));
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_kilometer <VT>::unit_type));
+		CHECK(typeid(unlib::volume) == typeid(unlib::           liter<VT>::unit_type));
+		CHECK(typeid(unlib::volume) == typeid(unlib::      milliliter<VT>::unit_type));
 
 		using namespace unlib::literals;
 		CHECK(1_km3 == 1000000000_m3 ); CHECK(is_near(1._km3, 1000000000._m3 ));
@@ -225,7 +225,7 @@ TEST_CASE("common quantities") {
 
 		// Wikipedia: F = T^-1
 		using frequency = unlib::create_unit_t< unlib::reciprocal_unit_t<unlib::time> >;
-		CHECK( test::is_same_unit<frequency,unlib::hertz<VT>::unit_type>() );
+		CHECK( typeid(frequency) == typeid(unlib::hertz<VT>::unit_type) );
 
 		const unlib::hertz<VT> Hz{ 1}; REQUIRE(Hz.get() ==  1);
 
@@ -245,14 +245,14 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 
-		CHECK(test::is_same_unit<unlib::hertz<double>>(1. / 1._s) );
+		CHECK(typeid(unlib::hertz<double>) == typeid(1. / 1._s));
 
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_fHz) ); CHECK(1_fHz == unlib::femto<unlib::hertz<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_pHz) ); CHECK(1_pHz == unlib::pico <unlib::hertz<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_nHz) ); CHECK(1_nHz == unlib::nano <unlib::hertz<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_uHz) ); CHECK(1_uHz == unlib::micro<unlib::hertz<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_mHz) ); CHECK(1_mHz == unlib::milli<unlib::hertz<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_Hz) ); CHECK(1_Hz == unlib::hertz<VT> {1} );
+		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_Hz ) ); CHECK(1_Hz  ==              unlib::hertz<VT> {1} );
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_kHz) ); CHECK(1_kHz == unlib::kilo <unlib::hertz<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_MHz) ); CHECK(1_MHz == unlib::mega <unlib::hertz<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::hertz<VT>>(1_GHz) ); CHECK(1_GHz == unlib::giga <unlib::hertz<VT>>{1} );
@@ -277,7 +277,7 @@ TEST_CASE("common quantities") {
 		                                    , unlib::square_unit_t<unlib::length>
 		                                    , unlib::reciprocal_unit_t<unlib::current>
 		                                    , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
-		CHECK(test::is_same_unit<voltage,unlib::volt<VT>::unit_type>());
+		CHECK(typeid(voltage) == typeid(unlib::volt<VT>::unit_type));
 
 		const unlib::volt<VT> V{ 1}; REQUIRE(V.get() ==  1);
 
@@ -297,14 +297,14 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 
-		CHECK(test::is_same_unit<unlib::volt<double>>((1._g * 1._m * 1._m) / (1._A * 1._s * 1._s * 1._s)) );
+		CHECK(typeid(unlib::volt<double>) == typeid((1._g * 1._m * 1._m) / (1._A * 1._s * 1._s * 1._s)) );
 
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_fV) ); CHECK(1_fV == unlib::femto<unlib::volt<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_pV) ); CHECK(1_pV == unlib::pico <unlib::volt<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_nV) ); CHECK(1_nV == unlib::nano <unlib::volt<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_uV) ); CHECK(1_uV == unlib::micro<unlib::volt<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_mV) ); CHECK(1_mV == unlib::milli<unlib::volt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::volt<VT>>(1_V) ); CHECK(1_V == unlib::volt<VT> {1} );
+		CHECK(test::is_same_unit<unlib::volt<VT>>(1_V ) ); CHECK(1_V  ==              unlib::volt<VT> {1} );
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_kV) ); CHECK(1_kV == unlib::kilo <unlib::volt<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_MV) ); CHECK(1_MV == unlib::mega <unlib::volt<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::volt<VT>>(1_GV) ); CHECK(1_GV == unlib::giga <unlib::volt<VT>>{1} );
@@ -329,7 +329,7 @@ TEST_CASE("common quantities") {
 		                                       , unlib::square_unit_t<unlib::length>
 		                                       , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::current>>
 		                                       , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
-		CHECK(test::is_same_unit<resistance, unlib::ohm<VT>::unit_type>() );
+		CHECK(typeid(resistance) == typeid(unlib::ohm<VT>::unit_type) );
 
 		const unlib::ohm<VT> O{ 1}; REQUIRE(O.get() ==  1);
 
@@ -349,14 +349,14 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 
-		CHECK(test::is_same_unit<unlib::ohm<double>>(1._V / 1._A) );
+		CHECK(typeid(unlib::ohm<double>) == typeid(1._V / 1._A) );
 
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_fO) ); CHECK(1_fO == unlib::femto<unlib::ohm<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_pO) ); CHECK(1_pO == unlib::pico <unlib::ohm<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_nO) ); CHECK(1_nO == unlib::nano <unlib::ohm<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_uO) ); CHECK(1_uO == unlib::micro<unlib::ohm<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_mO) ); CHECK(1_mO == unlib::milli<unlib::ohm<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_O) ); CHECK(1_O == unlib::ohm<VT> {1} );
+		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_O ) ); CHECK(1_O  ==              unlib::ohm<VT> {1} );
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_kO) ); CHECK(1_kO == unlib::kilo <unlib::ohm<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_MO) ); CHECK(1_MO == unlib::mega <unlib::ohm<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ohm<VT>>(1_GO) ); CHECK(1_GO == unlib::giga <unlib::ohm<VT>>{1} );
@@ -379,7 +379,7 @@ TEST_CASE("common quantities") {
 		using power = unlib::create_unit_t< unlib::mass
 		                                  , unlib::square_unit_t<unlib::length>
 		                                  , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
-		CHECK(test::is_same_unit<power, unlib::watt<VT>::unit_type>() );
+		CHECK(typeid(power) == typeid(unlib::watt<VT>::unit_type) );
 
 		const unlib::      watt<VT>    W{1}; REQUIRE(  W.get() == 1);
 		const unlib::       var<VT> va_r{1}; REQUIRE(va_r.get() == 1);
@@ -409,40 +409,40 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 
-		CHECK(test::is_same_unit<unlib::watt<double>>(1._V * 1._A) );
+		CHECK(typeid(unlib::watt<double>) == typeid(1._V * 1._A) );
 
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_fW) ); CHECK(1_fW == unlib::femto<unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_pW) ); CHECK(1_pW == unlib::pico <unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_nW) ); CHECK(1_nW == unlib::nano <unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_uW) ); CHECK(1_uW == unlib::micro<unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_mW) ); CHECK(1_mW == unlib::milli<unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_W) ); CHECK(1_W == unlib::watt<VT> {1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_kW) ); CHECK(1_kW == unlib::kilo <unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_MW) ); CHECK(1_MW == unlib::mega <unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_GW) ); CHECK(1_GW == unlib::giga <unlib::watt<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt<VT>>(1_TW) ); CHECK(1_TW == unlib::tera <unlib::watt<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_fW  ) ); CHECK(1_fW   == unlib::femto<unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_pW  ) ); CHECK(1_pW   == unlib::pico <unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_nW  ) ); CHECK(1_nW   == unlib::nano <unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_uW  ) ); CHECK(1_uW   == unlib::micro<unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_mW  ) ); CHECK(1_mW   == unlib::milli<unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_W   ) ); CHECK(1_W    ==              unlib::watt      <VT> {1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_kW  ) ); CHECK(1_kW   == unlib::kilo <unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_MW  ) ); CHECK(1_MW   == unlib::mega <unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_GW  ) ); CHECK(1_GW   == unlib::giga <unlib::watt      <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::watt       <VT>>(1_TW  ) ); CHECK(1_TW   == unlib::tera <unlib::watt      <VT>>{1} );
 
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_fVAr) ); CHECK(1_fVAr == unlib::femto<unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_pVAr) ); CHECK(1_pVAr == unlib::pico <unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_nVAr) ); CHECK(1_nVAr == unlib::nano <unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_uVAr) ); CHECK(1_uVAr == unlib::micro<unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_mVAr) ); CHECK(1_mVAr == unlib::milli<unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_VAr) ); CHECK(1_VAr == unlib::var<VT> {1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_kVAr) ); CHECK(1_kVAr == unlib::kilo <unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_MVAr) ); CHECK(1_MVAr == unlib::mega <unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_GVAr) ); CHECK(1_GVAr == unlib::giga <unlib::var<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::var<VT>>(1_TVAr) ); CHECK(1_TVAr == unlib::tera <unlib::var<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_fVAr) ); CHECK(1_fVAr == unlib::femto<unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_pVAr) ); CHECK(1_pVAr == unlib::pico <unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_nVAr) ); CHECK(1_nVAr == unlib::nano <unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_uVAr) ); CHECK(1_uVAr == unlib::micro<unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_mVAr) ); CHECK(1_mVAr == unlib::milli<unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_VAr ) ); CHECK(1_VAr  ==              unlib::var       <VT> {1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_kVAr) ); CHECK(1_kVAr == unlib::kilo <unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_MVAr) ); CHECK(1_MVAr == unlib::mega <unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_GVAr) ); CHECK(1_GVAr == unlib::giga <unlib::var       <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::var        <VT>>(1_TVAr) ); CHECK(1_TVAr == unlib::tera <unlib::var       <VT>>{1} );
 
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_fVA) ); CHECK(1_fVA == unlib::femto<unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_pVA) ); CHECK(1_pVA == unlib::pico <unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_nVA) ); CHECK(1_nVA == unlib::nano <unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_uVA) ); CHECK(1_uVA == unlib::micro<unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_mVA) ); CHECK(1_mVA == unlib::milli<unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_VA) ); CHECK(1_VA == unlib::voltampere<VT> {1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_kVA) ); CHECK(1_kVA == unlib::kilo <unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_MVA) ); CHECK(1_MVA == unlib::mega <unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_GVA) ); CHECK(1_GVA == unlib::giga <unlib::voltampere<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_TVA) ); CHECK(1_TVA == unlib::tera <unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_fVA  ) ); CHECK(1_fVA  == unlib::femto<unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_pVA  ) ); CHECK(1_pVA  == unlib::pico <unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_nVA  ) ); CHECK(1_nVA  == unlib::nano <unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_uVA  ) ); CHECK(1_uVA  == unlib::micro<unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_mVA  ) ); CHECK(1_mVA  == unlib::milli<unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_VA   ) ); CHECK(1_VA   ==              unlib::voltampere<VT> {1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_kVA  ) ); CHECK(1_kVA  == unlib::kilo <unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_MVA  ) ); CHECK(1_MVA  == unlib::mega <unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_GVA  ) ); CHECK(1_GVA  == unlib::giga <unlib::voltampere<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::voltampere<VT>>(1_TVA  ) ); CHECK(1_TVA  == unlib::tera <unlib::voltampere<VT>>{1} );
 
 		CHECK(1000_fW == 1_pW ); CHECK(is_near(1000._fW,1._pW) );
 		CHECK(1000_pW == 1_nW ); CHECK(is_near(1000._pW,1._nW) );
@@ -472,8 +472,8 @@ TEST_CASE("common quantities") {
 		using energy = unlib::create_unit_t< unlib::square_unit_t<unlib::length>
 		                                   , unlib::mass
 		                                   , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
-		CHECK(test::is_same_unit<energy, unlib::energy>() );
-		CHECK(test::is_same_unit<energy, unlib::watt_hour<VT>::unit_type>() );
+		CHECK(typeid(energy) == typeid(unlib::energy) );
+		CHECK(typeid(energy) == typeid(unlib::watt_hour<VT>::unit_type) );
 
 		const unlib::watt_hour  <VT> Wh{1 };           REQUIRE(Wh.get() == 1);
 		const unlib::watt_second<VT> Ws{Wh};           REQUIRE(Ws.get() == Wh.get()*3600);
@@ -498,14 +498,14 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 
-		CHECK(test::is_same_unit<unlib::watt_hour<double>>(1._W * 1._h));
+		CHECK(typeid(unlib::watt_hour<double>) == typeid(1._W * 1._h));
 
 		CHECK(test::is_same_unit<unlib::watt_second<VT>>(1_fWs) ); CHECK(1_fWs == unlib::femto<unlib::watt_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::watt_second<VT>>(1_pWs) ); CHECK(1_pWs == unlib::pico <unlib::watt_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::watt_second<VT>>(1_nWs) ); CHECK(1_nWs == unlib::nano <unlib::watt_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::watt_second<VT>>(1_uWs) ); CHECK(1_uWs == unlib::micro<unlib::watt_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::watt_second<VT>>(1_mWs) ); CHECK(1_mWs == unlib::milli<unlib::watt_second<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::watt_second<VT>>(1_Ws) ); CHECK(1_Ws == unlib::watt_second<VT> {1} );
+		CHECK(test::is_same_unit<unlib::watt_second<VT>>(1_Ws ) ); CHECK(1_Ws  ==              unlib::watt_second<VT> {1} );
 
 		CHECK(test::is_same_unit<unlib::joule<VT>>(1_J) ); CHECK(1_J == unlib::joule      <VT> {1} );
 
@@ -535,7 +535,7 @@ TEST_CASE("common quantities") {
 		// Wikipedia: Q = I?T
 		using charge = unlib::create_unit_t< unlib::current
 		                                   , unlib::time >;
-		CHECK(test::is_same_unit<charge, unlib::ampere_hour<VT>::unit_type>() );
+		CHECK(typeid(charge) == typeid(unlib::ampere_hour<VT>::unit_type) );
 
 		const unlib::ampere_hour  <VT> Ah{1 }; REQUIRE(Ah.get() == 1);
 		const unlib::ampere_second<VT> As{Ah}; REQUIRE(As.get() == Ah.get()*3600);
@@ -558,20 +558,20 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 
-		CHECK(test::is_same_unit<unlib::ampere_hour<double>>(1._A * 1._h) );
+		CHECK(typeid(unlib::ampere_hour<double>) == typeid(1._A * 1._h) );
 
 		CHECK(test::is_same_unit<unlib::ampere_second<VT>::unit_type>(1_fAs) ); CHECK(1_fAs == unlib::femto<unlib::ampere_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ampere_second<VT>::unit_type>(1_pAs) ); CHECK(1_pAs == unlib::pico <unlib::ampere_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ampere_second<VT>::unit_type>(1_nAs) ); CHECK(1_nAs == unlib::nano <unlib::ampere_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ampere_second<VT>::unit_type>(1_uAs) ); CHECK(1_uAs == unlib::micro<unlib::ampere_second<VT>>{1} );
 		CHECK(test::is_same_unit<unlib::ampere_second<VT>::unit_type>(1_mAs) ); CHECK(1_mAs == unlib::milli<unlib::ampere_second<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::ampere_second<VT>::unit_type>(1_As) ); CHECK(1_As == unlib::ampere_second<VT> {1} );
+		CHECK(test::is_same_unit<unlib::ampere_second<VT>::unit_type>(1_As ) ); CHECK(1_As  ==              unlib::ampere_second<VT> {1} );
 
-		CHECK(test::is_same_unit<unlib::ampere_hour<VT>::unit_type>(1_Ah) ); CHECK(1_Ah == unlib::ampere_hour  <VT> {1} );
-		CHECK(test::is_same_unit<unlib::ampere_hour<VT>::unit_type>(1_kAh) ); CHECK(1_kAh == unlib::kilo <unlib::ampere_hour  <VT>>{1} );
-		CHECK(test::is_same_unit<unlib::ampere_hour<VT>::unit_type>(1_MAh) ); CHECK(1_MAh == unlib::mega <unlib::ampere_hour  <VT>>{1} );
-		CHECK(test::is_same_unit<unlib::ampere_hour<VT>::unit_type>(1_GAh) ); CHECK(1_GAh == unlib::giga <unlib::ampere_hour  <VT>>{1} );
-		CHECK(test::is_same_unit<unlib::ampere_hour<VT>::unit_type>(1_TAh) ); CHECK(1_TAh == unlib::tera <unlib::ampere_hour  <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::ampere_hour  <VT>::unit_type>(1_Ah ) ); CHECK(1_Ah  ==              unlib::ampere_hour  <VT> {1} );
+		CHECK(test::is_same_unit<unlib::ampere_hour  <VT>::unit_type>(1_kAh) ); CHECK(1_kAh == unlib::kilo <unlib::ampere_hour  <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::ampere_hour  <VT>::unit_type>(1_MAh) ); CHECK(1_MAh == unlib::mega <unlib::ampere_hour  <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::ampere_hour  <VT>::unit_type>(1_GAh) ); CHECK(1_GAh == unlib::giga <unlib::ampere_hour  <VT>>{1} );
+		CHECK(test::is_same_unit<unlib::ampere_hour  <VT>::unit_type>(1_TAh) ); CHECK(1_TAh == unlib::tera <unlib::ampere_hour  <VT>>{1} );
 
 		CHECK(1000_fAs == 1_pAs ); CHECK(is_near(1000._fAs,1._pAs) );
 		CHECK(1000_pAs == 1_nAs ); CHECK(is_near(1000._pAs,1._nAs) );
@@ -592,8 +592,8 @@ TEST_CASE("common quantities") {
 		using pressure = unlib::create_unit_t< unlib::mass
 		                                     , unlib::reciprocal_unit_t<unlib::length>
 		                                     , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
-		CHECK(test::is_same_unit<pressure, unlib::pressure>() );
-		CHECK(test::is_same_unit<pressure, unlib::bar<VT>::unit_type>() );
+		CHECK(typeid(pressure) == typeid(unlib::pressure) );
+		CHECK(typeid(pressure) == typeid(unlib::bar<VT>::unit_type) );
 
 		const unlib::    bar<VT> bar1{1   }; REQUIRE(bar1.get() == 1);
 		const unlib::pascal_<VT>   Pa{bar1}; REQUIRE(  Pa.get() == bar1.get()*100000);
@@ -618,20 +618,20 @@ TEST_CASE("common quantities") {
 
 		using namespace unlib::literals;
 
-		CHECK(test::is_same_unit<unlib::pascal_<double>::unit_type>(1._g / (1._m * 1._s * 1._s)) );
+		CHECK(typeid(unlib::pascal_<double>) == typeid(1._g / (1._m * 1._s * 1._s)) );
 
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_pbar) ); CHECK(1_pbar == unlib::pico <unlib::bar<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_nbar) ); CHECK(1_nbar == unlib::nano <unlib::bar<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_ubar) ); CHECK(1_ubar == unlib::micro<unlib::bar<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_mbar) ); CHECK(1_mbar == unlib::milli<unlib::bar<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_bar ) ); CHECK(1_bar  == unlib::bar<VT> {1} );
+		CHECK(test::is_same_unit<unlib::bar    <VT>::unit_type>(1_pbar) ); CHECK(1_pbar == unlib::pico <unlib::bar<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::bar    <VT>::unit_type>(1_nbar) ); CHECK(1_nbar == unlib::nano <unlib::bar<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::bar    <VT>::unit_type>(1_ubar) ); CHECK(1_ubar == unlib::micro<unlib::bar<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::bar    <VT>::unit_type>(1_mbar) ); CHECK(1_mbar == unlib::milli<unlib::bar<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::bar    <VT>::unit_type>(1_bar ) ); CHECK(1_bar  ==              unlib::bar<VT> {1} );
 
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_Pa ) ); CHECK(1_Pa  == unlib::pascal_<VT> {1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_hPa) ); CHECK(1_hPa == unlib::hecto<unlib::pascal_<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_kPa) ); CHECK(1_kPa == unlib::kilo <unlib::pascal_<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_MPa) ); CHECK(1_MPa == unlib::mega <unlib::pascal_<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_GPa) ); CHECK(1_GPa == unlib::giga <unlib::pascal_<VT>>{1} );
-		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_TPa) ); CHECK(1_TPa == unlib::tera <unlib::pascal_<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_Pa  ) ); CHECK(1_Pa   ==              unlib::pascal_<VT> {1} );
+		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_hPa ) ); CHECK(1_hPa  == unlib::hecto<unlib::pascal_<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_kPa ) ); CHECK(1_kPa  == unlib::kilo <unlib::pascal_<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_MPa ) ); CHECK(1_MPa  == unlib::mega <unlib::pascal_<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_GPa ) ); CHECK(1_GPa  == unlib::giga <unlib::pascal_<VT>>{1} );
+		CHECK(test::is_same_unit<unlib::pascal_<VT>::unit_type>(1_TPa ) ); CHECK(1_TPa  == unlib::tera <unlib::pascal_<VT>>{1} );
 
 		CHECK(1000_pbar == 1_nbar ); CHECK(is_near(1000._pbar,1._nbar) );
 		CHECK(1000_nbar == 1_ubar ); CHECK(is_near(1000._nbar,1._ubar) );
@@ -651,9 +651,9 @@ TEST_CASE("common quantities") {
 		// Wikipedia: a =  	L?T^-1
 		using velocity = unlib::create_unit_t< unlib::length
 		                                     , unlib::reciprocal_unit_t<unlib::time> >;
-		CHECK(test::is_same_unit<unlib::velocity, velocity>() );
-		CHECK(test::is_same_unit<unlib::velocity, unlib::meter_per_second<VT>::unit_type>() );
-		CHECK(test::is_same_unit<unlib::velocity, unlib::kilometer_per_hour<VT>::unit_type>() );
+		CHECK(typeid(unlib::velocity) == typeid(velocity) );
+		CHECK(typeid(unlib::velocity) == typeid(unlib::meter_per_second<VT>::unit_type) );
+		CHECK(typeid(unlib::velocity) == typeid(unlib::kilometer_per_hour<VT>::unit_type) );
 
 		const unlib::    meter_per_second<VT> mps {100}; REQUIRE( mps.get() == 100            );
 		const unlib::kilometer_per_hour  <VT> kmph{mps}; CHECK  (kmph.get() == mps.get()*36/10);
@@ -672,11 +672,11 @@ TEST_CASE("common quantities") {
 	SUBCASE("volumetric flow rate") {
 		using VT = long long;
 
-		CHECK(test::is_same_unit<unlib::liter_per_hour<VT>::unit_type, unlib::volumetric_flow_rate>());
+		CHECK(typeid(unlib::liter_per_hour<VT>::unit_type) == typeid(unlib::volumetric_flow_rate));
 
 		using namespace unlib::literals;
 		CHECK(test::is_same_unit<unlib::liter_per_hour<double>>(1._l / 1._h) );
-		CHECK(test::is_same_unit<unlib::liter_per_hour<VT    >>(1_l_per_h));
+		CHECK(test::is_same_unit<unlib::liter_per_hour<VT    >>(1_l_per_h  ));
 
 		CHECK(1_l_per_h == unlib::liter_per_hour<VT>{1}); CHECK(is_near(1._l_per_h,unlib::liter_per_hour<double>{1}));
 	}

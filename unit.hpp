@@ -27,6 +27,12 @@ template< std::intmax_t Num
         , std::intmax_t Den = 1 >
 using exponent = std::ratio<std::ratio<Num,Den>::num,std::ratio<Num,Den>::den>;
 
+namespace detail {
+/* workaround for C++14 lacking the ...v variants */
+template<typename Exp1, typename Exp2>
+constexpr bool ratio_equal_v = std::ratio_equal<Exp1,Exp2>::value;
+}
+
 /**
  * @brief A physical unit
  *
@@ -79,6 +85,20 @@ struct unit< std::ratio<           TimeNum,           TimeDen>
 	using substance_amount_exponent = std::ratio< SubstanceAmountNum, SubstanceAmountDen>;
 };
 
+/**
+ * @{
+ *
+ * @brief access unit exponents
+ */
+template<typename Unit> using             time_exponent_t = typename Unit::            time_exponent;
+template<typename Unit> using             mass_exponent_t = typename Unit::            mass_exponent;
+template<typename Unit> using           length_exponent_t = typename Unit::          length_exponent;
+template<typename Unit> using          current_exponent_t = typename Unit::         current_exponent;
+template<typename Unit> using       luminosity_exponent_t = typename Unit::      luminosity_exponent;
+template<typename Unit> using      temperature_exponent_t = typename Unit::     temperature_exponent;
+template<typename Unit> using substance_amount_exponent_t = typename Unit::substance_amount_exponent;
+/** @} */
+
 namespace detail {
 
 /**
@@ -114,13 +134,13 @@ using substance_amount = unit< e0, e0, e0, e0, e0, e0, e1 >;
  * access the exponent for a specific basic unit in a unit
  */
 template<typename Unit, typename BasicUnit> struct get_exponent;
-template<typename Unit                    > struct get_exponent<Unit,            time> { using type = typename Unit::            time_exponent; };
-template<typename Unit                    > struct get_exponent<Unit,            mass> { using type = typename Unit::            mass_exponent; };
-template<typename Unit                    > struct get_exponent<Unit,          length> { using type = typename Unit::          length_exponent; };
-template<typename Unit                    > struct get_exponent<Unit,         current> { using type = typename Unit::         current_exponent; };
-template<typename Unit                    > struct get_exponent<Unit,      luminosity> { using type = typename Unit::      luminosity_exponent; };
-template<typename Unit                    > struct get_exponent<Unit,     temperature> { using type = typename Unit::     temperature_exponent; };
-template<typename Unit                    > struct get_exponent<Unit,substance_amount> { using type = typename Unit::substance_amount_exponent; };
+template<typename Unit                    > struct get_exponent<Unit,            time> { using type =             time_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,            mass> { using type =             mass_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,          length> { using type =           length_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,         current> { using type =          current_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,      luminosity> { using type =       luminosity_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,     temperature> { using type =      temperature_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,substance_amount> { using type = substance_amount_exponent_t<Unit>; };
 
 /** an unsorted compile-time list of basic units */
 template<typename ...BasicUnits>
@@ -179,22 +199,22 @@ using unit_from_unsorted_list_t = unit< typename find_first_exponent<           
  * meta functions for unit type manipulations
  */
 template<template<typename> class Operation, typename Unit>
-using apply_unary_t = unit< Operation<typename Unit ::            time_exponent>
-                          , Operation<typename Unit ::            mass_exponent>
-                          , Operation<typename Unit ::          length_exponent>
-                          , Operation<typename Unit ::         current_exponent>
-                          , Operation<typename Unit ::      luminosity_exponent>
-                          , Operation<typename Unit ::     temperature_exponent>
-                          , Operation<typename Unit ::substance_amount_exponent> >;
+using apply_unary_t = unit< Operation<            time_exponent_t<Unit>>
+                          , Operation<            mass_exponent_t<Unit>>
+                          , Operation<          length_exponent_t<Unit>>
+                          , Operation<         current_exponent_t<Unit>>
+                          , Operation<      luminosity_exponent_t<Unit>>
+                          , Operation<     temperature_exponent_t<Unit>>
+                          , Operation<substance_amount_exponent_t<Unit>> >;
 
 template<template<typename,typename> class Operation, typename Unit1, typename Unit2>
-using apply_binary_t = unit< Operation<typename Unit1::            time_exponent, typename Unit2::            time_exponent>
-                           , Operation<typename Unit1::            mass_exponent, typename Unit2::            mass_exponent>
-                           , Operation<typename Unit1::          length_exponent, typename Unit2::          length_exponent>
-                           , Operation<typename Unit1::         current_exponent, typename Unit2::         current_exponent>
-                           , Operation<typename Unit1::      luminosity_exponent, typename Unit2::      luminosity_exponent>
-                           , Operation<typename Unit1::     temperature_exponent, typename Unit2::     temperature_exponent>
-                           , Operation<typename Unit1::substance_amount_exponent, typename Unit2::substance_amount_exponent> >;
+using apply_binary_t = unit< Operation<            time_exponent_t<Unit1>,             time_exponent_t<Unit2>>
+                           , Operation<            mass_exponent_t<Unit1>,             mass_exponent_t<Unit2>>
+                           , Operation<          length_exponent_t<Unit1>,           length_exponent_t<Unit2>>
+                           , Operation<         current_exponent_t<Unit1>,          current_exponent_t<Unit2>>
+                           , Operation<      luminosity_exponent_t<Unit1>,       luminosity_exponent_t<Unit2>>
+                           , Operation<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
+                           , Operation<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
 
 template<typename E>
 using   negate_exp_t = exponent<-E::num,E::den>;

@@ -12,6 +12,8 @@ include_directories(doctest)
 
 add_executable(unlib_test
         unit.hpp
+        tag.hpp
+        scaling.hpp
         quantity.hpp
         common.hpp
         math.hpp
@@ -20,7 +22,8 @@ add_executable(unlib_test
         test/test_unit.cpp
         test/test_quantity.cpp
         test/test_common.cpp
-        test/test_math.cpp)
+        test/test_math.cpp
+)
 
 target_compile_features(unlib_test PRIVATE cxx_std_14)
 

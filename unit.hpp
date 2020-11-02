@@ -25,7 +25,7 @@ namespace unlib {
  */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >
-using exponent = std::ratio<std::ratio<Num,Den>::num,std::ratio<Num,Den>::den>;
+using exponent = typename std::ratio<Num,Den>::type;
 
 namespace detail {
 /* workaround for C++14 lacking the ...v variants */

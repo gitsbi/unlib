@@ -105,7 +105,7 @@ In engineering, sometimes different quantities that must not be confused are rep
 
 (_Note:_ Using tags, the library already provides the three incompatible quantities `watt` for active power, `var` for reactive power, and `voltampere` for apparent power.)
 
-A tag consists of a tag ID and a tag ratio. Except for **`void`**, ny type, even incomplete ones, can be used for tag IDs. Their only significance is that they differ from each other. The ratio is a `std::ratio` and is used when multiplying or dividing tagged types.
+A tag consists of a tag ID and a tag ratio. Except for **`void`**, any type, even an incomplete one, can be used for tag IDs. The only significance of these types is that they differ from each other. The ratio is a `std::ratio` and is used when multiplying or dividing tagged types.
 
 Quantities with either differing tag IDs or differing tag ratios are considered to be of different type and cannot be assigned to each other. (There is, however, a `tag_cast` to circumvent this.) Quantities can be multiplied and divided if
 
@@ -114,9 +114,9 @@ Quantities with either differing tag IDs or differing tag ratios are considered 
 
 When multiplying and dividing tagged quantities, the library keeps track of the tag's "exponents" (how many times quantities of the same tag have been multiplied or divided with). 
 
-Therefore you can, for example, multiply a tagged quantity with with an untagged one (getting a tagged quantity), and by dividing the result by the original tagged quantity, get the original untagged quantity as a result. (For example, multiplying _reactive power_ with _time_ results in _reactive energy_. This divided by reactive power results in untagged time.) 
+Therefore you can, for example, multiply _reactive power_ with _time_, resulting in _reactive energy_. This divided by reactive power results in untagged time. 
 
-You can also multiply a tagged quantity with itself, and get back a quantity with the same tag name, but a different exponent. Dividing this quantity by itself again returns a result with the original quantity's tag. (An example would be a ratio equation where you multiply reactive power with reactive power, then divide by reactive power again. The result will have the same tag as the original reactive power.)
+You can also multiply _reactive power_ with _reactive power_, resulting in a _reactive_ tag with a different eponent. If you then divide this by _reactive power_, the result will be _reactive power_ again.)
 
 Note that tags do not reflect all properties of their engineering counterparts. For example, dividing _active power_ by _voltage_, which is untagged, will result in a current quantity tagged as _reactive_, which very likely won't make much sense. In these cases you will have to use `tag_cast` to make the library submit to your application domain's rules. 
 
@@ -139,7 +139,7 @@ All four types of casts come in two flavors. One needs the targetted value type,
 The other flavor of the same cast does not need this. It returns a temporary object from which a quantity can be created, and that can be assigned to a quantity. Depending on the quantity created from it, or it is assigned to, the respective conversion is invoked automatically: 
 
 ```c++
-  my_floating_hours float_hrs = unlib::tag_value(integer_seconds); // note: scale cast from secs to hrs is implicit
+  my_floating_hours float_hrs = unlib::value_cast(integer_seconds); // note: scale cast from secs to hrs is implicit
 ```
 
 Remember that this cast returns a temporary object which is not a quantity, and must be assigned to a quantity in order to be used. Specifically, it cannot be used in mathematical operations. 

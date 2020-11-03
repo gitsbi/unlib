@@ -193,9 +193,19 @@ template<typename V> using kilometer_per_hour   = div_quantity_t<to_kilo<meter<V
 template<typename V> using       liter_per_hour = div_quantity_t<liter<V>, hour<V>>;                             UNLIB_DEFINE_LITERAL(liter_per_hour, l_per_h)
 /** @} */
 
-/** @{ scalar */
-template<typename V, typename T> using scalar  = quantity<dimensionless, no_scaling, V, T>;
-template<typename V>             using percent = scalar<V, struct percent_tag>;
+/**
+ * @{
+ *
+ * @brief scalar quantities
+ *
+ * Scalars are quantities with a dimensionless unit. The offer little
+ * advantage over a plain value type when untagged, so they should always
+ * have a tag.
+ */
+template<typename V, typename T, typename S=scale<1>> using scalar   = quantity<dimensionless, S, V, T>;
+template<typename V, typename S=scale<1>>             using fraction = scalar<V, struct fraction_tag, S>;
+template<typename V>                                  using percent  = typename fraction<V>::template rescale_by<centi_scaling>;
+template<typename V>                                  using permill  = typename fraction<V>::template rescale_by<milli_scaling>;
 /** @} */
 }
 

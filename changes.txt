@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.6.6
+* added scalar types
+
 0.6.5
 * fixed rounding errors when scaling
 * added common unit volumetric_flow_rate

@@ -680,4 +680,14 @@ TEST_CASE("common quantities") {
 
 		CHECK(1_l_per_h == unlib::liter_per_hour<VT>{1}); CHECK(is_near(1._l_per_h,unlib::liter_per_hour<double>{1}));
 	}
+
+	SUBCASE("scalar") {
+		using VT = long long;
+
+		CHECK(typeid(unlib::scalar<VT, void>::unit_type) == typeid(unlib::dimensionless));
+		CHECK(typeid(unlib::percent<VT>::unit_type)      == typeid(unlib::dimensionless));
+
+		CHECK(typeid(unlib::percent<VT>) == typeid(unlib::scalar<VT, unlib::percent_tag>));
+		CHECK(std::is_same<unlib::percent<VT>::tag_type, unlib::percent_tag>::value);
+	}
 }

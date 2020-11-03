@@ -193,6 +193,10 @@ template<typename V> using kilometer_per_hour   = div_quantity_t<to_kilo<meter<V
 template<typename V> using       liter_per_hour = div_quantity_t<liter<V>, hour<V>>;                             UNLIB_DEFINE_LITERAL(liter_per_hour, l_per_h)
 /** @} */
 
+/** @{ scalar */
+template<typename V, typename T> using scalar  = quantity<dimensionless, no_scaling, V, T>;
+template<typename V>             using percent = scalar<V, struct percent_tag>;
+/** @} */
 }
 
 #endif /* UNLIB_COMMON_HPP */

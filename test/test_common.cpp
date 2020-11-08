@@ -224,7 +224,7 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		// Wikipedia: F = T^-1
-		using frequency = unlib::create_unit_t< unlib::reciprocal_unit_t<unlib::time> >;
+		using frequency = unlib::unit_t< unlib::reciprocal_unit_t<unlib::time> >;
 		CHECK( typeid(frequency) == typeid(unlib::hertz<VT>::unit_type) );
 
 		const unlib::hertz<VT> Hz{ 1}; REQUIRE(Hz.get() ==  1);
@@ -273,10 +273,10 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		// Wikipedia: U = M?L^2?I^-1?T^-3
-		using voltage = unlib::create_unit_t< unlib::mass
-		                                    , unlib::square_unit_t<unlib::length>
-		                                    , unlib::reciprocal_unit_t<unlib::current>
-		                                    , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
+		using voltage = unlib::unit_t< unlib::mass
+		                             , unlib::square_unit_t<unlib::length>
+		                             , unlib::reciprocal_unit_t<unlib::current>
+		                             , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
 		CHECK(typeid(voltage) == typeid(unlib::volt<VT>::unit_type));
 
 		const unlib::volt<VT> V{ 1}; REQUIRE(V.get() ==  1);
@@ -325,10 +325,10 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		// Wikipedia: R = M?L^2?I^-2?T^-3
-		using resistance = unlib::create_unit_t< unlib::mass
-		                                       , unlib::square_unit_t<unlib::length>
-		                                       , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::current>>
-		                                       , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
+		using resistance = unlib::unit_t< unlib::mass
+		                                , unlib::square_unit_t<unlib::length>
+		                                , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::current>>
+		                                , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
 		CHECK(typeid(resistance) == typeid(unlib::ohm<VT>::unit_type) );
 
 		const unlib::ohm<VT> O{ 1}; REQUIRE(O.get() ==  1);
@@ -376,9 +376,9 @@ TEST_CASE("common quantities") {
 	SUBCASE("power") {
 		using VT = long long;
 
-		using power = unlib::create_unit_t< unlib::mass
-		                                  , unlib::square_unit_t<unlib::length>
-		                                  , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
+		using power = unlib::unit_t< unlib::mass
+		                           , unlib::square_unit_t<unlib::length>
+		                           , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
 		CHECK(typeid(power) == typeid(unlib::watt<VT>::unit_type) );
 
 		const unlib::      watt<VT>    W{1}; REQUIRE(  W.get() == 1);
@@ -469,9 +469,9 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		// Wikipedia: E = L^2?M?T^-2
-		using energy = unlib::create_unit_t< unlib::square_unit_t<unlib::length>
-		                                   , unlib::mass
-		                                   , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
+		using energy = unlib::unit_t< unlib::square_unit_t<unlib::length>
+		                            , unlib::mass
+		                            , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
 		CHECK(typeid(energy) == typeid(unlib::energy) );
 		CHECK(typeid(energy) == typeid(unlib::watt_hour<VT>::unit_type) );
 
@@ -533,8 +533,8 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		// Wikipedia: Q = I?T
-		using charge = unlib::create_unit_t< unlib::current
-		                                   , unlib::time >;
+		using charge = unlib::unit_t< unlib::current
+		                            , unlib::time >;
 		CHECK(typeid(charge) == typeid(unlib::ampere_hour<VT>::unit_type) );
 
 		const unlib::ampere_hour  <VT> Ah{1 }; REQUIRE(Ah.get() == 1);
@@ -589,9 +589,9 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		// Wikipedia: P =  	M?L^-1?T^-2
-		using pressure = unlib::create_unit_t< unlib::mass
-		                                     , unlib::reciprocal_unit_t<unlib::length>
-		                                     , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
+		using pressure = unlib::unit_t< unlib::mass
+		                              , unlib::reciprocal_unit_t<unlib::length>
+		                              , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
 		CHECK(typeid(pressure) == typeid(unlib::pressure) );
 		CHECK(typeid(pressure) == typeid(unlib::bar<VT>::unit_type) );
 
@@ -649,8 +649,8 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		// Wikipedia: a =  	L?T^-1
-		using velocity = unlib::create_unit_t< unlib::length
-		                                     , unlib::reciprocal_unit_t<unlib::time> >;
+		using velocity = unlib::unit_t< unlib::length
+		                              , unlib::reciprocal_unit_t<unlib::time> >;
 		CHECK(typeid(unlib::velocity) == typeid(velocity) );
 		CHECK(typeid(unlib::velocity) == typeid(unlib::meter_per_second<VT>::unit_type) );
 		CHECK(typeid(unlib::velocity) == typeid(unlib::kilometer_per_hour<VT>::unit_type) );

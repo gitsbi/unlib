@@ -20,11 +20,12 @@ namespace unlib {
 /**
  * @brief Quantity tag
  *
- * Quantities can be tagged with a tag, which consists of an ID and an
- * exponent. The ID is used to tell tags from each other. Any type, even an
- * incomplete type, will do for the ID. The exponent is used to track
- * multiplication and division of tagged quantities so that tags can be
- * canceled automatically when divided.
+ * Different kind of quantities of the same physical unit can be tagged in
+ * order to make them incompatible, These tags consists of an ID and an
+ * exponent. The ID is used to tell tags and, ultimately, quantities, from
+ * each other. Any type, even an incomplete type, will do for the ID. The
+ * exponent is used to track multiplication and division of tagged quantities
+ * so that tags can be canceled automatically when dividing quantities.
  *
  * @tparam  ID  tag ID
  * @tparam Num  tag exponent numerator

@@ -32,12 +32,12 @@ Energy is also power by time (P*t), and since the library already provides `unli
 using energy = unlib::mul_unit_t<unlib::power,unlib::time>;
 ```
 
-However, energy can also be defined by providing all the exponents to the `unlib::create_unit_t` meta-function: 
+However, energy can also be defined by providing all the exponents to the `unlib::unit_t` meta-function: 
 
 ```c++
-using energy = unlib::create_unit_t< unlib::mass
-                                   , unlib::square_unit_t<unlib::length>
-                                   , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
+using energy = unlib::unit_t< unlib::mass
+                            , unlib::square_unit_t<unlib::length>
+                            , unlib::reciprocal_unit_t<unlib::square_unit_t<unlib::time>> >;
 ```
 
 Finally, the type of a quantity defines the nested type `unit_type`, which could be used:

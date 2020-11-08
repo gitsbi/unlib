@@ -21,16 +21,16 @@ namespace unlib {
  *
  * @note They can be use to create other units:
  * @code
-using velocity = create_unit_t<length, reciprocal_unit_t<time>>;
+using velocity = unit_t<length, reciprocal_unit_t<time>>;
  * @endcode
  */
-using             time = unit<exponent<1>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>>;
-using             mass = unit<exponent<0>, exponent<1>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>>;
-using           length = unit<exponent<0>, exponent<0>, exponent<1>, exponent<0>, exponent<0>, exponent<0>, exponent<0>>;
-using          current = unit<exponent<0>, exponent<0>, exponent<0>, exponent<1>, exponent<0>, exponent<0>, exponent<0>>;
-using       luminosity = unit<exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<1>, exponent<0>, exponent<0>>;
-using      temperature = unit<exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<1>, exponent<0>>;
-using substance_amount = unit<exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<0>, exponent<1>>;
+using             time = unit<exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using             mass = unit<exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using           length = unit<exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using          current = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using       luminosity = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>>;
+using      temperature = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>>;
+using substance_amount = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>>;
 /** @} */
 
 /** @{
@@ -53,10 +53,10 @@ using             pressure =        div_unit_t< mass   , mul_unit_t<length, squa
 using              voltage =        div_unit_t< mul_unit_t<mass   , square_unit_t<length>>
                                               , mul_unit_t<current,   cube_unit_t<time  >> >;
 using                power =        mul_unit_t< current, voltage >;
-using               energy =        mul_unit_t< power  , time >;
-using      electric_charge =        mul_unit_t< current, time >;
+using               energy =        mul_unit_t< power  , time    >;
+using      electric_charge =        mul_unit_t< current, time    >;
 using           resistance =        div_unit_t< voltage, current >;
-using volumetric_flow_rate =        div_unit_t< volume, time >;
+using volumetric_flow_rate =        div_unit_t< volume , time    >;
 /** @} */
 
 /** @{
@@ -184,7 +184,7 @@ template<typename V> using ampere_hour   = typename ampere_second<V>::template r
  * @note Sadly, `pascal` is a keyword/macro on Windows; hence `pascal_`.
  */
 template<typename V> using pascal_ = quantity<pressure, no_scaling   , V>;                                       UNLIB_DEFINE_LITERAL(pascal_, Pa )            UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(pascal_, Pa )
-template<typename V> using     bar = quantity<pressure, scale<100000>, V>;                                       UNLIB_DEFINE_LITERAL(bar    , bar)            UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(bar    , bar)
+template<typename V> using     bar = quantity<pressure, scale_t<100000>, V>;                                     UNLIB_DEFINE_LITERAL(bar    , bar)            UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(bar    , bar)
 /** @} */
 
 /** @{ velocity quantities */
@@ -206,10 +206,10 @@ template<typename V> using       liter_per_hour = div_quantity_t<liter<V>, hour<
  * have a tag.
  */
 using fraction_tag = tag_t<struct fraction_tag_id>;
-template<typename V, typename T, typename S=scale<1>> using scalar   = quantity<dimensionless, S, V, T>;
-template<typename V, typename S=scale<1>>             using fraction = scalar<V, fraction_tag, S>;
-template<typename V>                                  using percent  = typename fraction<V>::template rescale_by<centi_scaling>;
-template<typename V>                                  using permill  = typename fraction<V>::template rescale_by<milli_scaling>;
+template<typename V, typename T, typename S=scale_t<1>> using scalar   = quantity<dimensionless, S, V, T>;
+template<typename V, typename S=scale_t<1>>             using fraction = scalar<V, fraction_tag, S>;
+template<typename V>                                    using percent  = typename fraction<V>::template rescale_by<centi_scaling>;
+template<typename V>                                    using permill  = typename fraction<V>::template rescale_by<milli_scaling>;
 /** @} */
 }
 

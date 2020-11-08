@@ -18,8 +18,8 @@
 #include <type_traits>
 
 #include <unlib/unit.hpp>
-#include <unlib/tag.hpp>
 #include <unlib/scaling.hpp>
+#include <unlib/tag.hpp>
 
 
 namespace unlib {
@@ -123,36 +123,56 @@ public:
  * @tparam     TagNum   the quantity's tag exponents numerator
  * @tparam     TagDen   the quantity's tag exponents denominator
  */
-template< typename      Unit
-        , typename      Scale
-        , typename      ValueType
-        , typename      TagID
-        , std::intmax_t TagNum
-        , std::intmax_t TagDen >
-class quantity<Unit, Scale, ValueType, tag<TagID,std::ratio<TagNum,TagDen>>> {
+template< std::intmax_t            TimeNum, std::intmax_t            TimeDen
+        , std::intmax_t            MassNum, std::intmax_t            MassDen
+        , std::intmax_t          LengthNum, std::intmax_t          LengthDen
+        , std::intmax_t         CurrentNum, std::intmax_t         CurrentDen
+        , std::intmax_t      LuminosityNum, std::intmax_t      LuminosityDen
+        , std::intmax_t     TemperatureNum, std::intmax_t     TemperatureDen
+        , std::intmax_t SubstanceAmountNum, std::intmax_t SubstanceAmountDen
+        , std::intmax_t           ScaleNum, std::intmax_t           ScaleDen
+        , std::intmax_t             TagNum, std::intmax_t             TagDen
+        , typename TagID
+        , typename ValueType >
+class quantity< unit< std::ratio<           TimeNum,           TimeDen>
+                    , std::ratio<           MassNum,           MassDen>
+                    , std::ratio<         LengthNum,         LengthDen>
+                    , std::ratio<        CurrentNum,        CurrentDen>
+                    , std::ratio<     LuminosityNum,     LuminosityDen>
+                    , std::ratio<    TemperatureNum,    TemperatureDen>
+                    , std::ratio<SubstanceAmountNum,SubstanceAmountDen> >
+              , std::ratio<ScaleNum,ScaleDen>
+              , ValueType
+              , tag<TagID,std::ratio<TagNum,TagDen>> > {
 public:
-	using unit_type  = Unit;                        /**< the quantity's unit type  */
-	using scale_type = Scale;                       /**< the quantity's scale      */
-	using value_type = ValueType;                   /**< the quantity's value type */
-	using tag_type   = tag_t<TagID,TagNum,TagDen>;  /**< the quantity's tag        */
+	using unit_type  = unit< std::ratio<           TimeNum,           TimeDen>    /**< the quantity's unit type  */
+	                       , std::ratio<           MassNum,           MassDen>
+	                       , std::ratio<         LengthNum,         LengthDen>
+	                       , std::ratio<        CurrentNum,        CurrentDen>
+	                       , std::ratio<     LuminosityNum,     LuminosityDen>
+	                       , std::ratio<    TemperatureNum,    TemperatureDen>
+	                       , std::ratio<SubstanceAmountNum,SubstanceAmountDen> >;
+	using scale_type = scale_t<ScaleNum,ScaleDen>;                                /**< the quantity's scale      */
+	using value_type = ValueType;                                                 /**< the quantity's value type */
+	using tag_type   = tag_t<TagID,TagNum,TagDen>;                                /**< the quantity's tag        */
 
 	/**
 	 * @{
 	 *
 	 * shortcuts for the unit's nested types
 	 */
-	using             time_exponent = typename unit_type::            time_exponent;
-	using             mass_exponent = typename unit_type::            mass_exponent;
-	using           length_exponent = typename unit_type::          length_exponent;
-	using          current_exponent = typename unit_type::         current_exponent;
-	using       luminosity_exponent = typename unit_type::      luminosity_exponent;
-	using      temperature_exponent = typename unit_type::     temperature_exponent;
-	using substance_amount_exponent = typename unit_type::substance_amount_exponent;
+	using             time_exponent =             time_exponent_t<unit_type>;
+	using             mass_exponent =             mass_exponent_t<unit_type>;
+	using           length_exponent =           length_exponent_t<unit_type>;
+	using          current_exponent =          current_exponent_t<unit_type>;
+	using       luminosity_exponent =       luminosity_exponent_t<unit_type>;
+	using      temperature_exponent =      temperature_exponent_t<unit_type>;
+	using substance_amount_exponent = substance_amount_exponent_t<unit_type>;
 	/** @} */
 
 	/** create a quantity type with a different tag */
 	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , NewTag   >;
-	                                using    untag   = quantity< unit_type, scale_type, value_type  , no_tag   >;
+	                                using untag      = quantity< unit_type, scale_type, value_type  , no_tag                 >;
 
 	/** create a quantity with a different value type */
 	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, tag_type >;
@@ -424,7 +444,7 @@ template<typename Q , int Power  > using  pow_quantity_t = quantity< pow_unit_t<
 
 namespace detail {
 
-/* This allows to be scaled using milli<q> and to_milli<q> */
+/* This allows quantities to be scaled using milli<q> and to_milli<q> */
 template<typename NewScale, typename U, typename S, typename V, typename T>
 struct scale_by<NewScale, quantity<U,S,V,T>>                    {using result = typename quantity<U,S,V,T>::template rescale_by<NewScale>;};
 template<typename NewScale, typename U, typename S, typename V, typename T>

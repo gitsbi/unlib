@@ -25,7 +25,7 @@ namespace unlib {
  */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >
-using exponent = typename std::ratio<Num,Den>::type;
+using exponent_t = typename std::ratio<Num,Den>::type;
 
 namespace detail {
 /* workaround for C++14 lacking the ...v variants */
@@ -48,10 +48,10 @@ constexpr bool ratio_equal_v = std::ratio_equal<Exp1,Exp2>::value;
  * @tparam     TemperatureExp  Exponent representing the     Temperature basic unit
  * @tparam SubstanceAmountExp  Exponent representing the SubstanceAmount basic unit
  *
- * @note Use create_unit_t to define units rather than using this template
- *       directly. The create_unit_t meta function creates instances of this
- *       template with all the basic units always in the same order, no
- *       matter in which order they are specified and how many are provided.
+ * @note Use unit_t to define units rather than using this template drectly.
+ *       The unit_t meta function creates instances of this template with all
+ *       the basic units always in the same order, no matter in which order
+ *       they are specified and how many are provided.
  */
 template< typename            TimeExp
         , typename            MassExp
@@ -76,13 +76,13 @@ struct unit< std::ratio<           TimeNum,           TimeDen>
            , std::ratio<     LuminosityNum,     LuminosityDen>
            , std::ratio<    TemperatureNum,    TemperatureDen>
            , std::ratio<SubstanceAmountNum,SubstanceAmountDen> > {
-	using             time_exponent = std::ratio<            TimeNum,            TimeDen>;
-	using             mass_exponent = std::ratio<            MassNum,            MassDen>;
-	using           length_exponent = std::ratio<          LengthNum,          LengthDen>;
-	using          current_exponent = std::ratio<         CurrentNum,         CurrentDen>;
-	using       luminosity_exponent = std::ratio<      LuminosityNum,      LuminosityDen>;
-	using      temperature_exponent = std::ratio<     TemperatureNum,     TemperatureDen>;
-	using substance_amount_exponent = std::ratio< SubstanceAmountNum, SubstanceAmountDen>;
+	using             time_exponent = exponent_t<            TimeNum,            TimeDen>;
+	using             mass_exponent = exponent_t<            MassNum,            MassDen>;
+	using           length_exponent = exponent_t<          LengthNum,          LengthDen>;
+	using          current_exponent = exponent_t<         CurrentNum,         CurrentDen>;
+	using       luminosity_exponent = exponent_t<      LuminosityNum,      LuminosityDen>;
+	using      temperature_exponent = exponent_t<     TemperatureNum,     TemperatureDen>;
+	using substance_amount_exponent = exponent_t< SubstanceAmountNum, SubstanceAmountDen>;
 };
 
 /**
@@ -106,8 +106,9 @@ namespace detail {
  *
  * Shortcuts to make the following code more easily readable
  */
-using e0 = exponent<0>;
-using e1 = exponent<1>;
+using e0 = exponent_t<0>;
+using e1 = exponent_t<1>;
+using e2 = exponent_t<2>;
 /** @} */
 
 /**
@@ -142,6 +143,10 @@ template<typename Unit                    > struct get_exponent<Unit,      lumin
 template<typename Unit                    > struct get_exponent<Unit,     temperature> { using type =      temperature_exponent_t<Unit>; };
 template<typename Unit                    > struct get_exponent<Unit,substance_amount> { using type = substance_amount_exponent_t<Unit>; };
 
+template<typename Unit, typename BasicUnit>
+using get_exponent_t = typename get_exponent<Unit,BasicUnit>::type;
+/** @} */
+
 /** an unsorted compile-time list of basic units */
 template<typename ...BasicUnits>
 struct unsorted_unit_list {};
@@ -158,44 +163,34 @@ struct unsorted_unit_list {};
  */
 template<typename BasicUnit, typename BasicList>
 struct find_first_exponent;
+template<typename BasicUnit, typename BasicList>
+using find_first_exponent_t = typename find_first_exponent<BasicUnit,BasicList>::type;
+
 template<typename BasicUnit>
 struct find_first_exponent<BasicUnit,unsorted_unit_list<>> {
-	using type = exponent<0>;
+	using type = exponent_t<0>;
 };
 template<typename BasicUnit, typename Head, typename ...Tail>
 struct find_first_exponent<BasicUnit,unsorted_unit_list<Head,Tail...>> {
-	using type = typename std::conditional< get_exponent<Head,BasicUnit>::type::num != 0
-	                                      , typename get_exponent<Head,BasicUnit>::type
-	                                      , typename find_first_exponent<BasicUnit, unsorted_unit_list<Tail...>>::type >::type;
+	using type = std::conditional_t< get_exponent_t<Head,BasicUnit>::num != 0
+	                               , get_exponent_t<Head,BasicUnit>
+	                               , find_first_exponent_t<BasicUnit, unsorted_unit_list<Tail...>> >;
 };
 /** @} */
 
-/** create an unsorted compile-time list of basic units from a unit */
-template<typename Unit>
-struct unsorted_unit_list_from_unit;
-template<typename E1, typename E2, typename E3, typename E4, typename E5, typename E6, typename E7>
-struct unsorted_unit_list_from_unit<unit<E1,E2,E3,E4,E5,E6,E7>> {
-	using type = unsorted_unit_list< unit< E1, e0, e0, e0, e0, e0, e0 >
-	                               , unit< e0, E2, e0, e0, e0, e0, e0 >
-	                               , unit< e0, e0, E3, e0, e0, e0, e0 >
-	                               , unit< e0, e0, e0, E4, e0, e0, e0 >
-	                               , unit< e0, e0, e0, e0, E5, e0, e0 >
-	                               , unit< e0, e0, e0, e0, e0, E6, e0 >
-	                               , unit< e0, e0, e0, e0, e0, e0, E7 > >;
-};
-
 /** create a unit with the basic units being sorted into the correct order from a unsorted_unit_list */
 template< typename UnsortedUnitList >
-using unit_from_unsorted_list_t = unit< typename find_first_exponent<            time, UnsortedUnitList>::type
-                                      , typename find_first_exponent<            mass, UnsortedUnitList>::type
-                                      , typename find_first_exponent<          length, UnsortedUnitList>::type
-                                      , typename find_first_exponent<         current, UnsortedUnitList>::type
-                                      , typename find_first_exponent<      luminosity, UnsortedUnitList>::type
-                                      , typename find_first_exponent<     temperature, UnsortedUnitList>::type
-                                      , typename find_first_exponent<substance_amount, UnsortedUnitList>::type >;
+using create_unit_t = unit< typename find_first_exponent<            time, UnsortedUnitList>::type
+                          , typename find_first_exponent<            mass, UnsortedUnitList>::type
+                          , typename find_first_exponent<          length, UnsortedUnitList>::type
+                          , typename find_first_exponent<         current, UnsortedUnitList>::type
+                          , typename find_first_exponent<      luminosity, UnsortedUnitList>::type
+                          , typename find_first_exponent<     temperature, UnsortedUnitList>::type
+                          , typename find_first_exponent<substance_amount, UnsortedUnitList>::type >;
 
 /**
  * @{
+ *
  * meta functions for unit type manipulations
  */
 template<template<typename> class Operation, typename Unit>
@@ -217,7 +212,7 @@ using apply_binary_t = unit< Operation<            time_exponent_t<Unit1>,      
                            , Operation<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
 
 template<typename E>
-using   negate_exp_t = exponent<-E::num,E::den>;
+using negate_exp_t = exponent_t<-E::num,E::den>;
 
 template<int Number, bool = (Number<0) > struct sign;
 template<int Number>                     struct sign<Number,false> { static const int value = +1; };
@@ -229,19 +224,19 @@ template<typename Unit, int Power> struct pow_unit<Unit, Power,   +1> { using ty
 template<typename Unit, int Power> struct pow_unit<Unit, Power,   -1> { using type = apply_binary_t<std::ratio_subtract, Unit, typename pow_unit<Unit,-Power+1>::type>; };
 template<typename Unit, int Sign > struct pow_unit<Unit,     0, Sign> { using type = unit<e0, e0, e0, e0, e0, e0, e0>; };
 
-using cube_unit = unit<exponent<2>, exponent<2>, exponent<2>, exponent<2>, exponent<2>, exponent<2>, exponent<2>>;
+using cube_unit = unit<e2, e2, e2, e2, e2, e2, e2>;
 /** @} */
 
 }
 
 /** a dimension-less unit */
-using dimensionless = unit< exponent<0>
-                          , exponent<0>
-                          , exponent<0>
-                          , exponent<0>
-                          , exponent<0>
-                          , exponent<0>
-                          , exponent<0> >;
+using dimensionless = unit< exponent_t<0>
+                          , exponent_t<0>
+                          , exponent_t<0>
+                          , exponent_t<0>
+                          , exponent_t<0>
+                          , exponent_t<0>
+                          , exponent_t<0> >;
 
 /**
  * @brief create a unit type
@@ -259,7 +254,7 @@ template< typename Basic1 = dimensionless
         , typename Basic5 = dimensionless
         , typename Basic6 = dimensionless
         , typename Basic7 = dimensionless >
-using create_unit_t = detail::unit_from_unsorted_list_t<detail::unsorted_unit_list<Basic1,Basic2,Basic3,Basic4,Basic5,Basic6,Basic7>>;
+using unit_t = detail::create_unit_t<detail::unsorted_unit_list<Basic1,Basic2,Basic3,Basic4,Basic5,Basic6,Basic7>>;
 
 /**
  * @{
@@ -284,13 +279,13 @@ template<typename Unit>                  using       sqrt_unit_t = detail::apply
  */
 template<typename Unit1, typename Unit2>
 using are_units_compatible = std::integral_constant< bool
-                                                   , std::ratio_equal<typename Unit1::            time_exponent, typename Unit2::            time_exponent>::value
-                                                  && std::ratio_equal<typename Unit1::            mass_exponent, typename Unit2::            mass_exponent>::value
-                                                  && std::ratio_equal<typename Unit1::          length_exponent, typename Unit2::          length_exponent>::value
-                                                  && std::ratio_equal<typename Unit1::         current_exponent, typename Unit2::         current_exponent>::value
-                                                  && std::ratio_equal<typename Unit1::      luminosity_exponent, typename Unit2::      luminosity_exponent>::value
-                                                  && std::ratio_equal<typename Unit1::     temperature_exponent, typename Unit2::     temperature_exponent>::value
-                                                  && std::ratio_equal<typename Unit1::substance_amount_exponent, typename Unit2::substance_amount_exponent>::value>;
+                                                   , detail::ratio_equal_v<            time_exponent_t<Unit1>,             time_exponent_t<Unit2>>
+                                                  && detail::ratio_equal_v<            mass_exponent_t<Unit1>,             mass_exponent_t<Unit2>>
+                                                  && detail::ratio_equal_v<          length_exponent_t<Unit1>,           length_exponent_t<Unit2>>
+                                                  && detail::ratio_equal_v<         current_exponent_t<Unit1>,          current_exponent_t<Unit2>>
+                                                  && detail::ratio_equal_v<      luminosity_exponent_t<Unit1>,       luminosity_exponent_t<Unit2>>
+                                                  && detail::ratio_equal_v<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
+                                                  && detail::ratio_equal_v<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
 
 template<typename Unit1, typename Unit2>
 constexpr bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value;
@@ -304,10 +299,10 @@ constexpr bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value
  * A unit has no dimensions when all its basics' exponents' numerators are zero.
  */
 template<typename Unit>
-using unit_is_dimensionless = std::is_same<Unit,dimensionless>;
+using is_unit_dimensionless = std::is_same<Unit,dimensionless>;
 
 template<typename Unit>
-constexpr bool unit_is_dimensionless_v = unit_is_dimensionless<Unit>::value;
+constexpr bool is_unit_dimensionless_v = is_unit_dimensionless<Unit>::value;
 /** @} */
 
 }

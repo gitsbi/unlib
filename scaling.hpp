@@ -2,7 +2,7 @@
 #define UNLIB_SCALING_HPP
 
 /*
- * tag.hpp
+ * scaling.hpp
  *
  * Copyright sbi http://stackoverflow.com/users/140719
  * Distributed under the Boost Software License, Version 1.0.
@@ -27,7 +27,7 @@ namespace unlib {
  */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >
-using scale = typename std::ratio<Num,Den>::type;
+using scale_t = typename std::ratio<Num,Den>::type;
 
 /**
  * @{
@@ -39,7 +39,7 @@ template<typename Scale1, typename Scale2> using div_scale_t = std::ratio_divide
 /** @} */
 
 /** an unscaled value */
-using     no_scaling = scale<1>;
+using     no_scaling = scale_t<1>;
 
 /**
  * @{
@@ -68,10 +68,10 @@ using    exa_scaling = std::  exa;
  * humans measure time in odd multiples of seconds
  */
 using second_scaling = no_scaling;
-using minute_scaling = scale<60>;
-using   hour_scaling = std::ratio_multiply<minute_scaling, scale<60>>;
-using    day_scaling = std::ratio_multiply<  hour_scaling, scale<24>>;
-using   week_scaling = std::ratio_multiply<   day_scaling, scale< 7>>;
+using minute_scaling = scale_t<60>;
+using   hour_scaling = std::ratio_multiply<minute_scaling, scale_t<60>>;
+using    day_scaling = std::ratio_multiply<  hour_scaling, scale_t<24>>;
+using   week_scaling = std::ratio_multiply<   day_scaling, scale_t< 7>>;
 /** @} */
 
 namespace detail {
@@ -79,6 +79,9 @@ namespace detail {
 template<typename NewScale, typename T> struct scale_by;
 template<typename NewScale, typename T> struct scale_to;
 
+/* note Providing the implementations for scales here, allowing for other
+ *      implementations for other types to be added to this namespace
+ *      elsewhere. */
 template<typename NewScale, std::intmax_t Num, std::intmax_t Den >
 struct scale_by<NewScale, std::ratio<Num,Den>>                  {using result = std::ratio_multiply<NewScale,std::ratio<Num,Den>>;};
 template<typename NewScale, std::intmax_t Num, std::intmax_t Den >
@@ -89,41 +92,39 @@ struct scale_to<NewScale, std::ratio<Num,Den>>                  {using result = 
 /**
  * @{
  *
- * Meta functions to get the type of a specifically scaled quantity.
+ * Meta functions to get the type of a specific scalingy.
  *
  * @note micro<kilo<meter>> will result in milli<meter>,
  *       to_micro<kilo<no_scaling>> and to_micro<to_kilo<no_scaling>> will
  *       result in micro<no_scaling>.
+ *
+ * @note With other implementations ("overloads) of detail::scale_by and
+ *       detail::scale_to provided, these meta functions can be used to scale
+ *       types other than scales, too.
  */
-template<typename T> using    second_scale = T;
-template<typename T> using    minute_scale = typename detail::scale_by<minute_scaling,T>::result;
-template<typename T> using      hour_scale = typename detail::scale_by<  hour_scaling,T>::result;
-template<typename T> using       day_scale = typename detail::scale_by<   day_scaling,T>::result;
-template<typename T> using      week_scale = typename detail::scale_by<  week_scaling,T>::result;
+template<typename T> using atto            = typename detail::scale_by<  atto_scaling,T>::result;
+template<typename T> using femto           = typename detail::scale_by< femto_scaling,T>::result;
+template<typename T> using pico            = typename detail::scale_by<  pico_scaling,T>::result;
+template<typename T> using nano            = typename detail::scale_by<  nano_scaling,T>::result;
+template<typename T> using micro           = typename detail::scale_by< micro_scaling,T>::result;
+template<typename T> using milli           = typename detail::scale_by< milli_scaling,T>::result;
+template<typename T> using centi           = typename detail::scale_by< centi_scaling,T>::result;
+template<typename T> using deci            = typename detail::scale_by<  deci_scaling,T>::result;
+template<typename T> using no_scale        = T;
+template<typename T> using deca            = typename detail::scale_by<  deca_scaling,T>::result;
+template<typename T> using hecto           = typename detail::scale_by< hecto_scaling,T>::result;
+template<typename T> using kilo            = typename detail::scale_by<  kilo_scaling,T>::result;
+template<typename T> using mega            = typename detail::scale_by<  mega_scaling,T>::result;
+template<typename T> using giga            = typename detail::scale_by<  giga_scaling,T>::result;
+template<typename T> using tera            = typename detail::scale_by<  tera_scaling,T>::result;
+template<typename T> using peta            = typename detail::scale_by<  peta_scaling,T>::result;
+template<typename T> using exa             = typename detail::scale_by<   exa_scaling,T>::result;
 
-template<typename T> using      atto       = typename detail::scale_by<  atto_scaling,T>::result;
-template<typename T> using     femto       = typename detail::scale_by< femto_scaling,T>::result;
-template<typename T> using      pico       = typename detail::scale_by<  pico_scaling,T>::result;
-template<typename T> using      nano       = typename detail::scale_by<  nano_scaling,T>::result;
-template<typename T> using     micro       = typename detail::scale_by< micro_scaling,T>::result;
-template<typename T> using     milli       = typename detail::scale_by< milli_scaling,T>::result;
-template<typename T> using     centi       = typename detail::scale_by< centi_scaling,T>::result;
-template<typename T> using      deci       = typename detail::scale_by<  deci_scaling,T>::result;
-template<typename T> using  no_scale       = T;
-template<typename T> using      deca       = typename detail::scale_by<  deca_scaling,T>::result;
-template<typename T> using     hecto       = typename detail::scale_by< hecto_scaling,T>::result;
-template<typename T> using      kilo       = typename detail::scale_by<  kilo_scaling,T>::result;
-template<typename T> using      mega       = typename detail::scale_by<  mega_scaling,T>::result;
-template<typename T> using      giga       = typename detail::scale_by<  giga_scaling,T>::result;
-template<typename T> using      tera       = typename detail::scale_by<  tera_scaling,T>::result;
-template<typename T> using      peta       = typename detail::scale_by<  peta_scaling,T>::result;
-template<typename T> using       exa       = typename detail::scale_by<   exa_scaling,T>::result;
-
-template<typename T> using to_second_scale = no_scale<T>;
-template<typename T> using to_minute_scale = typename detail::scale_to<minute_scaling,T>::result;
-template<typename T> using to_hour_scale   = typename detail::scale_to<  hour_scaling,T>::result;
-template<typename T> using to_day_scale    = typename detail::scale_to<   day_scaling,T>::result;
-template<typename T> using to_week_scale   = typename detail::scale_to<  week_scaling,T>::result;
+template<typename T> using second_scale    = T;
+template<typename T> using minute_scale    = typename detail::scale_by<minute_scaling,T>::result;
+template<typename T> using   hour_scale    = typename detail::scale_by<  hour_scaling,T>::result;
+template<typename T> using    day_scale    = typename detail::scale_by<   day_scaling,T>::result;
+template<typename T> using   week_scale    = typename detail::scale_by<  week_scaling,T>::result;
 
 template<typename T> using to_atto         = typename detail::scale_to<  atto_scaling,T>::result;
 template<typename T> using to_femto        = typename detail::scale_to< femto_scaling,T>::result;
@@ -142,6 +143,12 @@ template<typename T> using to_giga         = typename detail::scale_to<  giga_sc
 template<typename T> using to_tera         = typename detail::scale_to<  tera_scaling,T>::result;
 template<typename T> using to_peta         = typename detail::scale_to<  peta_scaling,T>::result;
 template<typename T> using to_exa          = typename detail::scale_to<   exa_scaling,T>::result;
+
+template<typename T> using to_second_scale = to_no_scale<T>;
+template<typename T> using to_minute_scale = typename detail::scale_to<minute_scaling,T>::result;
+template<typename T> using to_hour_scale   = typename detail::scale_to<  hour_scaling,T>::result;
+template<typename T> using to_day_scale    = typename detail::scale_to<   day_scaling,T>::result;
+template<typename T> using to_week_scale   = typename detail::scale_to<  week_scaling,T>::result;
 /** @} */
 
 }

@@ -8,7 +8,7 @@
 
 namespace {
 
-using default_test_unit = unlib::create_unit_t<unlib::pow_unit_t<unlib::detail::            time,1>
+using default_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::detail::            time,1>
                                               ,unlib::pow_unit_t<unlib::detail::            mass,2>
                                               ,unlib::pow_unit_t<unlib::detail::          length,3>
                                               ,unlib::pow_unit_t<unlib::detail::         current,4>
@@ -20,7 +20,7 @@ using default_test_unit = unlib::create_unit_t<unlib::pow_unit_t<unlib::detail::
 
 TEST_CASE("quantities type operations") {
 	using namespace unlib;
-	using scale_type = scale<1,2>;
+	using scale_type = scale_t<1,2>;
 	using value_type = double;
 	using test_quantity = quantity<default_test_unit, scale_type, value_type>;
 
@@ -31,13 +31,13 @@ TEST_CASE("quantities type operations") {
 		CHECK( typeid(scale_type)        == typeid(test_quantity::scale_type) );
 		CHECK( typeid(no_tag)            == typeid(test_quantity::tag_type)   );
 
-		CHECK( typeid(exponent<1>)       == typeid(test_quantity::            time_exponent) );
-		CHECK( typeid(exponent<2>)       == typeid(test_quantity::            mass_exponent) );
-		CHECK( typeid(exponent<3>)       == typeid(test_quantity::          length_exponent) );
-		CHECK( typeid(exponent<4>)       == typeid(test_quantity::         current_exponent) );
-		CHECK( typeid(exponent<5>)       == typeid(test_quantity::      luminosity_exponent) );
-		CHECK( typeid(exponent<6>)       == typeid(test_quantity::     temperature_exponent) );
-		CHECK( typeid(exponent<7>)       == typeid(test_quantity::substance_amount_exponent) );
+		CHECK( typeid(exponent_t<1>)       == typeid(test_quantity::            time_exponent) );
+		CHECK( typeid(exponent_t<2>)       == typeid(test_quantity::            mass_exponent) );
+		CHECK( typeid(exponent_t<3>)       == typeid(test_quantity::          length_exponent) );
+		CHECK( typeid(exponent_t<4>)       == typeid(test_quantity::         current_exponent) );
+		CHECK( typeid(exponent_t<5>)       == typeid(test_quantity::      luminosity_exponent) );
+		CHECK( typeid(exponent_t<6>)       == typeid(test_quantity::     temperature_exponent) );
+		CHECK( typeid(exponent_t<7>)       == typeid(test_quantity::substance_amount_exponent) );
 	}
 
 	SUBCASE("quantities can be retagged") {
@@ -51,9 +51,9 @@ TEST_CASE("quantities type operations") {
 
 	SUBCASE("quantities can be rescaled") {
 		using test_quantity_a = test_quantity;
-		REQUIRE( typeid(test_quantity_a::scale_type)                           == typeid(scale< 1, 2>) );
-		CHECK  ( typeid(test_quantity_a::rescale_to<scale<47,11>>::scale_type) == typeid(scale<47,11>) );
-		CHECK  ( typeid(test_quantity_a::rescale_by<scale< 4, 1>>::scale_type) == typeid(scale< 2, 1>) );
+		REQUIRE( typeid(test_quantity_a::scale_type)                             == typeid(scale_t< 1, 2>) );
+		CHECK  ( typeid(test_quantity_a::rescale_to<scale_t<47,11>>::scale_type) == typeid(scale_t<47,11>) );
+		CHECK  ( typeid(test_quantity_a::rescale_by<scale_t< 4, 1>>::scale_type) == typeid(scale_t< 2, 1>) );
 
 		using test_quantity_b = unlib::quantity<default_test_unit>;
 		CHECK( typeid( to_atto <test_quantity_b> ) == typeid( quantity<default_test_unit,  atto_scaling> ) );
@@ -107,7 +107,7 @@ TEST_CASE("quantity values") {
 	}
 
 	SUBCASE("is_near_zero") {
-		using test_q = test_quantity::rescale_to<scale<1,2>>;
+		using test_q = test_quantity::rescale_to<scale_t<1,2>>;
 
 		const value_type epsilon = 150*std::numeric_limits<value_type>::epsilon();
 
@@ -230,7 +230,7 @@ TEST_CASE("quantity values") {
 
 	SUBCASE("is_near") {
 			using local_value_type = double;
-			using test_q = test_quantity::rescale_to<scale<1,2>>;
+			using test_q = test_quantity::rescale_to<scale_t<1,2>>;
 
 			const local_value_type epsilon = std::numeric_limits<local_value_type>::epsilon();
 
@@ -311,27 +311,27 @@ TEST_CASE("quantity mathematical operations") {
 	}
 
 	SUBCASE("quantities can be multiplied and divided") {
-		using test_unit_b = create_unit_t<pow_unit_t<unlib::detail::            time,7>
-		                                 ,pow_unit_t<unlib::detail::            mass,6>
-		                                 ,pow_unit_t<unlib::detail::          length,5>
-		                                 ,pow_unit_t<unlib::detail::         current,4>
-		                                 ,pow_unit_t<unlib::detail::      luminosity,3>
-		                                 ,pow_unit_t<unlib::detail::     temperature,2>
-		                                 ,pow_unit_t<unlib::detail::substance_amount,1> >;
-		using test_unit_mab = create_unit_t<pow_unit_t<unlib::detail::            time,8>
-		                                   ,pow_unit_t<unlib::detail::            mass,8>
-		                                   ,pow_unit_t<unlib::detail::          length,8>
-		                                   ,pow_unit_t<unlib::detail::         current,8>
-		                                   ,pow_unit_t<unlib::detail::      luminosity,8>
-		                                   ,pow_unit_t<unlib::detail::     temperature,8>
-		                                   ,pow_unit_t<unlib::detail::substance_amount,8> >;
-		using test_unit_dab = create_unit_t<pow_unit_t<unlib::detail::            time,-6>
-		                                   ,pow_unit_t<unlib::detail::            mass,-4>
-		                                   ,pow_unit_t<unlib::detail::          length,-2>
-		                                   ,pow_unit_t<unlib::detail::         current, 0>
-		                                   ,pow_unit_t<unlib::detail::      luminosity, 2>
-		                                   ,pow_unit_t<unlib::detail::     temperature, 4>
-		                                   ,pow_unit_t<unlib::detail::substance_amount, 6> >;
+		using test_unit_b = unit_t<pow_unit_t<unlib::detail::            time,7>
+		                          ,pow_unit_t<unlib::detail::            mass,6>
+		                          ,pow_unit_t<unlib::detail::          length,5>
+		                          ,pow_unit_t<unlib::detail::         current,4>
+		                          ,pow_unit_t<unlib::detail::      luminosity,3>
+		                          ,pow_unit_t<unlib::detail::     temperature,2>
+		                          ,pow_unit_t<unlib::detail::substance_amount,1> >;
+		using test_unit_mab = unit_t<pow_unit_t<unlib::detail::            time,8>
+		                            ,pow_unit_t<unlib::detail::            mass,8>
+		                            ,pow_unit_t<unlib::detail::          length,8>
+		                            ,pow_unit_t<unlib::detail::         current,8>
+		                            ,pow_unit_t<unlib::detail::      luminosity,8>
+		                            ,pow_unit_t<unlib::detail::     temperature,8>
+		                            ,pow_unit_t<unlib::detail::substance_amount,8> >;
+		using test_unit_dab = unit_t<pow_unit_t<unlib::detail::            time,-6>
+		                            ,pow_unit_t<unlib::detail::            mass,-4>
+		                            ,pow_unit_t<unlib::detail::          length,-2>
+		                            ,pow_unit_t<unlib::detail::         current, 0>
+		                            ,pow_unit_t<unlib::detail::      luminosity, 2>
+		                            ,pow_unit_t<unlib::detail::     temperature, 4>
+		                            ,pow_unit_t<unlib::detail::substance_amount, 6> >;
 
 		using test_qa  = test_quantity::rescale_to<milli_scaling>;
 		using test_qb  = quantity<test_unit_b, kilo_scaling, value_type>;

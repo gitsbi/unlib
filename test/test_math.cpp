@@ -6,25 +6,25 @@
 
 TEST_CASE("math") {
 	using namespace unlib;
-	using scale_type = scale<1,2>;
+	using scale_type = scale_t<1,2>;
 	using value_type = double;
-	using unit_a = unit<exponent<1>
-	                   ,exponent<2>
-	                   ,exponent<3>
-	                   ,exponent<4>
-	                   ,exponent<5>
-	                   ,exponent<6>
-	                   ,exponent<7>>;
+	using unit_a = unit<exponent_t<1>
+	                   ,exponent_t<2>
+	                   ,exponent_t<3>
+	                   ,exponent_t<4>
+	                   ,exponent_t<5>
+	                   ,exponent_t<6>
+	                   ,exponent_t<7>>;
 	using quantity_a = quantity<unit_a, scale_type, value_type>;
 
 	SUBCASE("sqrt") {
-		using unit_sqrt = unit<exponent<1,2>
-		                      ,exponent<2,2>
-		                      ,exponent<3,2>
-		                      ,exponent<4,2>
-		                      ,exponent<5,2>
-		                      ,exponent<6,2>
-		                      ,exponent<7,2>>;
+		using unit_sqrt = unit<exponent_t<1,2>
+		                      ,exponent_t<2,2>
+		                      ,exponent_t<3,2>
+		                      ,exponent_t<4,2>
+		                      ,exponent_t<5,2>
+		                      ,exponent_t<6,2>
+		                      ,exponent_t<7,2>>;
 		CHECK(typeid(unlib::sqrt_unit_t<unit_a>) == typeid(unit_sqrt));
 
 		using quantity_sqrt = quantity<unit_sqrt, scale_type, value_type>;
@@ -49,19 +49,19 @@ TEST_CASE("math") {
 		quantity_a a{2};
 
 		const auto pow0 = unlib::pow<0>(a);
-		CHECK(unlib::unit_is_dimensionless<decltype(pow0)::unit_type>::value);
+		CHECK(unlib::is_unit_dimensionless_v<decltype(pow0)::unit_type>);
 		CHECK(pow0.get() == 1);
 
 		const quantity_a pow1 = unlib::pow<1>(a);
 		CHECK(pow1.get() == a.get());
 
-		using unit_pow2 = unit<exponent<1*2>
-		                      ,exponent<2*2>
-		                      ,exponent<3*2>
-		                      ,exponent<4*2>
-		                      ,exponent<5*2>
-		                      ,exponent<6*2>
-		                      ,exponent<7*2>>;
+		using unit_pow2 = unit<exponent_t<1*2>
+		                      ,exponent_t<2*2>
+		                      ,exponent_t<3*2>
+		                      ,exponent_t<4*2>
+		                      ,exponent_t<5*2>
+		                      ,exponent_t<6*2>
+		                      ,exponent_t<7*2>>;
 		const auto pow2 = unlib::pow<2>(a);
 		CHECK(typeid(decltype(pow2)::unit_type) == typeid(unit_pow2));
 		CHECK(pow2.get() == std::pow(a.get(),2));

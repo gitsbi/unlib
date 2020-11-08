@@ -32,51 +32,43 @@ namespace unlib {
  *
  * @note Do not this type directly. Use the create_tag_t meta function instead.
  */
+template<typename ID, typename Exponent>
+struct tag;
+
 template<typename ID, std::intmax_t Num, std::intmax_t Den>
-struct tag {
+struct tag<ID,std::ratio<Num,Den>> {
 	using id        = ID;
 	using is_no_tag = std::is_same<id,void>;
-	using exponent  = typename std::conditional<is_no_tag::value, std::ratio<0,1>, typename std::ratio<Num,Den>::type>::type;
+	using exponent  = std::conditional_t< is_no_tag::value, std::ratio<0,1>, typename std::ratio<Num,Den>::type >;
+	using type      = std::conditional_t< is_no_tag::value || Num==0, tag<void,std::ratio<0,1>>, tag<ID, exponent> >;
 };
+
+template<typename ID, std::intmax_t Num = 1, std::intmax_t Den = 1>
+using tag_t = typename tag<ID,std::ratio<Num,Den>>::type;
 
 /**
  * @brief No tag
  *
  * This signifies that a quantity has no tag
  */
-using no_tag = tag<void,0,1>;
+using no_tag = tag_t<void,0,1>;
 
 namespace detail {
-
-template<typename ID, std::intmax_t N=0, std::intmax_t D=0>
-struct create_tag                                               {using type = tag<ID,N,D>;};
-template<             std::intmax_t N  , std::intmax_t D  >
-struct create_tag<void,N,D>                                     {using type = no_tag;};
-template<typename ID                   , std::intmax_t D  >
-struct create_tag<ID,0,D>                                       {using type = no_tag;};
-template<                                std::intmax_t D  >
-struct create_tag<void,0,D>                                     {using type = no_tag;};
-template<typename ID, std::intmax_t N  , std::intmax_t D  >
-struct create_tag<tag<ID,N,D>,0,0>                              {using type = typename create_tag<ID,N ,D >::type;};
-template<typename ID, std::intmax_t N1 , std::intmax_t D1
-                    , std::intmax_t N2 , std::intmax_t D2 >
-struct create_tag<tag<ID,N1,D1>,N2,D2>                          {using type = typename create_tag<ID,N1,D1>::type;};
-
 
 template<typename Tag1, typename Tag2>
 struct add_tag_exponents;
 template<typename ID, std::intmax_t N1, std::intmax_t D1, std::intmax_t N2, std::intmax_t D2>
-struct add_tag_exponents<tag<ID,N1,D1>,tag<ID,N2,D2>> {
-	using type = typename create_tag<tag<ID, std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
-	                                       , std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::den>>::type;
+struct add_tag_exponents<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>> {
+	using type = tag_t< ID, std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
+	                      , std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::den >;
 };
 
 template<typename Tag1, typename Tag2>
 struct substract_tag_exponents;
 template<typename ID, std::intmax_t N1, std::intmax_t D1, std::intmax_t N2, std::intmax_t D2>
-struct substract_tag_exponents<tag<ID,N1,D1>,tag<ID,N2,D2>> {
-	using type = typename create_tag<tag<ID, std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
-	                                       , std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::den>>::type;
+struct substract_tag_exponents<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>> {
+	using type = tag_t<ID, std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
+	                     , std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::den >;
 };
 
 
@@ -84,72 +76,50 @@ template<typename Tag1, typename Tag2>
 struct mul_tag;
 
 template<>
-struct mul_tag<no_tag,no_tag>                                   {using type = no_tag;};
+struct mul_tag<no_tag,no_tag>                                             {using type = no_tag;};
 template<typename ID, std::intmax_t N , std::intmax_t D >
-struct mul_tag<no_tag,tag<ID,N,D>>                              {using type = tag<ID,N,D>;};
+struct mul_tag<no_tag,tag<ID,std::ratio<N,D>>>                            {using type = tag_t<ID,N,D>;};
 template<typename ID, std::intmax_t N , std::intmax_t D >
-struct mul_tag<tag<ID,N,D>,no_tag>                              {using type = tag<ID,N,D>;};
+struct mul_tag<tag<ID,std::ratio<N,D>>,no_tag>                            {using type = tag_t<ID,N,D>;};
 template<typename ID, std::intmax_t N1, std::intmax_t D1
                     , std::intmax_t N2, std::intmax_t D2>
-struct mul_tag<tag<ID,N1,D1>,tag<ID,N2,D2>>                     {using type = typename add_tag_exponents<tag<ID,N1,D1>,tag<ID,N2,D2>>::type;};
+struct mul_tag<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>>       {using type = typename add_tag_exponents<tag_t<ID,N1,D1>,tag_t<ID,N2,D2>>::type;};
 
 
 template<typename Tag1, typename Tag2>
 struct div_tag;
 
 template<>
-struct div_tag<no_tag,no_tag>                                   {using type = no_tag;};
+struct div_tag<no_tag,no_tag>                                             {using type = no_tag;};
 template<typename ID, std::intmax_t N , std::intmax_t D >
-struct div_tag<no_tag,tag<ID,N,D>>                              {using type = tag<ID,N,D>;};
+struct div_tag<no_tag,tag<ID,std::ratio<N,D>>>                            {using type = tag_t<ID,N,D>;};
 template<typename ID, std::intmax_t N , std::intmax_t D >
-struct div_tag<tag<ID,N,D>,no_tag>                              {using type = tag<ID,N,D>;};
+struct div_tag<tag<ID,std::ratio<N,D>>,no_tag>                            {using type = tag_t<ID,N,D>;};
 template<typename ID, std::intmax_t N1, std::intmax_t D1
                     , std::intmax_t N2, std::intmax_t D2>
-struct div_tag<tag<ID,N1,D1>,tag<ID,N2,D2>>                     {using type = typename substract_tag_exponents<tag<ID,N1,D1>,tag<ID,N2,D2>>::type;};
+struct div_tag<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>>       {using type = typename substract_tag_exponents<tag_t<ID,N1,D1>,tag_t<ID,N2,D2>>::type;};
 
 
 template<typename Tag>
-struct sqrt_tag : create_tag<typename Tag::id, std::ratio_divide<typename Tag::exponent,std::ratio<2>>::num
-                                             , std::ratio_divide<typename Tag::exponent,std::ratio<2>>::den> {};
+struct sqrt_tag : tag_t< typename Tag::id, std::ratio_divide<typename Tag::exponent,std::ratio<2>>::num
+                                         , std::ratio_divide<typename Tag::exponent,std::ratio<2>>::den > {};
 
 
 template<typename Tag, int Power>
-struct  pow_tag : create_tag<typename Tag::id, std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::num
-                                             , std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::den > {};
+struct  pow_tag : tag_t< typename Tag::id, std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::num
+                                         , std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::den > {};
 
 
 template<typename Tag1, typename Tag2>
 struct are_tags_compatible;
 template< typename ID1, std::intmax_t N1, std::intmax_t D1
         , typename ID2, std::intmax_t N2, std::intmax_t D2 >
-struct are_tags_compatible<tag<ID1,N1,D1>,tag<ID2,N2,D2>> : std::integral_constant<bool, tag<ID1,N1,D1>::is_no_tag::value
-                                                                                      or tag<ID2,N2,D2>::is_no_tag::value
-                                                                                      or std::is_same<ID1,ID2>::value > {};
+struct are_tags_compatible<tag<ID1,std::ratio<N1,D1>>,tag<ID2,std::ratio<N2,D2>>>
+	: std::integral_constant<bool, tag<ID1,std::ratio<N1,D1>>::is_no_tag::value
+	                            or tag<ID2,std::ratio<N2,D2>>::is_no_tag::value
+	                            or std::is_same<ID1,ID2>::value > {};
 
 }
-
-/**
- * @brief Tag creation
- *
- * This creates a tag from an ID and a exponent.
- *
- * @tparam  ID  tag ID
- * @tparam Num  tag exponent numerator
- * @tparam Den  tag exponent denominator
- *
- * @note While users can invoke this meta-function to create tags from their
- *       tag IDs, they can also just pass tag IDs, which the library will then
- *       turn into tags.
- *       In order for the library to do this, this meta-function can be
- *       invoked with either a tag ID (and, optionally, the tag exponent's
- *       numerator and denominator), or with a tag. If a tag is passed as
- *       the ID parameter, Num and Dem will be ignored and the tag returned
- *       instead. This allows the library to pass whatever users provide
- *       through this meta function and get a valid tag from it.
- *
- */
-template<typename ID, std::intmax_t Num = 1, std::intmax_t Den = 1>
-using create_tag_t = typename detail::create_tag<ID,Num,Den>::type;
 
 /**
  * @{
@@ -167,7 +137,7 @@ using create_tag_t = typename detail::create_tag<ID,Num,Den>::type;
  * @tparam Tag2  tag to check for compatibility
  */
 template<typename Tag1, typename Tag2>
-using are_tags_compatible = detail::are_tags_compatible<create_tag_t<Tag1>, create_tag_t<Tag2>>;
+using are_tags_compatible = detail::are_tags_compatible<Tag1, Tag2>;
 template<typename Tag1, typename Tag2>
 constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
 /** @} */
@@ -198,9 +168,9 @@ constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
  *       be created from them before the operation.
  */
 template<typename Tag1, typename Tag2>
-using mul_tag_t = typename detail:: mul_tag<create_tag_t<Tag1>, create_tag_t<Tag2>>::type;
+using mul_tag_t = typename detail:: mul_tag<Tag1, Tag2>::type;
 template<typename Tag1, typename Tag2>
-using div_tag_t = typename detail:: div_tag<create_tag_t<Tag1>, create_tag_t<Tag2>>::type;
+using div_tag_t = typename detail:: div_tag<Tag1, Tag2>::type;
 /** @} */
 
 /**
@@ -212,9 +182,9 @@ using div_tag_t = typename detail:: div_tag<create_tag_t<Tag1>, create_tag_t<Tag
  *       created from it before the operation.
  */
 template<typename Tag>
-using sqrt_tag_t = typename detail::sqrt_tag<create_tag_t<Tag>>::type;
+using sqrt_tag_t = typename detail::sqrt_tag<Tag>::type;
 template<typename Tag, int Power>
-using pow_tag_t = typename detail::  pow_tag<create_tag_t<Tag>, Power>::type;
+using pow_tag_t = typename detail::  pow_tag<Tag, Power>::type;
 /** @} */
 
 }

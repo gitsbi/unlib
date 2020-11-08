@@ -111,30 +111,9 @@ public:
 
 
 /**
- * @brief Quantity instantiated with tag ID
- *
- * This specialization allows the creation of quantities passing only a tag
- * ID, rather than a real tag (which consists of the ID and an exponent).
- *
- * @tparam       Unit   the quantity's unit type
- * @tparam      Scale   the quantity's scale
- * @tparam  ValueType   the quantity's value type
- * @tparam      TagID   the quantity's tag ID
- */
-template< typename Unit
-        , typename Scale
-        , typename ValueType
-        , typename TagID >
-class quantity : public quantity<Unit, Scale, ValueType, create_tag_t<TagID>> {
-public:
-	using quantity<Unit, Scale, ValueType, create_tag_t<TagID>>::quantity;
-};
-
-/**
  * @brief Quantity instantiated with tag
  *
- * This specialization allows the creation of quantities with a real tag,
- * rather than just a tag ID.
+ * This specialization assures quantities are created with tags.
  *
  * @tparam       Unit   the quantity's unit type
  * @tparam      Scale   the quantity's scale
@@ -150,12 +129,12 @@ template< typename      Unit
         , typename      TagID
         , std::intmax_t TagNum
         , std::intmax_t TagDen >
-class quantity<Unit, Scale, ValueType, tag<TagID,TagNum,TagDen>> {
+class quantity<Unit, Scale, ValueType, tag<TagID,std::ratio<TagNum,TagDen>>> {
 public:
-	using unit_type  = Unit;                      /**< the quantity's unit type  */
-	using scale_type = Scale;                     /**< the quantity's scale      */
-	using value_type = ValueType;                 /**< the quantity's value type */
-	using tag_type   = tag<TagID,TagNum,TagDen>;  /**< the quantity's tag        */
+	using unit_type  = Unit;                        /**< the quantity's unit type  */
+	using scale_type = Scale;                       /**< the quantity's scale      */
+	using value_type = ValueType;                   /**< the quantity's value type */
+	using tag_type   = tag_t<TagID,TagNum,TagDen>;  /**< the quantity's tag        */
 
 	/**
 	 * @{
@@ -172,14 +151,14 @@ public:
 	/** @} */
 
 	/** create a quantity type with a different tag */
-	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , create_tag_t<NewTag>   >;
-	                                using    untag   = quantity< unit_type, scale_type, value_type  , no_tag                 >;
+	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , NewTag   >;
+	                                using    untag   = quantity< unit_type, scale_type, value_type  , no_tag   >;
 
 	/** create a quantity with a different value type */
-	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, create_tag_t<tag_type> >;
+	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, tag_type >;
 
 	/** @{ create a quantity with a different value type */
-	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , create_tag_t<tag_type> >;
+	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , tag_type >;
 	template<typename NewScale>     using rescale_by = rescale_to<std::ratio_multiply<NewScale,scale_type>>;
 	/** @} */
 
@@ -639,7 +618,7 @@ constexpr auto scale_cast(const quantity<U,S,V,T>& q)                     {retur
 template<typename U, typename S, typename V, typename T>
 constexpr auto tag_cast(const quantity<U,S,V,T>& q)                       {return implicit_quantity_caster<U,S,V,T,false,false,true>{q};}
 template<typename NewTag, typename U, typename S, typename V, typename T>
-constexpr auto tag_cast(const quantity<U,S,V,T>& q)                       {return quantity<U,S,V,create_tag_t<NewTag>>{tag_cast(q)};}
+constexpr auto tag_cast(const quantity<U,S,V,T>& q)                       {return quantity<U,S,V,NewTag>{tag_cast(q)};}
 /** @} */
 
 

@@ -156,16 +156,19 @@ template<typename V> using        ohm = quantity<resistance, no_scaling, V>;    
 /** @} */
 
 /** @{ power quantities */
+using reactive_power_tag = tag_t<struct reactive_power_tag_id>;
+using apparent_power_tag = tag_t<struct apparent_power_tag_id>;
 template<typename V> using       watt = quantity<power, no_scaling, V>;                                          UNLIB_DEFINE_LITERAL(      watt, W  )         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(watt      , W  )
-template<typename V> using        var = typename watt<V>::template retag<struct reactive_power_tag>;             UNLIB_DEFINE_LITERAL(       var, VAr)         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(var       , VAr)
-template<typename V> using voltampere = typename watt<V>::template retag<struct apparent_power_tag>;             UNLIB_DEFINE_LITERAL(voltampere, VA )         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere, VA )
+template<typename V> using        var = typename watt<V>::template retag<reactive_power_tag>;                    UNLIB_DEFINE_LITERAL(       var, VAr)         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(var       , VAr)
+template<typename V> using voltampere = typename watt<V>::template retag<apparent_power_tag>;                    UNLIB_DEFINE_LITERAL(voltampere, VA )         UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere, VA )
 /** @} */
 
 /** @{ energy quantities */
-template<typename V> using             joule = quantity<energy, no_scaling, V, struct joule_tag>;                UNLIB_DEFINE_LITERAL(            joule, J   ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      joule      , J   )
+using joule_tag = tag_t<struct jule_tag_id>;
+template<typename V> using             joule = quantity<energy, no_scaling, V, joule_tag>;                       UNLIB_DEFINE_LITERAL(            joule, J   ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      joule      , J   )
 template<typename V> using       watt_second = typename joule<V>::untag;                                         UNLIB_DEFINE_LITERAL(      watt_second, Ws  ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      watt_second, Ws  )
-template<typename V> using        var_second = typename joule<V>::template retag<struct reactive_power_tag>;     UNLIB_DEFINE_LITERAL(       var_second, VArs) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(       var_second, VArs)
-template<typename V> using voltampere_second = typename joule<V>::template retag<struct apparent_power_tag>;     UNLIB_DEFINE_LITERAL(voltampere_second, VAs ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere_second, VAs )
+template<typename V> using        var_second = typename joule<V>::template retag<reactive_power_tag>;            UNLIB_DEFINE_LITERAL(       var_second, VArs) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(       var_second, VArs)
+template<typename V> using voltampere_second = typename joule<V>::template retag<apparent_power_tag>;            UNLIB_DEFINE_LITERAL(voltampere_second, VAs ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere_second, VAs )
 template<typename V> using       watt_hour   = typename       watt_second<V>::template rescale_by<hour_scaling>; UNLIB_DEFINE_LITERAL(      watt_hour  , Wh  ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      watt_hour  , Wh  )
 template<typename V> using        var_hour   = typename        var_second<V>::template rescale_by<hour_scaling>; UNLIB_DEFINE_LITERAL(       var_hour  , VArh) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(       var_hour  , VArh)
 template<typename V> using voltampere_hour   = typename voltampere_second<V>::template rescale_by<hour_scaling>; UNLIB_DEFINE_LITERAL(voltampere_hour  , VAh ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere_hour  , VAh )
@@ -202,8 +205,9 @@ template<typename V> using       liter_per_hour = div_quantity_t<liter<V>, hour<
  * advantage over a plain value type when untagged, so they should always
  * have a tag.
  */
+using fraction_tag = tag_t<struct fraction_tag_id>;
 template<typename V, typename T, typename S=scale<1>> using scalar   = quantity<dimensionless, S, V, T>;
-template<typename V, typename S=scale<1>>             using fraction = scalar<V, struct fraction_tag, S>;
+template<typename V, typename S=scale<1>>             using fraction = scalar<V, fraction_tag, S>;
 template<typename V>                                  using percent  = typename fraction<V>::template rescale_by<centi_scaling>;
 template<typename V>                                  using permill  = typename fraction<V>::template rescale_by<milli_scaling>;
 /** @} */

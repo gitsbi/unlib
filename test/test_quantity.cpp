@@ -29,7 +29,7 @@ TEST_CASE("quantities type operations") {
 		CHECK( typeid(value_type)        == typeid(test_quantity::value_type) );
 
 		CHECK( typeid(scale_type)        == typeid(test_quantity::scale_type) );
-		CHECK( typeid(void)              == typeid(test_quantity::tag_type)   );
+		CHECK( typeid(no_tag)            == typeid(test_quantity::tag_type)   );
 
 		CHECK( typeid(exponent<1>)       == typeid(test_quantity::            time_exponent) );
 		CHECK( typeid(exponent<2>)       == typeid(test_quantity::            mass_exponent) );
@@ -41,14 +41,12 @@ TEST_CASE("quantities type operations") {
 	}
 
 	SUBCASE("quantities can be retagged") {
-		struct foo_tag {};
-		struct bar_tag {};
-		using test_q_foo = test_quantity::retag<foo_tag>;
-		using test_q_bar = test_q_foo::retag<bar_tag>;
+		using test_q_foo = test_quantity::retag<tag_t<struct foo_tag_id>>;
+		using test_q_bar = test_q_foo   ::retag<tag_t<struct bar_tag_id>>;
 
-		REQUIRE( typeid(test_quantity::tag_type) == typeid(void   ) );
-		CHECK  ( typeid(test_q_foo::tag_type)    == typeid(foo_tag) );
-		CHECK  ( typeid(test_q_bar::tag_type)    == typeid(bar_tag) );
+		REQUIRE( typeid(test_quantity::tag_type) == typeid(unlib::no_tag         ) );
+		CHECK  ( typeid(test_q_foo::tag_type)    == typeid(tag_t<struct foo_tag_id>) );
+		CHECK  ( typeid(test_q_bar::tag_type)    == typeid(tag_t<struct bar_tag_id>) );
 	}
 
 	SUBCASE("quantities can be rescaled") {
@@ -272,11 +270,11 @@ TEST_CASE("quantity values") {
 	}
 }
 
-TEST_CASE("quantities can be added and subtracted") {
+TEST_CASE("quantity mathematical operations") {
 	using namespace unlib;
 
 	using value_type = double;
-	using test_quantity  = quantity<default_test_unit,    no_scaling, value_type>;
+	using test_quantity  = quantity<default_test_unit, no_scaling, value_type>;
 
 	SUBCASE("quantities can be added and subtracted") {
 		using test_mq = test_quantity::rescale_to<milli_scaling>;
@@ -348,12 +346,40 @@ TEST_CASE("quantities can be added and subtracted") {
 		test_qb ub{110};
 
 		const auto a_mul_b = ua * ub;
-		CHECK( test::demangle(a_mul_b) == test::demangle<quantity<test_q_mul_ab>>() );
+		CHECK( typeid(a_mul_b) == typeid(quantity<test_q_mul_ab>) );
 		CHECK( a_mul_b.get() == doctest::Approx(ua.get()*ub.get()) );
 
 		const auto a_div_b = ua / ub;
-		CHECK( test::demangle(a_div_b) == test::demangle<quantity<test_q_div_ab, std::ratio<1,1000000>>>() );
+		CHECK( typeid(a_div_b) == typeid(quantity<test_q_div_ab, std::ratio<1,1000000>>) );
 		CHECK( a_div_b.get() == doctest::Approx(ua.get()/ub.get()) );
+	}
+
+	SUBCASE("math operations preserve tag and correctly calculate ratio") {
+		using test_q = test_quantity::retag<tag_t<struct test_tag>>;
+		test_q a{42};
+		test_q b{23};
+
+		CHECK(typeid(decltype(a / b    )::tag_type) == typeid(no_tag) );
+		CHECK(typeid(decltype(a * b    )::tag_type) == typeid(tag_t<struct test_tag,2,1>) );
+		CHECK(typeid(decltype(a * b / b)::tag_type) == typeid(test_q::tag_type) );
+		CHECK(typeid(decltype(a / b * a)::tag_type) == typeid(test_q::tag_type) );
+
+		REQUIRE(typeid(                decltype(a*a    ) ::tag_type) == typeid(tag_t<struct test_tag,2,1>) );
+		CHECK  (typeid(sqrt_quantity_t<decltype(a*a    )>::tag_type) == typeid(tag_t<struct test_tag,1,1>) );
+		REQUIRE(typeid(                decltype(a*a*a*a) ::tag_type) == typeid(tag_t<struct test_tag,4,1>) );
+		CHECK  (typeid(sqrt_quantity_t<decltype(a*a*a*a)>::tag_type) == typeid(tag_t<struct test_tag,2,1>) );
+
+		CHECK(typeid(pow_quantity_t<test_q, 5>::tag_type) == typeid(tag_t<struct test_tag, 5,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 4>::tag_type) == typeid(tag_t<struct test_tag, 4,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 3>::tag_type) == typeid(tag_t<struct test_tag, 3,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 2>::tag_type) == typeid(tag_t<struct test_tag, 2,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 1>::tag_type) == typeid(tag_t<struct test_tag, 1,1>));
+		CHECK(typeid(pow_quantity_t<test_q, 0>::tag_type) == typeid(               no_tag      ));
+		CHECK(typeid(pow_quantity_t<test_q,-1>::tag_type) == typeid(tag_t<struct test_tag,-1,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-2>::tag_type) == typeid(tag_t<struct test_tag,-2,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-3>::tag_type) == typeid(tag_t<struct test_tag,-3,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-4>::tag_type) == typeid(tag_t<struct test_tag,-4,1>));
+		CHECK(typeid(pow_quantity_t<test_q,-5>::tag_type) == typeid(tag_t<struct test_tag,-5,1>));
 	}
 
 }
@@ -402,30 +428,30 @@ TEST_CASE("quantity casts") {
 
 	SUBCASE("testing tag_cast") {
 		using namespace unlib;
-		using test_qa  = test_quantity::retag<struct tag_a>;
-		using test_qb  = test_quantity::retag<struct tag_b>;
+		using test_qa  = test_quantity::retag<tag_t<struct tag_a>>;
+		using test_qb  = test_quantity::retag<tag_t<struct tag_b>>;
 
 		test_qa qa{420000};
 
 		//test_qb qb1{qa}; // doesn't compile
-		test_qb qb2{ tag_cast<struct tag_b>(qa)};
+		test_qb qb2{ tag_cast<tag_t<struct tag_b>>(qa)};
 		CHECK(qa.get() == doctest::Approx(qb2.get()));
 		test_qb qb3{ tag_cast(qa)};
 		CHECK(qa.get() == doctest::Approx(qb3.get()));
 
 		//qa = qb2; // doesn't compile
-		qa = tag_cast<struct tag_a>(qb2);
+		qa = tag_cast<tag_t<struct tag_a>>(qb2);
 		CHECK(qa.get() == doctest::Approx(qb2.get()));
 		qa = tag_cast(qb3);
 		CHECK(qa.get() == doctest::Approx(qb3.get()));
 	}
 
 	SUBCASE("testing quantity_cast") {
-		using test_qdka  = quantity<default_test_unit,  kilo_scaling, double, struct tag_a>;
-		using test_qika  = quantity<default_test_unit,  kilo_scaling, int   , struct tag_a>;
-		using test_qdma  = quantity<default_test_unit, milli_scaling, double, struct tag_a>;
-		using test_qdkb  = quantity<default_test_unit,  kilo_scaling, double, struct tag_b>;
-		using test_qimb  = quantity<default_test_unit, milli_scaling, double, struct tag_b>;
+		using test_qdka  = quantity<default_test_unit,  kilo_scaling, double, tag_t<struct tag_a>>;
+		using test_qika  = quantity<default_test_unit,  kilo_scaling, int   , tag_t<struct tag_a>>;
+		using test_qdma  = quantity<default_test_unit, milli_scaling, double, tag_t<struct tag_a>>;
+		using test_qdkb  = quantity<default_test_unit,  kilo_scaling, double, tag_t<struct tag_b>>;
+		using test_qimb  = quantity<default_test_unit, milli_scaling, double, tag_t<struct tag_b>>;
 
 		test_qdka qdka{42};
 

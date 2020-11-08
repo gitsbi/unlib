@@ -3,6 +3,7 @@ A minimal C++14 unit library
 
 Unlib is the beginnings of a minimal, C++14-compatible [SI unit](https://en.wikipedia.org/wiki/International_System_of_Units) library, featuring [units](#units) (e.g., _mass_), [scales](#scales) (e.g., _kilo_), and [quantities](#quantities) (e.g., _kilogram_). Unlib tries to protect you from Murphy's doings and thus often errs on the side of requiring you to be explicit, rather than allowing implicit conversions or similar conveniences. 
 
+
 ## Units
 
 A Unit is an abstract concept representing a measure. This library provides the [seven base measures](https://en.wikipedia.org/wiki/SI_base_unit) of the SI system
@@ -15,9 +16,9 @@ A Unit is an abstract concept representing a measure. This library provides the 
 1. temperature (_Kelvin_)
 1. substance amount (_mol_)
 
-and any combination of those. (Note that this means that unlib does not provide things like, e.g., _kilobytes_.)
+and any combination of those. (Note that this means that unlib does not provide units like, e.g., _kilobytes_.)
 
-All basic units and many combined units are predefined in the library, but it is easy to define your own measurements. For example, while energy is already defined, it could just as well be defined either by multiplying and dividing the base units just like in the formula (kg⋅m<sup>2</sup>⋅s<sup>−2</sup>):
+All basic units and many combined units are predefined in the library, but it is easy to define your own measurements. For example, while energy is already defined, you could just as well be define it yourself by multiplying and dividing the base units just like in the formula (kg⋅m<sup>2</sup>⋅s<sup>−2</sup>):
 
 ```c++
 using energy = unlib::div_unit_t< unlib::mul_unit_t< unlib::mass
@@ -47,15 +48,18 @@ auto power_quantity = (1_kg * 1_m * 1_m) / (1_s * 1_s);
 using energy = decltype(power_quantity)::unit_type;
 ```
 
+
 ## Quantities
 
-A quantity combines a [unit](#units) (_mass_), a [scale](#scales) (_kilo_), and a specific value type (_double_): 
+A quantity combines a [unit](#units) (_mass_), a [scale](#scales) (_kilo_), a specific value type (_double_), and an optional [tag](#tags) (_reactive_): 
 
 ```c++
 using kilogram = unlib::quantity<unlib::mass,unlib::kilo,double>`. 
 ```
 
-(Note: Of course, _kilogram_ is a common enough quantity to be already defined in the library.) Quantities are what actually holds the typed values in your code. They mostly behave like C++' built-in arithmetic types: they can be added, multiplied, compared, etc. A quantity can be created from a value type explicitly: 
+_(Note: Of course, _kilogram_ is a common enough quantity to be already defined in the library.)_ 
+
+Quantities are what actually holds the typed values in your code. They mostly behave like C++' built-in arithmetic types: they can be added, multiplied, compared, etc. A quantity can be created from a value type explicitly: 
 
 ```c++
 kilogram kg{42};
@@ -77,15 +81,14 @@ Nor can a quantity be used where its value type is needed. If you need to pass a
 void f(double kg);
 
 f(kg.get());                             // returns kg
-f(some_mass.get_scaled<unlib::kilo>()); // will return kg no matter what scale some_mass is
+f(some_mass.get_scaled<unlib::milli>()); // will return mg no matter what scale some_mass is
 ```
-
-In engineering, sometimes different quantities that must not be confused are represented by the same physical unit. For example, in electrical engineering, when it comes to AC, there is active power, reactive power, and apparent power. All three are units of power and can be represented by the physical unit _Watt_. Nevertheless, in engineering they must not be confused. In order to allow this, quantities also have an optional template parameter `Tag` (which defaults to `void`). Quantities of different tags are considered of different type and cannot be assigned to each other.   
-(The library provides the three incompatible quantities `watt` for active power, `var` for reactive power, and `voltampere` for apparent power.)
 
 ## Scales
 
-Quantities are scaled, where scales are rational numbers. Due to the limitations of 64 bit interger arithmetic, of the [standard scales provided by SI](https://en.wikipedia.org/wiki/International_System_of_Units#Prefixes) this library only covers atto–exa. They are named like `unlib::atto_scaling`, `unlib::femto_scaling` etc. and are aliases for `std::atto`, `std::femto`, etc. The library also provides shorthands to create scaled quantities from the basic quantities: 
+Quantities are scaled, where scales are rational numbers. Due to the limitations of 64 bit interger arithmetic, of the [standard scales provided by SI](https://en.wikipedia.org/wiki/International_System_of_Units#Prefixes) this library only covers atto–exa. They are named like `unlib::atto_scaling`, `unlib::femto_scaling` etc. and are aliases for `std::atto`, `std::femto`, etc. 
+
+The library also provides meta functions to create scaled quantities from the basic quantities: 
 
 ```c++
 using milligram = unlib::milli<unlib::gram>;
@@ -93,7 +96,30 @@ using  kilogram = unlib::kilo<unlib::gram>;
 using       ton = unlib::kilo<kilogram>;
 ```
 
-Besides those, noteworthy scales supported are `no_scaling`, as well as `minute_scaling`, `hour_scaling`, `day_scaling`, and `week_scaling`, which scale seconds to their respective time unit.   
+Besides those, noteworthy pre-defined scales are `no_scaling`, as well as `minute_scaling`, `hour_scaling`, `day_scaling`, and `week_scaling`, which scale seconds to their respective time unit.   
+
+
+##Tags
+
+In engineering, sometimes different quantities that must not be confused are represented by the same physical unit. For example, in electrical engineering, when it comes to AC, there is active power, reactive power, and apparent power. All three are units of power and can be represented by the physical unit _Watt_. Nevertheless, in engineering they must not be confused. In order to allow this, quantities also have an optional template parameter `Tag`. The template parameter defaults to `no_tag`. A quantity with the tag `no_tag` is considered an untagged quantity. 
+
+(_Note:_ Using tags, the library already provides the three incompatible quantities `watt` for active power, `var` for reactive power, and `voltampere` for apparent power.)
+
+A tag consists of a tag ID and a tag ratio. Except for **`void`**, any type, even an incomplete one, can be used for tag IDs. The only significance of these types is that they differ from each other. The ratio is a `std::ratio` and is used when multiplying or dividing tagged types.
+
+Quantities with either differing tag IDs or differing tag ratios are considered to be of different type and cannot be assigned to each other. (There is, however, a `tag_cast` to circumvent this.) Quantities can be multiplied and divided if
+
+ 1. either (or both) operand(s) have the `no_tag` tag or 
+ 1. both operands have the same tag.
+
+When multiplying and dividing tagged quantities, the library keeps track of the tag's "exponents" (how many times quantities of the same tag have been multiplied or divided with). 
+
+Therefore you can, for example, multiply _reactive power_ with _time_, resulting in _reactive energy_. This divided by reactive power results in untagged time. 
+
+You can also multiply _reactive power_ with _reactive power_, resulting in a _reactive_ tag with a different eponent. If you then divide this by _reactive power_, the result will be _reactive power_ again.)
+
+Note that tags do not reflect all properties of their engineering counterparts. For example, dividing _active power_ by _voltage_, which is untagged, will result in a current quantity tagged as _reactive_, which very likely won't make much sense. In these cases you will have to use `tag_cast` to make the library submit to your application domain's rules. 
+
 
 ## Conversions
 
@@ -110,10 +136,21 @@ All four types of casts come in two flavors. One needs the targetted value type,
   unlib::scale_cast<unlib::milli>(any_weight);
 ```
 
-The other does not need this. It returns a temporary object from which a quantity can be created, and that can be assigned to a quantity. Depending on the quantity created from it, or it is assigned to, the respective conversion is invoked automatically: 
+The other flavor of the same cast does not need this. It returns a temporary object from which a quantity can be created, and that can be assigned to a quantity. Depending on the quantity created from it, or it is assigned to, the respective conversion is invoked automatically: 
 
 ```c++
-  unlib::kilovoltampere reactive_power = unlib::tag_cast(some_active_power_in_kW);
+  my_floating_hours float_hrs = unlib::value_cast(integer_seconds); // note: scale cast from secs to hrs is implicit
 ```
 
-Remember that this cast returns a temporary object which is not a quantity, and must be assigned to a quantity in order to be used.  
+Remember that this cast returns a temporary object which is not a quantity, and must be assigned to a quantity in order to be used. Specifically, it cannot be used in mathematical operations. 
+
+```c++
+  // won't compile
+  unlib::kilo<unlib::watt> power = unlib::tag_cast(some_reactive_power_in_kW) / some_time;
+```
+
+In these cases, you need to explicitly mention the target you want to cast to: 
+
+```c++
+  unlib::kilo<unlib::watt> power = unlib::tag_cast<unlib::no_tag>(some_reactive_power_in_kW) / some_time;
+```

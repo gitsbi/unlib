@@ -33,8 +33,8 @@ namespace doctest {
 
 template<>
 struct StringMaker<std::type_info> {
-	static String convert(const std::type_info& mangled_symbol) {
-		return test::demangle(mangled_symbol).c_str();
+	static String convert(const std::type_info& ti) {
+		return test::demangle(ti).c_str();
 	}
 };
 

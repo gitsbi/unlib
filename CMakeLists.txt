@@ -11,6 +11,7 @@ include_directories(..)
 include_directories(doctest)
 
 add_executable(unlib_test
+        ratio.hpp
         unit.hpp
         tag.hpp
         scaling.hpp

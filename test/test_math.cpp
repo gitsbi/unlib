@@ -6,7 +6,7 @@
 
 TEST_CASE("math") {
 	using namespace unlib;
-	using scale_type = scale_t<1,2>;
+	using scale_type = scale_t<100,1>;
 	using value_type = double;
 	using unit_a = unit<exponent_t<1>
 	                   ,exponent_t<2>
@@ -27,7 +27,7 @@ TEST_CASE("math") {
 		                      ,exponent_t<7,2>>;
 		CHECK(typeid(unlib::sqrt_unit_t<unit_a>) == typeid(unit_sqrt));
 
-		using quantity_sqrt = quantity<unit_sqrt, scale_type, value_type>;
+		using quantity_sqrt = quantity<unit_sqrt, scale_t<10>, value_type>;
 		CHECK(typeid(quantity_sqrt) == typeid(unlib::sqrt_quantity_t<quantity_a>));
 
 		const auto sqroot = unlib::sqrt(quantity_a{81});

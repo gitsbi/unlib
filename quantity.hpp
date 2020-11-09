@@ -430,11 +430,11 @@ template<typename Q1, typename Q2> using  div_quantity_t = quantity< div_unit_t 
                                                                    , div_value_t<typename Q1::value_type, typename Q2::value_type>
                                                                    , div_tag_t  <typename Q1::tag_type  , typename Q2::tag_type  > >;
 template<typename Q              > using sqrt_quantity_t = quantity< sqrt_unit_t<typename Q::unit_type>
-                                                                   , typename Q::scale_type
+                                                                   , sqrt_scale_t<typename Q::scale_type>
                                                                    , typename Q::value_type
                                                                    , sqrt_tag_t<typename Q::tag_type> >;
 template<typename Q , int Power  > using  pow_quantity_t = quantity< pow_unit_t<typename Q::unit_type, Power>
-                                                                   , typename Q::scale_type
+                                                                   , pow_scale_t<typename Q::scale_type,Power>
                                                                    , typename Q::value_type
                                                                    , pow_tag_t<typename Q::tag_type, Power> >;
 /** @} */

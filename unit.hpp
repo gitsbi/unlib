@@ -13,7 +13,8 @@
 
 #include <cstdint>
 #include <type_traits>
-#include <ratio>
+
+#include <unlib/ratio.hpp>
 
 namespace unlib {
 
@@ -25,13 +26,7 @@ namespace unlib {
  */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >
-using exponent_t = typename std::ratio<Num,Den>::type;
-
-namespace detail {
-/* workaround for C++14 lacking the ...v variants */
-template<typename Exp1, typename Exp2>
-constexpr bool ratio_equal_v = std::ratio_equal<Exp1,Exp2>::value;
-}
+using exponent_t = ratio_t<Num,Den>;
 
 /**
  * @brief A physical unit
@@ -211,18 +206,14 @@ using apply_binary_t = unit< Operation<            time_exponent_t<Unit1>,      
                            , Operation<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
                            , Operation<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
 
-template<typename E>
-using negate_exp_t = exponent_t<-E::num,E::den>;
-
-template<int Number, bool = (Number<0) > struct sign;
-template<int Number>                     struct sign<Number,false> { static const int value = +1; };
-template<int Number>                     struct sign<Number,true > { static const int value = -1; };
-template<>                               struct sign<0     ,false> { static const int value =  0; };
-
-template<typename Unit, int Power, int Sign = sign<Power>::value> struct pow_unit;
-template<typename Unit, int Power> struct pow_unit<Unit, Power,   +1> { using type = apply_binary_t<std::ratio_add     , Unit, typename pow_unit<Unit, Power-1>::type>; };
-template<typename Unit, int Power> struct pow_unit<Unit, Power,   -1> { using type = apply_binary_t<std::ratio_subtract, Unit, typename pow_unit<Unit,-Power+1>::type>; };
-template<typename Unit, int Sign > struct pow_unit<Unit,     0, Sign> { using type = unit<e0, e0, e0, e0, e0, e0, e0>; };
+template<typename Unit, int Power, int Sign = sign<Power>::value>
+struct pow_unit;
+template<typename Unit, int Power>
+struct pow_unit<Unit, Power,   +1> {using type = apply_binary_t<std::ratio_add     , Unit, typename pow_unit<Unit, Power-1>::type>;};
+template<typename Unit, int Power>
+struct pow_unit<Unit, Power,   -1> {using type = apply_binary_t<std::ratio_subtract, Unit, typename pow_unit<Unit,-Power+1>::type>;};
+template<typename Unit, int Sign >
+struct pow_unit<Unit,     0, Sign> {using type = unit<e0, e0, e0, e0, e0, e0, e0>;};
 
 using cube_unit = unit<e2, e2, e2, e2, e2, e2, e2>;
 /** @} */
@@ -266,7 +257,7 @@ template<typename Unit1, typename Unit2> using        div_unit_t = detail::apply
 template<typename Unit , int Power>      using        pow_unit_t = typename detail::pow_unit<Unit,Power>::type;
 template<typename Unit>                  using     square_unit_t = pow_unit_t<Unit,2>;
 template<typename Unit>                  using       cube_unit_t = pow_unit_t<Unit,3>;
-template<typename Unit>                  using reciprocal_unit_t = detail::apply_unary_t<detail::negate_exp_t,Unit>;
+template<typename Unit>                  using reciprocal_unit_t = detail::apply_unary_t<ratio_negate_t,Unit>;
 template<typename Unit>                  using       sqrt_unit_t = detail::apply_binary_t<std::ratio_divide, Unit, detail::cube_unit>;
 /** @} */
 
@@ -279,13 +270,13 @@ template<typename Unit>                  using       sqrt_unit_t = detail::apply
  */
 template<typename Unit1, typename Unit2>
 using are_units_compatible = std::integral_constant< bool
-                                                   , detail::ratio_equal_v<            time_exponent_t<Unit1>,             time_exponent_t<Unit2>>
-                                                  && detail::ratio_equal_v<            mass_exponent_t<Unit1>,             mass_exponent_t<Unit2>>
-                                                  && detail::ratio_equal_v<          length_exponent_t<Unit1>,           length_exponent_t<Unit2>>
-                                                  && detail::ratio_equal_v<         current_exponent_t<Unit1>,          current_exponent_t<Unit2>>
-                                                  && detail::ratio_equal_v<      luminosity_exponent_t<Unit1>,       luminosity_exponent_t<Unit2>>
-                                                  && detail::ratio_equal_v<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
-                                                  && detail::ratio_equal_v<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
+                                                   , ratio_equal_v<            time_exponent_t<Unit1>,             time_exponent_t<Unit2>>
+                                                  && ratio_equal_v<            mass_exponent_t<Unit1>,             mass_exponent_t<Unit2>>
+                                                  && ratio_equal_v<          length_exponent_t<Unit1>,           length_exponent_t<Unit2>>
+                                                  && ratio_equal_v<         current_exponent_t<Unit1>,          current_exponent_t<Unit2>>
+                                                  && ratio_equal_v<      luminosity_exponent_t<Unit1>,       luminosity_exponent_t<Unit2>>
+                                                  && ratio_equal_v<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
+                                                  && ratio_equal_v<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
 
 template<typename Unit1, typename Unit2>
 constexpr bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value;

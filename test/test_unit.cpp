@@ -23,8 +23,9 @@ struct unsorted_unit_list_from_unit<unlib::unit<E1,E2,E3,E4,E5,E6,E7>> {
 };
 
 }
+TEST_CASE("units") {
 
-TEST_CASE("exponents") {
+	SUBCASE("exponents") {
 	using namespace unlib;
 	using unit_a = unit<exponent_t<1>
 	                   ,exponent_t<2>
@@ -69,7 +70,7 @@ TEST_CASE("exponents") {
 	}
 }
 
-TEST_CASE("unit type manipulations") {
+SUBCASE("unit type manipulations") {
 	using namespace unlib;
 
 	SUBCASE("power") {
@@ -226,7 +227,7 @@ TEST_CASE("unit type manipulations") {
 	}
 }
 
-TEST_CASE("unit compatibility") {
+SUBCASE("unit compatibility") {
 	using namespace unlib;
 	using unit_a = unit_t<pow_unit_t<unlib::detail::            time,1>
 	                     ,pow_unit_t<unlib::detail::            mass,2>
@@ -259,7 +260,7 @@ TEST_CASE("unit compatibility") {
 	CHECK(not are_units_compatible_v<unit_c, dimensionless>);
 }
 
-TEST_CASE("dimensionlessness") {
+SUBCASE("dimensionlessness") {
 	using namespace unlib;
 	SUBCASE("dimensionless") {
 		CHECK( typeid(dimensionless) == typeid(unit<exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>>) );
@@ -289,4 +290,6 @@ TEST_CASE("dimensionlessness") {
 		                     ,pow_unit_t<unlib::detail::substance_amount,7> >;
 		CHECK(not are_units_compatible_v<unit_a , unit_c>);
 	}
+}
+
 }

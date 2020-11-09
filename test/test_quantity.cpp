@@ -18,7 +18,9 @@ using default_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::detail::       
 
 }
 
-TEST_CASE("quantities type operations") {
+TEST_CASE("quantities") {
+
+SUBCASE("quantities type operations") {
 	using namespace unlib;
 	using scale_type = scale_t<1,2>;
 	using value_type = double;
@@ -77,7 +79,7 @@ TEST_CASE("quantities type operations") {
 	}
 }
 
-TEST_CASE("quantity values") {
+SUBCASE("quantity values") {
 	using namespace unlib;
 
 	using value_type = double;
@@ -270,7 +272,7 @@ TEST_CASE("quantity values") {
 	}
 }
 
-TEST_CASE("quantity mathematical operations") {
+SUBCASE("quantity mathematical operations") {
 	using namespace unlib;
 
 	using value_type = double;
@@ -470,7 +472,7 @@ TEST_CASE("quantity mathematical operations") {
 
 }
 
-TEST_CASE("quantity casts") {
+SUBCASE("quantity casts") {
 	using namespace unlib;
 	using test_quantity  = quantity<default_test_unit, no_scaling, double>;
 
@@ -556,4 +558,6 @@ TEST_CASE("quantity casts") {
 		test_qdkb qdkb3{ quantity_cast(qdka)}; CHECK(qdkb3.get() == doctest::Approx(qdka.get()          ));
 		test_qimb qimb3{ quantity_cast(qdka)}; CHECK(qimb3.get() == doctest::Approx(qdka.get()*1000*1000));
 	}
+}
+
 }

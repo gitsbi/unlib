@@ -1,6 +1,11 @@
 Changes
 =======
 
+0.7.1
+* fixed pow and sqrt for quantities by adding pow_scale_t and sqrt_scale_t
+* added unlib/ratio.hpp, used by other headers
+*
+
 0.7.0
 * allowed quantity multiplication and division of units with different tags under specific circumstances
 * added pow function

@@ -13,7 +13,8 @@
 
 #include <cstdint>
 #include <type_traits>
-#include <ratio>
+
+#include <unlib/ratio.hpp>
 
 namespace unlib {
 
@@ -31,28 +32,48 @@ namespace unlib {
  * @tparam Num  tag exponent numerator
  * @tparam Den  tag exponent denominator
  *
- * @note Do not this type directly. Use the create_tag_t meta function instead.
+ * @note Do not use this type directly. Use the tag_t meta function instead.
  */
 template<typename ID, typename Exponent>
 struct tag;
+
+/**
+ * @brief Tag ratio
+ *
+ * Tag rations are used to track multiplication and division of tagged
+ * quantities so that tags can be canceled automatically when dividing
+ * tags.
+ */
+template< std::intmax_t Num = 1
+        , std::intmax_t Den = 1 >
+using tag_ratio_t = ratio_t<Num,Den>;
 
 template<typename ID, std::intmax_t Num, std::intmax_t Den>
 struct tag<ID,std::ratio<Num,Den>> {
 	using id        = ID;
 	using is_no_tag = std::is_same<id,void>;
-	using exponent  = std::conditional_t< is_no_tag::value, std::ratio<0,1>, typename std::ratio<Num,Den>::type >;
-	using type      = std::conditional_t< is_no_tag::value || Num==0, tag<void,std::ratio<0,1>>, tag<ID, exponent> >;
+	using exponent  = std::conditional_t< is_no_tag::value, tag_ratio_t<0,1>, typename tag_ratio_t<Num,Den>::type >;
+	using type      = std::conditional_t< is_no_tag::value || Num==0, tag<void,tag_ratio_t<0,1>>, tag<ID, exponent> >;
 };
-
-template<typename ID, std::intmax_t Num = 1, std::intmax_t Den = 1>
-using tag_t = typename tag<ID,std::ratio<Num,Den>>::type;
 
 /**
  * @brief No tag
  *
  * This signifies that a quantity has no tag
  */
-using no_tag = tag_t<void,0,1>;
+using no_tag = tag<void,tag_ratio_t<0>>;
+
+/**
+ * @brief Create tag types
+ *
+ * This is a meta function to create tag types. The result will already be
+ * cancelled, if possible. If either ID is void or Num is zero, this will
+ * result in no_tag.
+ *
+ * @see tag
+ */
+template<typename ID, std::intmax_t Num = 1, std::intmax_t Den = 1>
+using tag_t = typename tag<ID,tag_ratio_t<Num,Den>>::type;
 
 namespace detail {
 
@@ -60,22 +81,21 @@ template<typename Tag1, typename Tag2>
 struct add_tag_exponents;
 template<typename ID, std::intmax_t N1, std::intmax_t D1, std::intmax_t N2, std::intmax_t D2>
 struct add_tag_exponents<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>> {
-	using type = tag_t< ID, std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
-	                      , std::ratio_add<std::ratio<N1,D1>,std::ratio<N2,D2>>::den >;
+	using type = tag_t< ID, std::ratio_add<tag_ratio_t<N1,D1>,tag_ratio_t<N2,D2>>::num
+	                      , std::ratio_add<tag_ratio_t<N1,D1>,tag_ratio_t<N2,D2>>::den >;
 };
 
 template<typename Tag1, typename Tag2>
 struct substract_tag_exponents;
 template<typename ID, std::intmax_t N1, std::intmax_t D1, std::intmax_t N2, std::intmax_t D2>
 struct substract_tag_exponents<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>> {
-	using type = tag_t<ID, std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::num
-	                     , std::ratio_subtract<std::ratio<N1,D1>,std::ratio<N2,D2>>::den >;
+	using type = tag_t<ID, std::ratio_subtract<tag_ratio_t<N1,D1>,tag_ratio_t<N2,D2>>::num
+	                     , std::ratio_subtract<tag_ratio_t<N1,D1>,tag_ratio_t<N2,D2>>::den >;
 };
 
 
 template<typename Tag1, typename Tag2>
 struct mul_tag;
-
 template<>
 struct mul_tag<no_tag,no_tag>                                             {using type = no_tag;};
 template<typename ID, std::intmax_t N , std::intmax_t D >
@@ -89,7 +109,6 @@ struct mul_tag<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>>       {using
 
 template<typename Tag1, typename Tag2>
 struct div_tag;
-
 template<>
 struct div_tag<no_tag,no_tag>                                             {using type = no_tag;};
 template<typename ID, std::intmax_t N , std::intmax_t D >
@@ -102,13 +121,13 @@ struct div_tag<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>>       {using
 
 
 template<typename Tag>
-struct sqrt_tag : tag_t< typename Tag::id, std::ratio_divide<typename Tag::exponent,std::ratio<2>>::num
-                                         , std::ratio_divide<typename Tag::exponent,std::ratio<2>>::den > {};
+struct sqrt_tag : tag_t< typename Tag::id, std::ratio_divide<typename Tag::exponent,tag_ratio_t<2>>::num
+                                         , std::ratio_divide<typename Tag::exponent,tag_ratio_t<2>>::den > {};
 
 
 template<typename Tag, int Power>
-struct  pow_tag : tag_t< typename Tag::id, std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::num
-                                         , std::ratio_multiply<typename Tag::exponent,std::ratio<Power>>::den > {};
+struct  pow_tag : tag_t< typename Tag::id, std::ratio_multiply<typename Tag::exponent,tag_ratio_t<Power>>::num
+                                         , std::ratio_multiply<typename Tag::exponent,tag_ratio_t<Power>>::den > {};
 
 
 template<typename Tag1, typename Tag2>
@@ -116,8 +135,8 @@ struct are_tags_compatible;
 template< typename ID1, std::intmax_t N1, std::intmax_t D1
         , typename ID2, std::intmax_t N2, std::intmax_t D2 >
 struct are_tags_compatible<tag<ID1,std::ratio<N1,D1>>,tag<ID2,std::ratio<N2,D2>>>
-	: std::integral_constant<bool, tag<ID1,std::ratio<N1,D1>>::is_no_tag::value
-	                            or tag<ID2,std::ratio<N2,D2>>::is_no_tag::value
+	: std::integral_constant<bool, tag<ID1,tag_ratio_t<N1,D1>>::is_no_tag::value
+	                            or tag<ID2,tag_ratio_t<N2,D2>>::is_no_tag::value
 	                            or std::is_same<ID1,ID2>::value > {};
 
 }

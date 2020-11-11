@@ -205,9 +205,8 @@ template<typename V> using       liter_per_hour = div_quantity_t<liter<V>, hour<
  * advantage over a plain value type when untagged, so they should always
  * have a tag.
  */
-using fraction_tag = tag_t<struct fraction_tag_id>;
 template<typename V, typename T, typename S=scale_t<1>> using scalar   = quantity<dimensionless, S, V, T>;
-template<typename V, typename S=scale_t<1>>             using fraction = scalar<V, fraction_tag, S>;
+template<typename V, typename S=scale_t<1>>             using fraction = scalar<V, no_tag, S>;
 template<typename V>                                    using percent  = typename fraction<V>::template rescale_by<centi_scaling>;
 template<typename V>                                    using permill  = typename fraction<V>::template rescale_by<milli_scaling>;
 /** @} */

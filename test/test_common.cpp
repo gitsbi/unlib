@@ -689,12 +689,18 @@ SUBCASE("scalar") {
 	CHECK(typeid(unlib::percent <VT              >::unit_type) == typeid(unlib::dimensionless));
 	CHECK(typeid(unlib::permill <VT              >::unit_type) == typeid(unlib::dimensionless));
 
-	CHECK(typeid(unlib::scalar  <VT,unlib::no_tag>) == typeid(unlib::scalar<VT,       unlib::no_tag                      >));
-	CHECK(typeid(unlib::fraction<VT              >) == typeid(unlib::scalar<VT, unlib::fraction_tag                      >));
-	CHECK(typeid(unlib::percent <VT              >) == typeid(unlib::scalar<VT, unlib::fraction_tag, unlib::centi_scaling>));
-	CHECK(typeid(unlib::permill <VT              >) == typeid(unlib::scalar<VT, unlib::fraction_tag, unlib::milli_scaling>));
+	CHECK(typeid(unlib::scalar  <VT,unlib::no_tag>) == typeid(unlib::scalar<VT, unlib::no_tag                      >));
+	CHECK(typeid(unlib::fraction<VT              >) == typeid(unlib::scalar<VT, unlib::no_tag                      >));
+	CHECK(typeid(unlib::percent <VT              >) == typeid(unlib::scalar<VT, unlib::no_tag, unlib::centi_scaling>));
+	CHECK(typeid(unlib::permill <VT              >) == typeid(unlib::scalar<VT, unlib::no_tag, unlib::milli_scaling>));
 
-	CHECK(std::is_same<unlib::percent<VT>::tag_type, unlib::fraction_tag>::value);
+	CHECK(std::is_same<unlib::percent<VT>::tag_type, unlib::no_tag>::value);
+
+	using namespace unlib::literals;
+
+	const auto power = 1000._kW;
+	const auto percent = unlib::percent<double>{49.};
+	CHECK(power * percent == 490._kW);
 }
 
 }

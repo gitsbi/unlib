@@ -120,16 +120,6 @@ template<typename ID, std::intmax_t N1, std::intmax_t D1
 struct div_tag<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>>       {using type = typename substract_tag_exponents<tag_t<ID,N1,D1>,tag_t<ID,N2,D2>>::type;};
 
 
-template<typename Tag>
-struct sqrt_tag : tag_t< typename Tag::id, std::ratio_divide<typename Tag::exponent,tag_ratio_t<2>>::num
-                                         , std::ratio_divide<typename Tag::exponent,tag_ratio_t<2>>::den > {};
-
-
-template<typename Tag, int Power>
-struct  pow_tag : tag_t< typename Tag::id, std::ratio_multiply<typename Tag::exponent,tag_ratio_t<Power>>::num
-                                         , std::ratio_multiply<typename Tag::exponent,tag_ratio_t<Power>>::den > {};
-
-
 template<typename Tag1, typename Tag2>
 struct are_tags_compatible;
 template< typename ID1, std::intmax_t N1, std::intmax_t D1
@@ -201,10 +191,10 @@ using div_tag_t = typename detail:: div_tag<Tag1, Tag2>::type;
  * @note If the parameter is a tag IDs, rather than a tag, a tag will be
  *       created from it before the operation.
  */
+template<typename Tag, typename Ratio>
+using pow_tag_t = typename tag<typename Tag::id, std::ratio_multiply<typename Tag::exponent,Ratio>>::type;
 template<typename Tag>
-using sqrt_tag_t = typename detail::sqrt_tag<Tag>::type;
-template<typename Tag, int Power>
-using pow_tag_t = typename detail::  pow_tag<Tag, Power>::type;
+using sqrt_tag_t = pow_tag_t<Tag, std::ratio<1,2>>;
 /** @} */
 
 }

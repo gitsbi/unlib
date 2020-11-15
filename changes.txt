@@ -1,10 +1,17 @@
 Changes
 =======
 
+0.7.3
+* allow ratios as exponents for pow
+* allow extracting square and cube roots of ratios (limited to a few ratios)
+
+0.7.2
+* fixed type in detail::is_same_v
+* removed tag from fractions
+
 0.7.1
 * fixed pow and sqrt for quantities by adding pow_scale_t and sqrt_scale_t
 * added unlib/ratio.hpp, used by other headers
-*
 
 0.7.0
 * allowed quantity multiplication and division of units with different tags under specific circumstances

@@ -8,13 +8,13 @@
 
 namespace {
 
-using default_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::detail::            time,std::ratio<1>>
-                                       ,unlib::pow_unit_t<unlib::detail::            mass,std::ratio<2>>
-                                       ,unlib::pow_unit_t<unlib::detail::          length,std::ratio<3>>
-                                       ,unlib::pow_unit_t<unlib::detail::         current,std::ratio<4>>
-                                       ,unlib::pow_unit_t<unlib::detail::      luminosity,std::ratio<5>>
-                                       ,unlib::pow_unit_t<unlib::detail::     temperature,std::ratio<6>>
-                                       ,unlib::pow_unit_t<unlib::detail::substance_amount,std::ratio<7>> >;
+using default_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
+                                       ,unlib::pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
+                                       ,unlib::pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
+                                       ,unlib::pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
+                                       ,unlib::pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
+                                       ,unlib::pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
+                                       ,unlib::pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
 
 }
 
@@ -313,27 +313,27 @@ SUBCASE("quantity mathematical operations") {
 	}
 
 	SUBCASE("quantities can be multiplied and divided") {
-		using test_unit_b = unit_t<pow_unit_t<unlib::detail::            time,std::ratio<7>>
-		                          ,pow_unit_t<unlib::detail::            mass,std::ratio<6>>
-		                          ,pow_unit_t<unlib::detail::          length,std::ratio<5>>
-		                          ,pow_unit_t<unlib::detail::         current,std::ratio<4>>
-		                          ,pow_unit_t<unlib::detail::      luminosity,std::ratio<3>>
-		                          ,pow_unit_t<unlib::detail::     temperature,std::ratio<2>>
-		                          ,pow_unit_t<unlib::detail::substance_amount,std::ratio<1>> >;
-		using test_unit_mab = unit_t<pow_unit_t<unlib::detail::            time,std::ratio<8>>
-		                            ,pow_unit_t<unlib::detail::            mass,std::ratio<8>>
-		                            ,pow_unit_t<unlib::detail::          length,std::ratio<8>>
-		                            ,pow_unit_t<unlib::detail::         current,std::ratio<8>>
-		                            ,pow_unit_t<unlib::detail::      luminosity,std::ratio<8>>
-		                            ,pow_unit_t<unlib::detail::     temperature,std::ratio<8>>
-		                            ,pow_unit_t<unlib::detail::substance_amount,std::ratio<8>> >;
-		using test_unit_dab = unit_t<pow_unit_t<unlib::detail::            time,std::ratio<-6>>
-		                            ,pow_unit_t<unlib::detail::            mass,std::ratio<-4>>
-		                            ,pow_unit_t<unlib::detail::          length,std::ratio<-2>>
-		                            ,pow_unit_t<unlib::detail::         current,std::ratio<0>>
-		                            ,pow_unit_t<unlib::detail::      luminosity,std::ratio<2>>
-		                            ,pow_unit_t<unlib::detail::     temperature,std::ratio<4>>
-		                            ,pow_unit_t<unlib::detail::substance_amount,std::ratio<6>> >;
+		using test_unit_b = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<7>>
+		                          ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<6>>
+		                          ,pow_unit_t<unlib::detail::          length_unit,std::ratio<5>>
+		                          ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
+		                          ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<3>>
+		                          ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<2>>
+		                          ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<1>> >;
+		using test_unit_mab = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::          length_unit,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::         current_unit,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<8>> >;
+		using test_unit_dab = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<-6>>
+		                            ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<-4>>
+		                            ,pow_unit_t<unlib::detail::          length_unit,std::ratio<-2>>
+		                            ,pow_unit_t<unlib::detail::         current_unit,std::ratio<0>>
+		                            ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<2>>
+		                            ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<4>>
+		                            ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<6>> >;
 
 		using test_qa  = test_quantity::rescale_to<milli_scaling>;
 		using test_qb  = quantity<test_unit_b, kilo_scaling, value_type>;

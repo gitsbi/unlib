@@ -20,9 +20,10 @@ namespace unlib {
 /**
  * @brief Quantity scale
  *
- * Quantities have a scaling for their value that is part of their type.
- * Common scalings are the ones SI provides (kilo, milli, etc.), but time
- * spans are measured in weird scales which need their own definitions.
+ * A scale is a rational fraction. Quantities have a scaling for their value
+ * that is part of their type. Common scalings are the ones SI provides (kilo,
+ * milli, etc.), but time spans are measured in weird scales which need their
+ * own definitions.
  *
  * There are meta functions to scale by and to different scalings.
  */
@@ -35,7 +36,7 @@ using     no_scaling = scale_t<1>;
 
 /**
  * @{
- * import std ratios so they are available in the same namespace as no_scaling is
+ * import std ratios so they are available in the unlib namespace
  */
 using   atto_scaling = std:: atto;
 using  femto_scaling = std::femto;
@@ -57,7 +58,7 @@ using    exa_scaling = std::  exa;
 
 /**
  * @{
- * humans measure time in odd multiples of seconds
+ * humans measure time in Babylonian multiples of seconds
  */
 using second_scaling = no_scaling;
 using minute_scaling = scale_t<60>;
@@ -72,7 +73,7 @@ template<typename NewScale, typename T> struct scale_by;
 template<typename NewScale, typename T> struct scale_to;
 
 /* note Providing the implementations for scales here, allowing for other
- *      implementations for other types to be added to this namespace
+ *      implementations for other types to be added to the detail namespace
  *      elsewhere. */
 template<typename NewScale, std::intmax_t Num, std::intmax_t Den >
 struct scale_by<NewScale, std::ratio<Num,Den>>        {using result = std::ratio_multiply<NewScale,std::ratio<Num,Den>>;};
@@ -86,7 +87,7 @@ struct scale_to<NewScale, std::ratio<Num,Den>>        {using result = NewScale;}
  *
  * Meta functions to get the type of a specific scalingy.
  *
- * @note micro<kilo<meter>> will result in milli<meter>,
+ * @note micro<kilo<meter>> will result in milli<meter>, whereas
  *       to_micro<kilo<no_scaling>> and to_micro<to_kilo<no_scaling>> will
  *       result in micro<no_scaling>.
  *

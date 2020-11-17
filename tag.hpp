@@ -40,9 +40,8 @@ struct tag;
 /**
  * @brief Tag ratio
  *
- * Tag rations are used to track multiplication and division of tagged
- * quantities so that tags can be canceled automatically when dividing
- * tags.
+ * Ratios are used to track multiplication and division of tagged quantities
+ * so that tags can be canceled automatically when dividing tags.
  */
 template< std::intmax_t Num = 1
         , std::intmax_t Den = 1 >
@@ -53,7 +52,7 @@ struct tag<ID,std::ratio<Num,Den>> {
 	using id        = ID;
 	using is_no_tag = std::is_same<id,void>;
 	using exponent  = std::conditional_t< is_no_tag::value, tag_ratio_t<0,1>, typename tag_ratio_t<Num,Den>::type >;
-	using type      = std::conditional_t< is_no_tag::value || Num==0, tag<void,tag_ratio_t<0,1>>, tag<ID, exponent> >;
+	using type      = tag< std::conditional_t<is_no_tag::value || Num==0, void, ID>, exponent >;
 };
 
 /**

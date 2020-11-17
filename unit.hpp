@@ -21,8 +21,8 @@ namespace unlib {
 /**
  * @brief an exponent of a basic SI unit
  *
- * An exponent with the numerator set to zero represents a unit that is not
- * present.
+ * An exponent is a std::ratio. An exponent with the numerator set to zero
+ * represents a unit that is not present.
  */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >
@@ -99,7 +99,7 @@ namespace detail {
 /**
  * @{
  *
- * Shortcuts to make the following code more easily readable
+ * Shortcuts for the following code
  */
 using e0 = exponent_t<0>;
 using e1 = exponent_t<1>;
@@ -115,13 +115,13 @@ using e2 = exponent_t<2>;
  *       Definitions intended to be used by users are done elsewhere together
  *       with units derived from the basic units.
  */
-using             time = unit< e1, e0, e0, e0, e0, e0, e0 >;
-using             mass = unit< e0, e1, e0, e0, e0, e0, e0 >;
-using           length = unit< e0, e0, e1, e0, e0, e0, e0 >;
-using          current = unit< e0, e0, e0, e1, e0, e0, e0 >;
-using       luminosity = unit< e0, e0, e0, e0, e1, e0, e0 >;
-using      temperature = unit< e0, e0, e0, e0, e0, e1, e0 >;
-using substance_amount = unit< e0, e0, e0, e0, e0, e0, e1 >;
+using             time_unit = unit< e1, e0, e0, e0, e0, e0, e0 >;
+using             mass_unit = unit< e0, e1, e0, e0, e0, e0, e0 >;
+using           length_unit = unit< e0, e0, e1, e0, e0, e0, e0 >;
+using          current_unit = unit< e0, e0, e0, e1, e0, e0, e0 >;
+using       luminosity_unit = unit< e0, e0, e0, e0, e1, e0, e0 >;
+using      temperature_unit = unit< e0, e0, e0, e0, e0, e1, e0 >;
+using substance_amount_unit = unit< e0, e0, e0, e0, e0, e0, e1 >;
 /** @} */
 
 /**
@@ -130,13 +130,13 @@ using substance_amount = unit< e0, e0, e0, e0, e0, e0, e1 >;
  * access the exponent for a specific basic unit in a unit
  */
 template<typename Unit, typename BasicUnit> struct get_exponent;
-template<typename Unit                    > struct get_exponent<Unit,            time> { using type =             time_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,            mass> { using type =             mass_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,          length> { using type =           length_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,         current> { using type =          current_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,      luminosity> { using type =       luminosity_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,     temperature> { using type =      temperature_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,substance_amount> { using type = substance_amount_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,            time_unit> { using type =             time_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,            mass_unit> { using type =             mass_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,          length_unit> { using type =           length_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,         current_unit> { using type =          current_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,      luminosity_unit> { using type =       luminosity_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,     temperature_unit> { using type =      temperature_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,substance_amount_unit> { using type = substance_amount_exponent_t<Unit>; };
 
 template<typename Unit, typename BasicUnit>
 using get_exponent_t = typename get_exponent<Unit,BasicUnit>::type;
@@ -175,13 +175,13 @@ struct find_first_exponent<BasicUnit,unsorted_unit_list<Head,Tail...>> {
 
 /** create a unit with the basic units being sorted into the correct order from a unsorted_unit_list */
 template< typename UnsortedUnitList >
-using create_unit_t = unit< typename find_first_exponent<            time, UnsortedUnitList>::type
-                          , typename find_first_exponent<            mass, UnsortedUnitList>::type
-                          , typename find_first_exponent<          length, UnsortedUnitList>::type
-                          , typename find_first_exponent<         current, UnsortedUnitList>::type
-                          , typename find_first_exponent<      luminosity, UnsortedUnitList>::type
-                          , typename find_first_exponent<     temperature, UnsortedUnitList>::type
-                          , typename find_first_exponent<substance_amount, UnsortedUnitList>::type >;
+using create_unit_t = unit< typename find_first_exponent<            time_unit, UnsortedUnitList>::type
+                          , typename find_first_exponent<            mass_unit, UnsortedUnitList>::type
+                          , typename find_first_exponent<          length_unit, UnsortedUnitList>::type
+                          , typename find_first_exponent<         current_unit, UnsortedUnitList>::type
+                          , typename find_first_exponent<      luminosity_unit, UnsortedUnitList>::type
+                          , typename find_first_exponent<     temperature_unit, UnsortedUnitList>::type
+                          , typename find_first_exponent<substance_amount_unit, UnsortedUnitList>::type >;
 
 /**
  * @{
@@ -201,6 +201,8 @@ struct apply_unary<Operation, unit<Tim,Mas,Len,Cur,Lum,Tem,Sub>> {
 	                 , Operation<Tem>
 	                 , Operation<Sub> >;
 };
+template<template<typename> class Operation, typename Unit>
+using apply_unary_t = typename apply_unary<Operation, Unit>::type;
 
 template<template<typename,typename> class Operation, typename Unit, typename Operand>
 struct apply_binary;
@@ -228,6 +230,8 @@ struct apply_binary<Operation, unit<Tim1,Mas1,Len1,Cur1,Lum1,Tem1,Sub1>, unit<Ti
 	                 , Operation<Tem1, Tem2>
 	                 , Operation<Sub1, Sub2> >;
 };
+template<template<typename,typename> class Operation, typename Unit, typename Operand>
+using apply_binary_t = typename apply_binary<Operation, Unit, Operand>::type;
 
 template<typename Unit, typename Ratio>
 struct pow_unit;
@@ -271,14 +275,14 @@ using unit_t = detail::create_unit_t<detail::unsorted_unit_list<Basic1,Basic2,Ba
 /**
  * @{
  *
- * @brief unit type manipulations
+ * @brief common unit type manipulations
  */
-template<typename Unit1, typename Unit2> using        mul_unit_t = typename detail::apply_binary<std::ratio_add     ,Unit1,Unit2>::type;
-template<typename Unit1, typename Unit2> using        div_unit_t = typename detail::apply_binary<std::ratio_subtract,Unit1,Unit2>::type;
-template<typename Unit , typename Ratio> using        pow_unit_t = typename detail::apply_binary<std::ratio_multiply,Unit ,Ratio>::type;
+template<typename Unit1, typename Unit2> using        mul_unit_t = detail::apply_binary_t<std::ratio_add     ,Unit1,Unit2>;
+template<typename Unit1, typename Unit2> using        div_unit_t = detail::apply_binary_t<std::ratio_subtract,Unit1,Unit2>;
+template<typename Unit , typename Ratio> using        pow_unit_t = detail::apply_binary_t<std::ratio_multiply,Unit ,Ratio>;
 template<typename Unit>                  using     square_unit_t = pow_unit_t<Unit,std::ratio<2,1>>;
 template<typename Unit>                  using       cube_unit_t = pow_unit_t<Unit,std::ratio<3,1>>;
-template<typename Unit>                  using reciprocal_unit_t = typename detail::apply_unary<ratio_negate_t,Unit>::type;
+template<typename Unit>                  using reciprocal_unit_t = detail::apply_unary_t<ratio_negate_t,Unit>;
 template<typename Unit>                  using       sqrt_unit_t = pow_unit_t<Unit, std::ratio<1,2>>;
 template<typename Unit>                  using       cbrt_unit_t = pow_unit_t<Unit, std::ratio<1,3>>;
 /** @} */

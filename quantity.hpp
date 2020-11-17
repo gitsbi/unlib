@@ -51,6 +51,11 @@ template< typename Unit
         , typename Tag       = no_tag >
 class quantity;
 
+template<typename T>                                     struct is_quantity                    : std::false_type {};
+template<typename U, typename S, typename V, typename T> struct is_quantity<quantity<U,S,V,T>> : std::true_type {};
+
+template<typename T> constexpr bool is_quantity_v = is_quantity<T>::value;
+
 namespace detail {
 
 template<typename NewScale, typename OldScale>
@@ -73,6 +78,18 @@ struct value_rescaler<Scale,Scale> {
 
 template<typename NewScale, typename OldScale, typename ValueType>
 constexpr ValueType rescale_value(ValueType v)                            {return value_rescaler<NewScale,OldScale>::rescale_value(v);}
+
+template<typename T>
+constexpr bool is_floating_point_v = std::is_floating_point<T>::value;
+template<typename T>
+constexpr bool is_integral_v = std::is_integral<T>::value;
+
+template<typename T>
+constexpr std::enable_if_t<is_integral_v<T>,T>       get_tolerance()      {return T{};}
+template<typename F>
+constexpr std::enable_if_t<is_floating_point_v<F>,F> get_tolerance()      {return 100*std::numeric_limits<float>::epsilon();}
+template<typename Q>
+constexpr std::enable_if_t<is_quantity_v<Q>, Q>      get_tolerance()      {return Q{get_tolerance<typename Q::value_type>()};}
 
 }
 
@@ -170,12 +187,13 @@ public:
 	using substance_amount_exponent = substance_amount_exponent_t<unit_type>;
 	/** @} */
 
-	/** create a quantity type with a different tag */
-	template<typename NewTag>       using    retag   = quantity< unit_type, scale_type, value_type  , NewTag   >;
-	                                using untag      = quantity< unit_type, scale_type, value_type  , no_tag                 >;
+	/** @{ create a quantity type with a different tag */
+	template<typename NewTag>       using      retag = quantity< unit_type, scale_type, value_type  , NewTag   >;
+	                                using      untag = quantity< unit_type, scale_type, value_type  , no_tag   >;
+	/** @} */
 
 	/** create a quantity with a different value type */
-	template<typename NewValueType> using  revalue   = quantity< unit_type, scale_type, NewValueType, tag_type >;
+	template<typename NewValueType> using    revalue = quantity< unit_type, scale_type, NewValueType, tag_type >;
 
 	/** @{ create a quantity with a different value type */
 	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , tag_type >;
@@ -207,6 +225,9 @@ public:
 	 *       which tell the user why the conversion is not allowed, and what
 	 *       casts (if any) can be used to allow it.
 	 *
+	 * @note This constructor intentionally is not marked `explicit`, since
+	 *       rescaling should be done implicitly.
+	 *
 	 * @param rhs  quantity to convert from
 	 */
 	template<typename U, typename S, typename V, typename T>
@@ -226,6 +247,9 @@ public:
 	 * conversions of any combination of scale, tag, and value type.
 	 *
 	 * @param rhs  Quantity to convert from
+	 *
+	 * @note This constructor intentionally is not marked `explicit`, since
+	 *       conversions from implicit_quantity_caster should be implicit.
 	 *
 	 * @sa unlibs::value_cast
 	 */
@@ -251,41 +275,23 @@ public:
 	constexpr quantity& operator=(const quantity& rhs)                  = default;
 
 	/**
-	 * @{
-	 *
 	 * @brief get value
 	 *
 	 * This retrieves the quantity's underlying value
+	 *
+	 * @note There is a free function of the same name.
 	 */
 	constexpr value_type get() const                                      {return value;}
-	friend constexpr value_type get(const quantity& q)                    {return q.get();}
-	/** @} */
 
 	/**
-	 * @{
-	 *
 	 * @brief get scaled value
 	 *
 	 * This retrieves the quantity's underlying value at the specified scale
+	 *
+	 * @note There is a free function of the same name.
 	 */
 	template<typename NewScale>
 	constexpr value_type get_scaled(NewScale = NewScale{}) const          {return detail::rescale_value<NewScale,scale_type>(value);}
-	template<typename NewScale, typename U, typename S, typename V, typename T, typename E>
-	constexpr value_type get_scaled(const quantity<U,S,V,T>& q, NewScale = NewScale{})
-	                                                                      {return q.template get_scaled<NewScale>();}
-	/** @} */
-
-	/**
-	 * @{
-	 * @brief Comparison operators
-	 */
-	template<typename S> constexpr bool operator==(const quantity<unit_type,S,value_type,tag_type>& rhs) const {return value == rhs.template get_scaled<scale_type>();}
-	template<typename S> constexpr bool operator< (const quantity<unit_type,S,value_type,tag_type>& rhs) const {return value <  rhs.template get_scaled<scale_type>();}
-	template<typename S> constexpr bool operator> (const quantity<unit_type,S,value_type,tag_type>& rhs) const {return value >  rhs.template get_scaled<scale_type>();}
-	template<typename S> constexpr bool operator>=(const quantity<unit_type,S,value_type,tag_type>& rhs) const {return not (*this <  rhs);}
-	template<typename S> constexpr bool operator<=(const quantity<unit_type,S,value_type,tag_type>& rhs) const {return not (*this >  rhs);}
-	template<typename S> constexpr bool operator!=(const quantity<unit_type,S,value_type,tag_type>& rhs) const {return not (*this == rhs);}
-	/** @} */
 
 	/**
 	 * @{
@@ -354,56 +360,71 @@ public:
 	constexpr quantity operator+() const                                  {return *this;}
 
 	/**
-	 * @{
-	 *
 	 * @brief Check whether two floating point quantities are almost equal
 	 *
 	 * Checks whether two floating point quantities are almost equal. For
 	 * integer types, this will test whether they are equal.
 	 *
-	 * @param epsilon  Tolerance for comparison.
+	 * @param tolerance  Tolerance for comparison.
 	 *
 	 * @return true, if near zero
+	 *
+	 * @note There is a free function of the same name.
 	 */
-	template<typename U, typename S, typename V, typename T, typename E = value_type>
-	constexpr bool is_near(const quantity<U,S,V,T>& rhs, const E epsilon = get_epsilon<V>()) const
+	template<typename U, typename S, typename V, typename T, typename E = V>
+	constexpr bool is_near(const quantity<U,S,V,T>& rhs, const E tolerance = detail::get_tolerance<E>()) const
 	                                                                      {
 		                                                                      static_assert(are_units_compatible_v<unit_type , U>, "fundamentally incompatible units"      );
 		                                                                      static_assert(detail::is_same_v     <value_type, V>, "different value types (use value_cast)");
 		                                                                      static_assert(detail::is_same_v     <tag_type  , T>, "incompatible tags (use tag_cast)"      );
-		                                                                      return std::abs(value - rhs.template get_scaled<scale_type>()) <= epsilon;
+		                                                                      return (*this-rhs).is_near_zero(tolerance);
 	                                                                      }
-	template<typename U, typename S, typename V, typename T, typename E = value_type>
-	friend constexpr bool is_near(const quantity& lhs, const quantity<U,S,V,T>& rhs, const E epsilon = get_epsilon<value_type>())
-	                                                                      {return lhs.is_near(rhs,epsilon);}
-	/** @} */
 
 	/**
-	 * @{
-	 *
 	 * @brief Check whether a floating point quantity is near zero
 	 *
 	 * Checks whether a floating point value is near zero. For integer types,
 	 * this will test whether the value is zero.
 	 *
-	 * @param epsilon  Tolerance for comparison.
+	 * @param tolerance  Tolerance for comparison.
 	 *
 	 * @return true, if near zero
+	 *
+	 * @note There is a free function of the same name.
 	 */
 	template<typename E = value_type>
-	constexpr bool is_near_zero(const E epsilon = get_epsilon<value_type>()) const
-	                                                                      {return std::abs(value) <= epsilon;}
-	template<typename E = value_type>
-	friend constexpr bool is_near_zero(const quantity& q, const E epsilon = get_epsilon<value_type>())
-	                                                                      {return q.is_near_zero(epsilon);}
-	/** @} */
+	constexpr bool is_near_zero(const E tolerance = detail::get_tolerance<E>()) const
+	                                                                      {return is_near_zero_impl(tolerance);}
 
 private:
-	template<typename V>
-	static constexpr V get_epsilon()                                      {return std::numeric_limits<V>::epsilon() > V{} ? 100*std::numeric_limits<V>::epsilon() : V{};}
+	template<typename E>
+	constexpr bool is_near_zero_impl(const E tolerance) const               {return std::abs(value) <= tolerance;}
+	template<typename UE, typename SE, typename VE, typename TE>
+	constexpr bool is_near_zero_impl(const quantity<UE,SE,VE,TE>& tolerance) const
+	                                                                      {return quantity{std::abs(value)} <= tolerance;}
 
 	value_type                                        value;
 };
+
+/* free function alternatives for member functions ***************************/
+
+template<typename U, typename S, typename V, typename T, typename E>
+constexpr typename quantity<U,S,V,T>::value_type get(const quantity<U,S,V,T>& q)
+                                                                      {return q.get();}
+
+template<typename NewScale, typename U, typename S, typename V, typename T, typename E>
+constexpr typename quantity<U,S,V,T>::value_type get_scaled(const quantity<U,S,V,T>& q, NewScale = NewScale{})
+                                                                      {return q.template get_scaled<NewScale>();}
+
+template< typename U1, typename S1, typename V1, typename T1
+        , typename U2, typename S2, typename V2, typename T2
+        , typename E = V1>
+constexpr bool is_near(quantity<U1,S1,V1,T1> lhs, const quantity<U2,S2,V2,T2>& rhs, const E tolerance = detail::get_tolerance<E>())
+                                                                      {return lhs.is_near(rhs,tolerance);}
+
+template< typename U, typename S, typename V, typename T, typename E = V>
+constexpr bool is_near_zero(const quantity<U,S,V,T>& q, const E tolerance = detail::get_tolerance<E>())
+                                                                      {return q.is_near_zero(tolerance);}
 
 /**
  * @{
@@ -412,7 +433,9 @@ private:
  */
 template<typename V1, typename V2> using mul_value_t = decltype(V1{}*V2{});
 template<typename V1, typename V2> using div_value_t = decltype(V1{}/V2{});
+template<typename V1, typename V2> using mod_value_t = decltype(V1{}%V2{});
 /** @} */
+
 
 /* quantity type manipulations ***********************************************/
 
@@ -430,10 +453,10 @@ template<typename Q1, typename Q2  > using  div_quantity_t = quantity<  div_unit
                                                                      ,  div_value_t<typename Q1::value_type, typename Q2::value_type>
                                                                      ,  div_tag_t  <typename Q1::  tag_type, typename Q2::  tag_type> >;
 
-template<typename Q, typename Ratio> using  pow_quantity_t = quantity< pow_unit_t <typename Q :: unit_type, Ratio>
-                                                                     , pow_scale_t<typename Q ::scale_type, Ratio>
-                                                                     ,             typename Q ::value_type
-                                                                     , pow_tag_t  <typename Q ::  tag_type, Ratio> >;
+template<typename Q, typename Ratio> using  pow_quantity_t = quantity< pow_unit_t <typename Q:: unit_type, Ratio>
+                                                                     , pow_scale_t<typename Q::scale_type, Ratio>
+                                                                     ,             typename Q::value_type
+                                                                     , pow_tag_t  <typename Q::  tag_type, Ratio> >;
 template<typename Q                > using sqrt_quantity_t = pow_quantity_t<Q,std::ratio<1,2>>;
 template<typename Q                > using cbrt_quantity_t = pow_quantity_t<Q,std::ratio<1,3>>;
 /** @} */
@@ -453,6 +476,54 @@ struct scale_to<NewScale, quantity<U,S,V,T>>                    {using result = 
 
 
 /* quantity operators ********************************************************/
+
+/**
+ * @{
+ * @brief Comparison operators
+ */
+template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
+constexpr auto operator==(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
+	static_assert(are_units_compatible_v<U1, U2>, "fundamentally incompatible units"      );
+	static_assert(detail::is_same_v     <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v <T1, T2>, "incompatible tags (use tag_cast)"      );
+	return lhs.get() == rhs.template get_scaled<S1>();
+}
+template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
+constexpr auto operator< (const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
+	static_assert(are_units_compatible_v<U1, U2>, "fundamentally incompatible units"      );
+	static_assert(detail::is_same_v     <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v <T1, T2>, "incompatible tags (use tag_cast)"      );
+	return lhs.get() <  rhs.template get_scaled<S1>();
+}
+template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
+constexpr auto operator> (const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
+	static_assert(are_units_compatible_v<U1, U2>, "fundamentally incompatible units"      );
+	static_assert(detail::is_same_v     <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v <T1, T2>, "incompatible tags (use tag_cast)"      );
+	return lhs.get() >  rhs.template get_scaled<S1>();
+}
+template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
+constexpr auto operator>=(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
+	static_assert(are_units_compatible_v<U1, U2>, "fundamentally incompatible units"      );
+	static_assert(detail::is_same_v     <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v <T1, T2>, "incompatible tags (use tag_cast)"      );
+	return not (lhs <  rhs);
+}
+template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
+constexpr auto operator<=(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
+	static_assert(are_units_compatible_v<U1, U2>, "fundamentally incompatible units"      );
+	static_assert(detail::is_same_v     <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v <T1, T2>, "incompatible tags (use tag_cast)"      );
+	return not (lhs >  rhs);
+}
+template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
+constexpr auto operator!=(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
+	static_assert(are_units_compatible_v<U1, U2>, "fundamentally incompatible units"      );
+	static_assert(detail::is_same_v     <V1, V2>, "different value types (use value_cast)");
+	static_assert(are_tags_compatible_v <T1, T2>, "incompatible tags (use tag_cast)"      );
+	return not (lhs == rhs);
+}
+/** @} */
 
 /**
  * @brief Stream output operator
@@ -513,11 +584,11 @@ constexpr auto operator*(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
 constexpr auto operator*(const quantity<U1,S1,V1,T1>& lhs, const V2& rhs) {
-	return quantity<U1,S1,decltype(V1{}*V2{}),T1>{lhs.get() * rhs};
+	return quantity<U1,S1,mul_value_t<V1,V2>,T1>{lhs.get() * rhs};
 }
 template<typename V1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator*( const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	return quantity<U2,S2,decltype(V1{}*V2{}),T2>{lhs * rhs.get()};
+	return quantity<U2,S2,mul_value_t<V1,V2>,T2>{lhs * rhs.get()};
 }
 
 template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
@@ -528,26 +599,32 @@ constexpr auto operator/(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
 constexpr auto operator/(const quantity<U1,S1,V1,T1>& lhs, const V2& rhs) {
-	return quantity<U1,S1,decltype(V1{}/V2{}),T1>{lhs.get() / rhs};
+	return quantity<U1,S1,div_value_t<V1,V2>,T1>{lhs.get() / rhs};
 }
 template<typename V1, typename U2, typename S2, typename T2, typename V2>
-constexpr auto operator/( const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	return quantity<reciprocal_unit_t<U2>,S2,decltype(V1{}/V2{}),T2>{lhs / rhs.get()};
+constexpr auto operator/(const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
+	return quantity<reciprocal_unit_t<U2>,S2,div_value_t<V1,V2>,T2>{lhs / rhs.get()};
 }
 
 template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator%(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
 	static_assert(detail::is_same_v    <V1, V2>, "different value types (use value_cast)");
 	static_assert(are_tags_compatible_v<T1, T2>, "incompatible tags (use tag_cast)"      );
+	static_assert(std::numeric_limits<V1>::is_integer, "modulo on non-integer type"  );
+	static_assert(std::numeric_limits<V2>::is_integer, "modulo with non-integer type");
 	return div_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>{lhs.get() % rhs.get()};
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
 constexpr auto operator%(const quantity<U1,S1,V1,T1>& lhs, const V2& rhs) {
-	return quantity<U1,S1,decltype(V1{}%V2{}),T1>{lhs.get() % rhs};
+	static_assert(std::numeric_limits<V1>::is_integer, "modulo on non-integer type"  );
+	static_assert(std::numeric_limits<V2>::is_integer, "modulo with non-integer type");
+	return quantity<U1,S1,mod_value_t<V1,V2>,T1>{lhs.get() % rhs};
 }
 template<typename V1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator%(const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	return quantity<reciprocal_unit_t<U2>,S2,decltype(V1{}%V2{}),T2>{lhs % rhs.get()};
+	static_assert(std::numeric_limits<V1>::is_integer, "modulo with non-integer type");
+	static_assert(std::numeric_limits<V2>::is_integer, "modulo on non-integer type"  );
+	return quantity<reciprocal_unit_t<U2>,S2,mod_value_t<V1,V2>,T2>{lhs % rhs.get()};
 }
 /** @} */
 
@@ -602,14 +679,14 @@ constexpr auto value_cast(const quantity<U,S,V,T>& q)                     {retur
  *       conversion. As with all implicit conversions, use this with care.
  *
  * @code
- * milli<seconds<unsigned long long>> value =                           1_s ; // error, seconds<unsigned long long>
- * milli<seconds<unsigned long long>> value = scale_cast<milli_scaling>(1_s); // OK
- * milli<seconds<unsigned long long>> value = scale_cast               (1_s); // OK
+ * seconds<unsigned long long> value =                            1_h ; // OK, implicit conversion for scaling
+ * seconds<unsigned long long> value = scale_cast<second_scaling>(1_h); // OK
+ * seconds<unsigned long long> value = scale_cast                (1_h); // OK
  */
 template<typename S, typename U, typename V, typename T>
 constexpr auto scale_cast(const quantity<U,S,V,T>& q)                     {return implicit_quantity_caster<U,S,V,T,false,true,false>{q};}
 template<typename NewScale, typename U, typename S, typename V, typename T>
-constexpr auto scale_cast(const quantity<U,S,V,T>& q)                     {return typename quantity<U,S,V,T>::template rescale_by<NewScale>{scale_cast(q)};}
+constexpr auto scale_cast(const quantity<U,S,V,T>& q)                     {return quantity<U,NewScale,V,T>{scale_cast(q)};}
 /** @} */
 
 

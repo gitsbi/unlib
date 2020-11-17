@@ -22,8 +22,7 @@ namespace detail {
 
 template<typename U, typename S, typename V, typename T, std::intmax_t N, std::intmax_t D>
 auto pow(const quantity<U,S,T,V>& q, const std::ratio<N,D>) {
-	return pow_quantity_t<quantity<U,S,T,V>, std::ratio<N,D>>{ std::pow( static_cast<double>(q.get())
-	                                                         , static_cast<double>(N)/D ) };
+	return pow_quantity_t<quantity<U,S,T,V>, std::ratio<N,D>>{ std::pow( static_cast<double>(q.get()), static_cast<double>(N)/D ) };
 }
 
 template<typename U, typename S, typename V, typename T>
@@ -48,9 +47,7 @@ auto pow(const quantity<U,S,T,V>& q, const std::ratio<1,2>) {
  * @return absolute value of @p q
  */
 template<typename U, typename S, typename V, typename T>
-auto abs(quantity<U,S,T,V> q) {
-	return q < quantity<U,S,T,V>{0} ? -q : q;
-}
+auto abs(quantity<U,S,T,V> q)                                             {return quantity<U,S,T,V>{std::abs(q.get())};}
 
 /**
  * @{
@@ -68,10 +65,10 @@ auto abs(quantity<U,S,T,V> q) {
  * @return @p q, raised to Power, as pow_quantity_t<quantity<U,S,T,V>,
  */
 template<typename Power, typename U, typename S, typename V, typename T>
-auto pow(const quantity<U,S,T,V>& q)                            {return detail::pow(q, typename Power::type{});}
+auto pow(const quantity<U,S,T,V>& q)                                      {return detail::pow(q, typename Power::type{});}
 
 template<int Power, typename U, typename S, typename V, typename T>
-auto pow(quantity<U,S,T,V> q)                                   {return pow<ratio_t<Power>>(q);}
+auto pow(quantity<U,S,T,V> q)                                             {return pow<ratio_t<Power>>(q);}
 /** @} */
 
 /**
@@ -92,7 +89,7 @@ auto pow(quantity<U,S,T,V> q)                                   {return pow<rati
  * @note This operation will affect @p U, @p S, and @p T as well.
  */
 template<typename U, typename S, typename V, typename T>
-auto sqrt(quantity<U,S,T,V> q)                                  {return pow_quantity_t<quantity<U,S,T,V>,std::ratio<1,2>>(std::sqrt(q.get()));}
+auto sqrt(quantity<U,S,T,V> q)                                            {return pow_quantity_t<quantity<U,S,T,V>,std::ratio<1,2>>(std::sqrt(q.get()));}
 /** @} */
 
 /**
@@ -113,7 +110,7 @@ auto sqrt(quantity<U,S,T,V> q)                                  {return pow_quan
  * @note This operation will affect @p U, @p S, and @p T as well.
  */
 template<typename U, typename S, typename V, typename T>
-auto cbrt(quantity<U,S,T,V> q)                                  {return pow<std::ratio<1,3>>(q);}
+auto cbrt(quantity<U,S,T,V> q)                                            {return pow<std::ratio<1,3>>(q);}
 /** @} */
 
 }

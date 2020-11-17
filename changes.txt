@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.7.4
+* fixed many individual issues found during an extensive code review
+
 0.7.3
 * allow ratios as exponents for pow
 * allow extracting square and cube roots of ratios (limited to a few ratios)

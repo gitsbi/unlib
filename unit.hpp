@@ -239,8 +239,6 @@ template<typename Unit, std::intmax_t Nom, std::intmax_t Den>
 struct pow_unit<Unit, std::ratio<Nom,Den>> {
 	using type = typename apply_binary<std::ratio_multiply, Unit, std::ratio<Nom,Den>>::type;
 };
-
-using cube_unit = unit<e2, e2, e2, e2, e2, e2, e2>;
 /** @} */
 
 }

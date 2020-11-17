@@ -169,9 +169,9 @@ template<typename V> using             joule = quantity<energy, no_scaling, V, j
 template<typename V> using       watt_second = typename joule<V>::untag;                                         UNLIB_DEFINE_LITERAL(      watt_second, Ws  ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      watt_second, Ws  )
 template<typename V> using        var_second = typename joule<V>::template retag<reactive_power_tag>;            UNLIB_DEFINE_LITERAL(       var_second, VArs) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(       var_second, VArs)
 template<typename V> using voltampere_second = typename joule<V>::template retag<apparent_power_tag>;            UNLIB_DEFINE_LITERAL(voltampere_second, VAs ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere_second, VAs )
-template<typename V> using       watt_hour   = typename       watt_second<V>::template rescale_by<hour_scaling>; UNLIB_DEFINE_LITERAL(      watt_hour  , Wh  ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      watt_hour  , Wh  )
-template<typename V> using        var_hour   = typename        var_second<V>::template rescale_by<hour_scaling>; UNLIB_DEFINE_LITERAL(       var_hour  , VArh) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(       var_hour  , VArh)
-template<typename V> using voltampere_hour   = typename voltampere_second<V>::template rescale_by<hour_scaling>; UNLIB_DEFINE_LITERAL(voltampere_hour  , VAh ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere_hour  , VAh )
+template<typename V> using       watt_hour   = typename       watt_second<V>::template rescale_to<hour_scaling>; UNLIB_DEFINE_LITERAL(      watt_hour  , Wh  ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(      watt_hour  , Wh  )
+template<typename V> using        var_hour   = typename        var_second<V>::template rescale_to<hour_scaling>; UNLIB_DEFINE_LITERAL(       var_hour  , VArh) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(       var_hour  , VArh)
+template<typename V> using voltampere_hour   = typename voltampere_second<V>::template rescale_to<hour_scaling>; UNLIB_DEFINE_LITERAL(voltampere_hour  , VAh ) UNLIB_DEFINE_METRIC_PREFIXED_LITERALS(voltampere_hour  , VAh )
 /** @} */
 
 /** @{ electric charge quantities */

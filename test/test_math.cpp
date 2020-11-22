@@ -159,10 +159,17 @@ TEST_CASE("math") {
 		using quantity_sqrt = quantity<unit_sqrt, scale_t<10>, value_type>;
 		CHECK(typeid(quantity_sqrt) == typeid(unlib::sqrt_quantity_t<quantity_2>));
 
-		const auto sq_root = unlib::sqrt(quantity_2{81});
-		CHECK(typeid(sq_root) == typeid(quantity_sqrt));
+		const auto sq_root_1 = unlib::sqrt(quantity_2{81});
+		CHECK(typeid(sq_root_1) == typeid(quantity_sqrt));
+		CHECK(sq_root_1.get() == doctest::Approx(9));
 
-		CHECK(sq_root.get() == doctest::Approx(9));
+		const auto sq_root_2 = unlib::pow<unlib::ratio_t<1,2>>(quantity_2{81});
+		CHECK(typeid(sq_root_2) == typeid(quantity_sqrt));
+		CHECK(sq_root_2.get() == doctest::Approx(9));
+
+		const auto sq_root_3 = unlib::pow<unlib::ratio_t<2,4>>(quantity_2{81});
+		CHECK(typeid(sq_root_3) == typeid(quantity_sqrt));
+		CHECK(sq_root_3.get() == doctest::Approx(9));
 	}
 
 	SUBCASE("cbrt") {
@@ -180,9 +187,16 @@ TEST_CASE("math") {
 		using quantity_cbrt = quantity<unit_cbrt, scale_t<10>, value_type>;
 		CHECK(typeid(quantity_cbrt) == typeid(unlib::cbrt_quantity_t<quantity_3>));
 
-		const auto cb_root = unlib::cbrt(quantity_3{64});
-		CHECK(typeid(cb_root) == typeid(quantity_cbrt));
+		const auto cb_root_1 = unlib::cbrt(quantity_3{64});
+		CHECK(typeid(cb_root_1) == typeid(quantity_cbrt));
+		CHECK(cb_root_1.get() == doctest::Approx(4));
 
-		CHECK(cb_root.get() == doctest::Approx(4));
+		const auto cb_root_2 = unlib::pow<unlib::ratio_t<1,3>>(quantity_3{64});
+		CHECK(typeid(cb_root_2) == typeid(quantity_cbrt));
+		CHECK(cb_root_2.get() == doctest::Approx(4));
+
+		const auto cb_root_3 = unlib::pow<unlib::ratio_t<3,9>>(quantity_3{64});
+		CHECK(typeid(cb_root_3) == typeid(quantity_cbrt));
+		CHECK(cb_root_3.get() == doctest::Approx(4));
 	}
 }

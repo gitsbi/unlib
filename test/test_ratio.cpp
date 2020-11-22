@@ -13,22 +13,22 @@ namespace {
 
 using doctest::Approx;
 
-constexpr double get_float(std::intmax_t num, std::intmax_t den) {return static_cast<double>(num)/static_cast<double>(den);}
+constexpr double get_double(std::intmax_t num, std::intmax_t den) {return static_cast<double>(num)/static_cast<double>(den);}
 
 template<std::intmax_t Num, std::intmax_t Den>
-constexpr double get_float() {return static_cast<double>(Num)/static_cast<double>(Den);}
+constexpr double get_double() {return static_cast<double>(Num)/static_cast<double>(Den);}
 template<typename Ratio>
-constexpr double get_float() {return get_float<Ratio::num,Ratio::den>();}
+constexpr double get_double() {return get_double<Ratio::num,Ratio::den>();}
 
 template<std::intmax_t Root> struct root;
-template<> struct root<1> { static double get_root(std::intmax_t Num, std::intmax_t Den) {return           get_float(Num,Den) ;} };
-template<> struct root<2> { static double get_root(std::intmax_t Num, std::intmax_t Den) {return std::sqrt(get_float(Num,Den));} };
-template<> struct root<3> { static double get_root(std::intmax_t Num, std::intmax_t Den) {return std::cbrt(get_float(Num,Den));} };
+template<> struct root<1> { static double get_root(std::intmax_t Num, std::intmax_t Den) {return           get_double(Num,Den) ;} };
+template<> struct root<2> { static double get_root(std::intmax_t Num, std::intmax_t Den) {return std::sqrt(get_double(Num,Den));} };
+template<> struct root<3> { static double get_root(std::intmax_t Num, std::intmax_t Den) {return std::cbrt(get_double(Num,Den));} };
 
 template<std::intmax_t Root, std::intmax_t Num, std::intmax_t Den>
 bool check_ratio_root() {
-	CHECK( get_float<unlib::ratio_root_t<unlib::ratio_t<Num,Den>, Root>>() == Approx(root<Root>::get_root(Num,Den)) );
-	return get_float<unlib::ratio_root_t<unlib::ratio_t<Num,Den>, Root>>() == Approx(root<Root>::get_root(Num,Den));
+	CHECK( get_double<unlib::ratio_root_t<unlib::ratio_t<Num,Den>, Root>>() == Approx(root<Root>::get_root(Num,Den)) );
+	return get_double<unlib::ratio_root_t<unlib::ratio_t<Num,Den>, Root>>() == Approx(root<Root>::get_root(Num,Den));
 }
 
 }
@@ -66,10 +66,6 @@ TEST_CASE("ratios") {
 	}
 
 	SUBCASE("power") {
-		CHECK( typeid(unlib::ratio_pow_t<ratio_t<0,1>,-4>) == typeid(ratio_t<0>));
-		CHECK( typeid(unlib::ratio_pow_t<ratio_t<0,1>,-3>) == typeid(ratio_t<0>));
-		CHECK( typeid(unlib::ratio_pow_t<ratio_t<0,1>,-2>) == typeid(ratio_t<0>));
-		CHECK( typeid(unlib::ratio_pow_t<ratio_t<0,1>,-1>) == typeid(ratio_t<0>));
 		CHECK( typeid(unlib::ratio_pow_t<ratio_t<0,1>, 0>) == typeid(ratio_t<1>));
 		CHECK( typeid(unlib::ratio_pow_t<ratio_t<0,1>, 1>) == typeid(ratio_t<0>));
 		CHECK( typeid(unlib::ratio_pow_t<ratio_t<0,1>, 2>) == typeid(ratio_t<0>));

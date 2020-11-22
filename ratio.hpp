@@ -76,7 +76,6 @@ template<typename Ratio, int Power>
 using ratio_pow_t = typename ratio_pow<Ratio,Power>::type;
 
 template<typename Ratio , int Sign > struct ratio_pow<     Ratio     ,     0, Sign> {using type = ratio_t<1>;};
-template<std::intmax_t D, int Power> struct ratio_pow<std::ratio<0,D>, Power,   -1> {using type = ratio_t<0>;};
 template<std::intmax_t D, int Power> struct ratio_pow<std::ratio<0,D>, Power,    1> {using type = ratio_t<0>;};
 template<std::intmax_t D, int Sign > struct ratio_pow<std::ratio<0,D>,     0, Sign> {using type = ratio_t<1>;};
 template<typename Ratio , int Power> struct ratio_pow<     Ratio     , Power,   +1> {using type = std::ratio_multiply<Ratio, ratio_pow_t<Ratio,Power-1>>;};
@@ -121,11 +120,8 @@ template<> struct root<7*24*60*60ll*7*24*60*60*7*24*60*60   , 3 > {static conste
 }
 
 template<typename Ratio, int Root>
-struct ratio_root  {
-	using type = ratio_t< ratio_impl::root<Ratio::num,Root>::value
-	                    , ratio_impl::root<Ratio::den,Root>::value >;
-};
-
+using ratio_root_t = ratio_t< ratio_impl::root<Ratio::num,Root>::value
+                            , ratio_impl::root<Ratio::den,Root>::value >;
 }
 
 /**
@@ -152,8 +148,8 @@ using abs_t = std::conditional_t< Ratio::type::num < 0, ratio_t<-Ratio::type::nu
  *       7*24*60*60, of which the root is a rational number.
  *       Any other invocation will result in a compile error.
  */
-template<typename Ratio, int Power> using ratio_pow_t  = typename detail::ratio_pow <Ratio,Power>::type;
-template<typename Ratio, int Root > using ratio_root_t = typename detail::ratio_root<Ratio,Root >::type;
+template<typename Ratio, int Power> using ratio_pow_t  = detail::ratio_pow_t<Ratio,Power>;
+template<typename Ratio, int Root > using ratio_root_t = detail::ratio_root_t<Ratio,Root>;
 /** @} */
 
 }

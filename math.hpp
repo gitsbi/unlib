@@ -18,6 +18,21 @@
 
 namespace unlib {
 
+namespace detail {
+
+template<typename U, typename S, typename V, typename T, std::intmax_t N, std::intmax_t D>
+auto pow(const quantity<U,S,T,V>& q, const std::ratio<N,D>) {
+	return pow_quantity_t<quantity<U,S,T,V>, std::ratio<N,D>>{ std::pow( static_cast<double>(q.get())
+	                                                         , static_cast<double>(N)/D ) };
+}
+
+template<typename U, typename S, typename V, typename T>
+auto pow(const quantity<U,S,T,V>& q, const std::ratio<1,2>) {
+	return pow_quantity_t<quantity<U,S,T,V>,std::ratio<1,2>>(std::sqrt(q.get()));
+}
+
+}
+
 /**
  * @brief Absolute value
  *
@@ -50,18 +65,13 @@ auto abs(quantity<U,S,T,V> q) {
  *
  * @param q  Quantity to raise
  *
- * @return @p q, raised to Power
+ * @return @p q, raised to Power, as pow_quantity_t<quantity<U,S,T,V>,
  */
 template<typename Power, typename U, typename S, typename V, typename T>
-auto pow(const quantity<U,S,T,V>& q) {
-	return pow_quantity_t<quantity<U,S,T,V>, Power>{ std::pow( static_cast<double>(q.get())
-	                                                         , static_cast<double>(Power::num)/Power::den ) };
-}
+auto pow(const quantity<U,S,T,V>& q)                            {return detail::pow(q, typename Power::type{});}
 
 template<int Power, typename U, typename S, typename V, typename T>
-auto pow(quantity<U,S,T,V> q) {
-	return pow<ratio_t<Power>>(q);
-}
+auto pow(quantity<U,S,T,V> q)                                   {return pow<ratio_t<Power>>(q);}
 /** @} */
 
 /**
@@ -79,15 +89,10 @@ auto pow(quantity<U,S,T,V> q) {
  * @note The square root is only defined for selected values of @p S and @p T.
  *       @see ratio_root_t for more details.
  *
- * @note This operation will affect @p U, @p S, and @p T as well. If the type
- *       of @p q is not the result of a quantity raised to the power of two,
- *       then the resulting scale will be an awkward approximation of the
- *       correct value.
+ * @note This operation will affect @p U, @p S, and @p T as well.
  */
 template<typename U, typename S, typename V, typename T>
-auto sqrt(quantity<U,S,T,V> q) {
-	return pow<std::ratio<1,2>>(q);
-}
+auto sqrt(quantity<U,S,T,V> q)                                  {return pow_quantity_t<quantity<U,S,T,V>,std::ratio<1,2>>(std::sqrt(q.get()));}
 /** @} */
 
 /**
@@ -102,18 +107,13 @@ auto sqrt(quantity<U,S,T,V> q) {
  *
  * @return cube root of @p q
  *
- * @note The square root is only defined for selected values of @p S and @p T.
+ * @note The cube root is only defined for selected values of @p S and @p T.
  *       @see ratio_root_t for more details.
  *
- * @note This operation will affect @p U, @p S, and @p T as well. If the type
- *       of @p q is not the result of a quantity raised to the power of three,
- *       then the resulting scale will be an awkward approximation of the
- *       correct value.
+ * @note This operation will affect @p U, @p S, and @p T as well.
  */
 template<typename U, typename S, typename V, typename T>
-auto cbrt(quantity<U,S,T,V> q) {
-	return pow<std::ratio<1,3>>(q);
-}
+auto cbrt(quantity<U,S,T,V> q)                                  {return pow<std::ratio<1,3>>(q);}
 /** @} */
 
 }

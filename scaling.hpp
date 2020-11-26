@@ -143,47 +143,6 @@ template<typename T> using to_day_scale    = typename detail::scale_to<   day_sc
 template<typename T> using to_week_scale   = typename detail::scale_to<  week_scaling,T>::result;
 /** @} */
 
-namespace detail {
-
-template<typename Scale, int Power, int Sign = sign_v<Power>>
-struct pow;
-template<typename Scale, int Power>
-struct pow<Scale,Power,+1>                            {using type = std::ratio_multiply<Scale, typename pow<Scale,Power-1>::type>;};
-template<typename Scale, int Sign>
-struct pow<Scale,0, Sign>                             {using type = ratio_t<1>;};
-template<typename Scale, int Power>
-struct pow<Scale,Power,-1>                            {using type = typename pow<ratio_reciprocal_t<Scale>, -Power>::type;};
-
-template<typename Scale>
-struct sqrt;
-
-template<> struct sqrt<scale_t<                  1,1000000000000000000>>  {using type = scale_t<         1,1000000000>;};
-template<> struct sqrt<scale_t<                  1,  10000000000000000>>  {using type = scale_t<         1, 100000000>;};
-template<> struct sqrt<scale_t<                  1,    100000000000000>>  {using type = scale_t<         1,  10000000>;};
-template<> struct sqrt<scale_t<                  1,      1000000000000>>  {using type = scale_t<         1,   1000000>;};
-template<> struct sqrt<scale_t<                  1,        10000000000>>  {using type = scale_t<         1,    100000>;};
-template<> struct sqrt<scale_t<                  1,          100000000>>  {using type = scale_t<         1,     10000>;};
-template<> struct sqrt<scale_t<                  1,            1000000>>  {using type = scale_t<         1,      1000>;};
-template<> struct sqrt<scale_t<                  1,              10000>>  {using type = scale_t<         1,       100>;};
-template<> struct sqrt<scale_t<                  1,                100>>  {using type = scale_t<         1,        10>;};
-template<> struct sqrt<scale_t<                  1,                  1>>  {using type = scale_t<         1,         1>;};
-template<> struct sqrt<scale_t<                100,                  1>>  {using type = scale_t<        10,         1>;};
-template<> struct sqrt<scale_t<              10000,                  1>>  {using type = scale_t<       100,         1>;};
-template<> struct sqrt<scale_t<            1000000,                  1>>  {using type = scale_t<      1000,         1>;};
-template<> struct sqrt<scale_t<          100000000,                  1>>  {using type = scale_t<     10000,         1>;};
-template<> struct sqrt<scale_t<        10000000000,                  1>>  {using type = scale_t<    100000,         1>;};
-template<> struct sqrt<scale_t<      1000000000000,                  1>>  {using type = scale_t<   1000000,         1>;};
-template<> struct sqrt<scale_t<    100000000000000,                  1>>  {using type = scale_t<  10000000,         1>;};
-template<> struct sqrt<scale_t<  10000000000000000,                  1>>  {using type = scale_t< 100000000,         1>;};
-template<> struct sqrt<scale_t<1000000000000000000,                  1>>  {using type = scale_t<1000000000,         1>;};
-
-template<> struct sqrt<pow<minute_scaling,2>::type>   {using type =  minute_scaling;};
-template<> struct sqrt<pow<  hour_scaling,2>::type>   {using type =    hour_scaling;};
-template<> struct sqrt<pow<   day_scaling,2>::type>   {using type =     day_scaling;};
-template<> struct sqrt<pow<  week_scaling,2>::type>   {using type =    week_scaling;};
-
-}
-
 /**
  * @{
  *
@@ -191,8 +150,11 @@ template<> struct sqrt<pow<  week_scaling,2>::type>   {using type =    week_scal
  */
 template<typename Scale1, typename Scale2> using  mul_scale_t = std::ratio_multiply<Scale1,Scale2>;
 template<typename Scale1, typename Scale2> using  div_scale_t = std::ratio_divide  <Scale1,Scale2>;
-template<typename Scale ,      int Power > using  pow_scale_t = typename detail::pow<Scale,Power>::type;
-template<typename Scale                  > using sqrt_scale_t = typename detail::sqrt<Scale>::type;
+template<typename Scale , typename Ratio > using  pow_scale_t = ratio_root_t< ratio_pow_t< Scale
+                                                                                         , abs_t<Ratio>::num >
+                                                                            , abs_t<Ratio>::den >;
+template<typename Scale                  > using sqrt_scale_t = ratio_root_t<Scale, 2>;
+template<typename Scale                  > using cbrt_scale_t = ratio_root_t<Scale, 3>;
 /** @} */
 
 }

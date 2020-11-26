@@ -20,6 +20,7 @@ add_executable(unlib_test
         math.hpp
         test/unlib_test.hpp
         test/unlib_test.cpp
+        test/test_ratio.cpp
         test/test_unit.cpp
         test/test_quantity.cpp
         test/test_common.cpp

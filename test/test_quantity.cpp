@@ -8,13 +8,13 @@
 
 namespace {
 
-using default_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::detail::            time,1>
-                                       ,unlib::pow_unit_t<unlib::detail::            mass,2>
-                                       ,unlib::pow_unit_t<unlib::detail::          length,3>
-                                       ,unlib::pow_unit_t<unlib::detail::         current,4>
-                                       ,unlib::pow_unit_t<unlib::detail::      luminosity,5>
-                                       ,unlib::pow_unit_t<unlib::detail::     temperature,6>
-                                       ,unlib::pow_unit_t<unlib::detail::substance_amount,7> >;
+using default_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::detail::            time,std::ratio<1>>
+                                       ,unlib::pow_unit_t<unlib::detail::            mass,std::ratio<2>>
+                                       ,unlib::pow_unit_t<unlib::detail::          length,std::ratio<3>>
+                                       ,unlib::pow_unit_t<unlib::detail::         current,std::ratio<4>>
+                                       ,unlib::pow_unit_t<unlib::detail::      luminosity,std::ratio<5>>
+                                       ,unlib::pow_unit_t<unlib::detail::     temperature,std::ratio<6>>
+                                       ,unlib::pow_unit_t<unlib::detail::substance_amount,std::ratio<7>> >;
 
 }
 
@@ -313,27 +313,27 @@ SUBCASE("quantity mathematical operations") {
 	}
 
 	SUBCASE("quantities can be multiplied and divided") {
-		using test_unit_b = unit_t<pow_unit_t<unlib::detail::            time,7>
-		                          ,pow_unit_t<unlib::detail::            mass,6>
-		                          ,pow_unit_t<unlib::detail::          length,5>
-		                          ,pow_unit_t<unlib::detail::         current,4>
-		                          ,pow_unit_t<unlib::detail::      luminosity,3>
-		                          ,pow_unit_t<unlib::detail::     temperature,2>
-		                          ,pow_unit_t<unlib::detail::substance_amount,1> >;
-		using test_unit_mab = unit_t<pow_unit_t<unlib::detail::            time,8>
-		                            ,pow_unit_t<unlib::detail::            mass,8>
-		                            ,pow_unit_t<unlib::detail::          length,8>
-		                            ,pow_unit_t<unlib::detail::         current,8>
-		                            ,pow_unit_t<unlib::detail::      luminosity,8>
-		                            ,pow_unit_t<unlib::detail::     temperature,8>
-		                            ,pow_unit_t<unlib::detail::substance_amount,8> >;
-		using test_unit_dab = unit_t<pow_unit_t<unlib::detail::            time,-6>
-		                            ,pow_unit_t<unlib::detail::            mass,-4>
-		                            ,pow_unit_t<unlib::detail::          length,-2>
-		                            ,pow_unit_t<unlib::detail::         current, 0>
-		                            ,pow_unit_t<unlib::detail::      luminosity, 2>
-		                            ,pow_unit_t<unlib::detail::     temperature, 4>
-		                            ,pow_unit_t<unlib::detail::substance_amount, 6> >;
+		using test_unit_b = unit_t<pow_unit_t<unlib::detail::            time,std::ratio<7>>
+		                          ,pow_unit_t<unlib::detail::            mass,std::ratio<6>>
+		                          ,pow_unit_t<unlib::detail::          length,std::ratio<5>>
+		                          ,pow_unit_t<unlib::detail::         current,std::ratio<4>>
+		                          ,pow_unit_t<unlib::detail::      luminosity,std::ratio<3>>
+		                          ,pow_unit_t<unlib::detail::     temperature,std::ratio<2>>
+		                          ,pow_unit_t<unlib::detail::substance_amount,std::ratio<1>> >;
+		using test_unit_mab = unit_t<pow_unit_t<unlib::detail::            time,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::            mass,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::          length,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::         current,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::      luminosity,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::     temperature,std::ratio<8>>
+		                            ,pow_unit_t<unlib::detail::substance_amount,std::ratio<8>> >;
+		using test_unit_dab = unit_t<pow_unit_t<unlib::detail::            time,std::ratio<-6>>
+		                            ,pow_unit_t<unlib::detail::            mass,std::ratio<-4>>
+		                            ,pow_unit_t<unlib::detail::          length,std::ratio<-2>>
+		                            ,pow_unit_t<unlib::detail::         current,std::ratio<0>>
+		                            ,pow_unit_t<unlib::detail::      luminosity,std::ratio<2>>
+		                            ,pow_unit_t<unlib::detail::     temperature,std::ratio<4>>
+		                            ,pow_unit_t<unlib::detail::substance_amount,std::ratio<6>> >;
 
 		using test_qa  = test_quantity::rescale_to<milli_scaling>;
 		using test_qb  = quantity<test_unit_b, kilo_scaling, value_type>;
@@ -379,61 +379,91 @@ SUBCASE("quantity mathematical operations") {
 			CHECK(typeid(decltype(a*b*b*b)::scale_type) == typeid(giga_scaling) );
 			CHECK(typeid(decltype(b*b*b*b)::scale_type) == typeid(tera_scaling) );
 
-			CHECK(typeid(pow_quantity_t<test_qa, 3>::scale_type) == typeid(no_scaling));
-			CHECK(typeid(pow_quantity_t<test_qa, 2>::scale_type) == typeid(no_scaling));
-			CHECK(typeid(pow_quantity_t<test_qa, 1>::scale_type) == typeid(no_scaling));
-			CHECK(typeid(pow_quantity_t<test_qa, 0>::scale_type) == typeid(no_scaling));
-			CHECK(typeid(pow_quantity_t<test_qa,-1>::scale_type) == typeid(no_scaling));
-			CHECK(typeid(pow_quantity_t<test_qa,-2>::scale_type) == typeid(no_scaling));
-			CHECK(typeid(pow_quantity_t<test_qa,-3>::scale_type) == typeid(no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 3>>::scale_type) == typeid(no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 2>>::scale_type) == typeid(no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 1>>::scale_type) == typeid(no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 0>>::scale_type) == typeid(no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-1>>::scale_type) == typeid(no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-2>>::scale_type) == typeid(no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-3>>::scale_type) == typeid(no_scaling));
 
-			CHECK(typeid(pow_quantity_t<test_qb, 3>::scale_type) == typeid( giga_scaling));
-			CHECK(typeid(pow_quantity_t<test_qb, 2>::scale_type) == typeid( mega_scaling));
-			CHECK(typeid(pow_quantity_t<test_qb, 1>::scale_type) == typeid( kilo_scaling));
-			CHECK(typeid(pow_quantity_t<test_qb, 0>::scale_type) == typeid(   no_scaling));
-			CHECK(typeid(pow_quantity_t<test_qb,-1>::scale_type) == typeid(milli_scaling));
-			CHECK(typeid(pow_quantity_t<test_qb,-2>::scale_type) == typeid(micro_scaling));
-			CHECK(typeid(pow_quantity_t<test_qb,-3>::scale_type) == typeid( nano_scaling));
+			CHECK(typeid(pow_quantity_t<test_qb,std::ratio< 3>>::scale_type) == typeid( giga_scaling));
+			CHECK(typeid(pow_quantity_t<test_qb,std::ratio< 2>>::scale_type) == typeid( mega_scaling));
+			CHECK(typeid(pow_quantity_t<test_qb,std::ratio< 1>>::scale_type) == typeid( kilo_scaling));
+			CHECK(typeid(pow_quantity_t<test_qb,std::ratio< 0>>::scale_type) == typeid(   no_scaling));
+			CHECK(typeid(pow_quantity_t<test_qb,std::ratio<-1>>::scale_type) == typeid( kilo_scaling));
+			CHECK(typeid(pow_quantity_t<test_qb,std::ratio<-2>>::scale_type) == typeid( mega_scaling));
+			CHECK(typeid(pow_quantity_t<test_qb,std::ratio<-3>>::scale_type) == typeid( giga_scaling));
 
-			CHECK(typeid(sqrt_quantity_t<               test_qa   >::scale_type) == typeid(  no_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<test_qb,2>>::scale_type) == typeid(kilo_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<test_qb,4>>::scale_type) == typeid(mega_scaling));
+			CHECK(typeid(sqrt_quantity_t<               test_qa               >::scale_type) == typeid(  no_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<test_qb,std::ratio<2>>>::scale_type) == typeid(kilo_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<test_qb,std::ratio<4>>>::scale_type) == typeid(mega_scaling));
 
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,1'000'000'000'000'000'000>>) == typeid(nano_scaling          ));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,   10'000'000'000'000'000>>) == typeid(scale_t<1,100'000'000>));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,      100'000'000'000'000>>) == typeid(scale_t<1, 10'000'000>));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,        1'000'000'000'000>>) == typeid(micro_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,           10'000'000'000>>) == typeid(scale_t<1,    100'000>));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,              100'000'000>>) == typeid(scale_t<1,     10'000>));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,                1'000'000>>) == typeid(milli_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,                   10'000>>) == typeid(centi_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,                      100>>) == typeid( deci_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<                  1,1                        >>) == typeid(   no_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<                100,1                        >>) == typeid( deca_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<              10000,1                        >>) == typeid(hecto_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<            1000000,1                        >>) == typeid( kilo_scaling         ));
-			CHECK(typeid(sqrt_scale_t<scale_t<          100000000,1                        >>) == typeid(scale_t<     10'000,1>));
-			CHECK(typeid(sqrt_scale_t<scale_t<        10000000000,1                        >>) == typeid(scale_t<    100'000,1>));
-			CHECK(typeid(sqrt_scale_t<scale_t<      1000000000000,1                        >>) == typeid(mega_scaling          ));
-			CHECK(typeid(sqrt_scale_t<scale_t<    100000000000000,1                        >>) == typeid(scale_t< 10'000'000,1>));
-			CHECK(typeid(sqrt_scale_t<scale_t<  10000000000000000,1                        >>) == typeid(scale_t<100'000'000,1>));
-			CHECK(typeid(sqrt_scale_t<scale_t<1000000000000000000,1                        >>) == typeid(giga_scaling          ));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,1000000000000000000>>) == typeid(scale_t<1         ,1000000000>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,  10000000000000000>>) == typeid(scale_t<1         , 100000000>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,    100000000000000>>) == typeid(scale_t<1         ,  10000000>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,      1000000000000>>) == typeid(scale_t<1         ,   1000000>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,        10000000000>>) == typeid(scale_t<1         ,    100000>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,          100000000>>) == typeid(scale_t<1         ,     10000>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,            1000000>>) == typeid(scale_t<1         ,      1000>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,              10000>>) == typeid(scale_t<1         ,       100>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,                100>>) == typeid(scale_t<1         ,        10>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                  1,1                  >>) == typeid(scale_t<1         ,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<                100,1                  >>) == typeid(scale_t<        10,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<              10000,1                  >>) == typeid(scale_t<       100,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<            1000000,1                  >>) == typeid(scale_t<      1000,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<          100000000,1                  >>) == typeid(scale_t<     10000,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<        10000000000,1                  >>) == typeid(scale_t<    100000,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<      1000000000000,1                  >>) == typeid(scale_t<   1000000,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<    100000000000000,1                  >>) == typeid(scale_t<  10000000,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<  10000000000000000,1                  >>) == typeid(scale_t< 100000000,         1>));
+			CHECK(typeid(sqrt_scale_t<scale_t<1000000000000000000,1                  >>) == typeid(scale_t<1000000000,         1>));
 
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        nano<test_qa>,2>>::scale_type) == typeid(  nano_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       micro<test_qa>,2>>::scale_type) == typeid( micro_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       milli<test_qa>,2>>::scale_type) == typeid( milli_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       centi<test_qa>,2>>::scale_type) == typeid( centi_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        deci<test_qa>,2>>::scale_type) == typeid(  deci_scaling));
-			CHECK(typeid(sqrt_quantity_t<                            test_qa    >::scale_type) == typeid(    no_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        deca<test_qa>,2>>::scale_type) == typeid(  deca_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       hecto<test_qa>,2>>::scale_type) == typeid( hecto_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        kilo<test_qa>,2>>::scale_type) == typeid(  kilo_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        mega<test_qa>,2>>::scale_type) == typeid(  mega_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        giga<test_qa>,2>>::scale_type) == typeid(  giga_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<minute_scale<test_qa>,2>>::scale_type) == typeid(minute_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<  hour_scale<test_qa>,2>>::scale_type) == typeid(  hour_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<   day_scale<test_qa>,2>>::scale_type) == typeid(   day_scaling));
-			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<  week_scale<test_qa>,2>>::scale_type) == typeid(  week_scaling));
+			CHECK(typeid(cbrt_scale_t<scale_t<                  1,1000000000000000000>>) == typeid(scale_t<      1,1000000>));
+			CHECK(typeid(cbrt_scale_t<scale_t<                  1,   1000000000000000>>) == typeid(scale_t<      1, 100000>));
+			CHECK(typeid(cbrt_scale_t<scale_t<                  1,      1000000000000>>) == typeid(scale_t<      1,  10000>));
+			CHECK(typeid(cbrt_scale_t<scale_t<                  1,         1000000000>>) == typeid(scale_t<      1,   1000>));
+			CHECK(typeid(cbrt_scale_t<scale_t<                  1,            1000000>>) == typeid(scale_t<      1,    100>));
+			CHECK(typeid(cbrt_scale_t<scale_t<                  1,               1000>>) == typeid(scale_t<      1,     10>));
+			CHECK(typeid(cbrt_scale_t<scale_t<                  1,1                  >>) == typeid(scale_t<      1,      1>));
+			CHECK(typeid(cbrt_scale_t<scale_t<               1000,1                  >>) == typeid(scale_t<     10,      1>));
+			CHECK(typeid(cbrt_scale_t<scale_t<            1000000,1                  >>) == typeid(scale_t<    100,      1>));
+			CHECK(typeid(cbrt_scale_t<scale_t<         1000000000,1                  >>) == typeid(scale_t<   1000,      1>));
+			CHECK(typeid(cbrt_scale_t<scale_t<      1000000000000,1                  >>) == typeid(scale_t<  10000,      1>));
+			CHECK(typeid(cbrt_scale_t<scale_t<   1000000000000000,1                  >>) == typeid(scale_t< 100000,      1>));
+			CHECK(typeid(cbrt_scale_t<scale_t<1000000000000000000,1                  >>) == typeid(scale_t<1000000,      1>));
+
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        nano<test_qa>,std::ratio<2>>>::scale_type) == typeid(  nano_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       micro<test_qa>,std::ratio<2>>>::scale_type) == typeid( micro_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       milli<test_qa>,std::ratio<2>>>::scale_type) == typeid( milli_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       centi<test_qa>,std::ratio<2>>>::scale_type) == typeid( centi_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        deci<test_qa>,std::ratio<2>>>::scale_type) == typeid(  deci_scaling));
+			CHECK(typeid(sqrt_quantity_t<                            test_qa                >::scale_type) == typeid(    no_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        deca<test_qa>,std::ratio<2>>>::scale_type) == typeid(  deca_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<       hecto<test_qa>,std::ratio<2>>>::scale_type) == typeid( hecto_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        kilo<test_qa>,std::ratio<2>>>::scale_type) == typeid(  kilo_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        mega<test_qa>,std::ratio<2>>>::scale_type) == typeid(  mega_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<        giga<test_qa>,std::ratio<2>>>::scale_type) == typeid(  giga_scaling));
+
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<minute_scale<test_qa>,std::ratio<2>>>::scale_type) == typeid(minute_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<  hour_scale<test_qa>,std::ratio<2>>>::scale_type) == typeid(  hour_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<   day_scale<test_qa>,std::ratio<2>>>::scale_type) == typeid(   day_scaling));
+			CHECK(typeid(sqrt_quantity_t<pow_quantity_t<  week_scale<test_qa>,std::ratio<2>>>::scale_type) == typeid(  week_scaling));
+
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<       micro<test_qa>,std::ratio<3>>>::scale_type) == typeid( micro_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<       milli<test_qa>,std::ratio<3>>>::scale_type) == typeid( milli_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<       centi<test_qa>,std::ratio<3>>>::scale_type) == typeid( centi_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<        deci<test_qa>,std::ratio<3>>>::scale_type) == typeid(  deci_scaling));
+			CHECK(typeid(cbrt_quantity_t<                            test_qa                >::scale_type) == typeid(    no_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<        deca<test_qa>,std::ratio<3>>>::scale_type) == typeid(  deca_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<       hecto<test_qa>,std::ratio<3>>>::scale_type) == typeid( hecto_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<        kilo<test_qa>,std::ratio<3>>>::scale_type) == typeid(  kilo_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<        mega<test_qa>,std::ratio<3>>>::scale_type) == typeid(  mega_scaling));
+
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<minute_scale<test_qa>,std::ratio<3>>>::scale_type) == typeid(minute_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<  hour_scale<test_qa>,std::ratio<3>>>::scale_type) == typeid(  hour_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<   day_scale<test_qa>,std::ratio<3>>>::scale_type) == typeid(   day_scaling));
+			CHECK(typeid(cbrt_quantity_t<pow_quantity_t<  week_scale<test_qa>,std::ratio<3>>>::scale_type) == typeid(  week_scaling));
 		}
 
 		SUBCASE("tags and tag ratios") {
@@ -456,17 +486,17 @@ SUBCASE("quantity mathematical operations") {
 			REQUIRE(typeid(                decltype(b*b*b*b) ::tag_type) == typeid(tag_t<test_tag_id,4,1>) );
 			CHECK  (typeid(sqrt_quantity_t<decltype(b*b*b*b)>::tag_type) == typeid(tag_t<test_tag_id,2,1>) );
 //
-			CHECK(typeid(pow_quantity_t<test_qa, 5>::tag_type) == typeid(tag_t<test_tag_id, 5,1>));
-			CHECK(typeid(pow_quantity_t<test_qa, 4>::tag_type) == typeid(tag_t<test_tag_id, 4,1>));
-			CHECK(typeid(pow_quantity_t<test_qa, 3>::tag_type) == typeid(tag_t<test_tag_id, 3,1>));
-			CHECK(typeid(pow_quantity_t<test_qa, 2>::tag_type) == typeid(tag_t<test_tag_id, 2,1>));
-			CHECK(typeid(pow_quantity_t<test_qa, 1>::tag_type) == typeid(tag_t<test_tag_id, 1,1>));
-			CHECK(typeid(pow_quantity_t<test_qa, 0>::tag_type) == typeid(        no_tag         ));
-			CHECK(typeid(pow_quantity_t<test_qa,-1>::tag_type) == typeid(tag_t<test_tag_id,-1,1>));
-			CHECK(typeid(pow_quantity_t<test_qa,-2>::tag_type) == typeid(tag_t<test_tag_id,-2,1>));
-			CHECK(typeid(pow_quantity_t<test_qa,-3>::tag_type) == typeid(tag_t<test_tag_id,-3,1>));
-			CHECK(typeid(pow_quantity_t<test_qa,-4>::tag_type) == typeid(tag_t<test_tag_id,-4,1>));
-			CHECK(typeid(pow_quantity_t<test_qa,-5>::tag_type) == typeid(tag_t<test_tag_id,-5,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 5>>::tag_type) == typeid(tag_t<test_tag_id, 5,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 4>>::tag_type) == typeid(tag_t<test_tag_id, 4,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 3>>::tag_type) == typeid(tag_t<test_tag_id, 3,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 2>>::tag_type) == typeid(tag_t<test_tag_id, 2,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 1>>::tag_type) == typeid(tag_t<test_tag_id, 1,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio< 0>>::tag_type) == typeid(        no_tag         ));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-1>>::tag_type) == typeid(tag_t<test_tag_id,-1,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-2>>::tag_type) == typeid(tag_t<test_tag_id,-2,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-3>>::tag_type) == typeid(tag_t<test_tag_id,-3,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-4>>::tag_type) == typeid(tag_t<test_tag_id,-4,1>));
+			CHECK(typeid(pow_quantity_t<test_qa,std::ratio<-5>>::tag_type) == typeid(tag_t<test_tag_id,-5,1>));
 		}
 	}
 

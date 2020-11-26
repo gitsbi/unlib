@@ -189,31 +189,52 @@ using create_unit_t = unit< typename find_first_exponent<            time, Unsor
  * meta functions for unit type manipulations
  */
 template<template<typename> class Operation, typename Unit>
-using apply_unary_t = unit< Operation<            time_exponent_t<Unit>>
-                          , Operation<            mass_exponent_t<Unit>>
-                          , Operation<          length_exponent_t<Unit>>
-                          , Operation<         current_exponent_t<Unit>>
-                          , Operation<      luminosity_exponent_t<Unit>>
-                          , Operation<     temperature_exponent_t<Unit>>
-                          , Operation<substance_amount_exponent_t<Unit>> >;
+struct apply_unary;
+template< template<typename> class Operation
+        , typename Tim, typename Mas, typename Len, typename Cur, typename Lum, typename Tem, typename Sub >
+struct apply_unary<Operation, unit<Tim,Mas,Len,Cur,Lum,Tem,Sub>> {
+	using type = unit< Operation<Tim>
+	                 , Operation<Mas>
+	                 , Operation<Len>
+	                 , Operation<Cur>
+	                 , Operation<Lum>
+	                 , Operation<Tem>
+	                 , Operation<Sub> >;
+};
 
-template<template<typename,typename> class Operation, typename Unit1, typename Unit2>
-using apply_binary_t = unit< Operation<            time_exponent_t<Unit1>,             time_exponent_t<Unit2>>
-                           , Operation<            mass_exponent_t<Unit1>,             mass_exponent_t<Unit2>>
-                           , Operation<          length_exponent_t<Unit1>,           length_exponent_t<Unit2>>
-                           , Operation<         current_exponent_t<Unit1>,          current_exponent_t<Unit2>>
-                           , Operation<      luminosity_exponent_t<Unit1>,       luminosity_exponent_t<Unit2>>
-                           , Operation<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
-                           , Operation<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
+template<template<typename,typename> class Operation, typename Unit, typename Operand>
+struct apply_binary;
+template< template< typename,typename> class Operation
+        , typename Tim, typename Mas, typename Len, typename Cur, typename Lum, typename Tem, typename Sub
+        , std::intmax_t Nom, std::intmax_t Den>
+struct apply_binary<Operation, unit<Tim,Mas,Len,Cur,Lum,Tem,Sub>, std::ratio<Nom,Den>> {
+	using type = unit< Operation<Tim, std::ratio<Nom,Den>>
+	                 , Operation<Mas, std::ratio<Nom,Den>>
+	                 , Operation<Len, std::ratio<Nom,Den>>
+	                 , Operation<Cur, std::ratio<Nom,Den>>
+	                 , Operation<Lum, std::ratio<Nom,Den>>
+	                 , Operation<Tem, std::ratio<Nom,Den>>
+	                 , Operation<Sub, std::ratio<Nom,Den>> >;
+};
+template<template<typename,typename> class Operation
+        , typename Tim1, typename Mas1, typename Len1, typename Cur1, typename Lum1, typename Tem1, typename Sub1
+        , typename Tim2, typename Mas2, typename Len2, typename Cur2, typename Lum2, typename Tem2, typename Sub2 >
+struct apply_binary<Operation, unit<Tim1,Mas1,Len1,Cur1,Lum1,Tem1,Sub1>, unit<Tim2,Mas2,Len2,Cur2,Lum2,Tem2,Sub2>>  {
+	using type = unit< Operation<Tim1, Tim2>
+	                 , Operation<Mas1, Mas2>
+	                 , Operation<Len1, Len2>
+	                 , Operation<Cur1, Cur2>
+	                 , Operation<Lum1, Lum2>
+	                 , Operation<Tem1, Tem2>
+	                 , Operation<Sub1, Sub2> >;
+};
 
-template<typename Unit, int Power, int Sign = sign<Power>::value>
+template<typename Unit, typename Ratio>
 struct pow_unit;
-template<typename Unit, int Power>
-struct pow_unit<Unit, Power,   +1> {using type = apply_binary_t<std::ratio_add     , Unit, typename pow_unit<Unit, Power-1>::type>;};
-template<typename Unit, int Power>
-struct pow_unit<Unit, Power,   -1> {using type = apply_binary_t<std::ratio_subtract, Unit, typename pow_unit<Unit,-Power+1>::type>;};
-template<typename Unit, int Sign >
-struct pow_unit<Unit,     0, Sign> {using type = unit<e0, e0, e0, e0, e0, e0, e0>;};
+template<typename Unit, std::intmax_t Nom, std::intmax_t Den>
+struct pow_unit<Unit, std::ratio<Nom,Den>> {
+	using type = typename apply_binary<std::ratio_multiply, Unit, std::ratio<Nom,Den>>::type;
+};
 
 using cube_unit = unit<e2, e2, e2, e2, e2, e2, e2>;
 /** @} */
@@ -252,13 +273,14 @@ using unit_t = detail::create_unit_t<detail::unsorted_unit_list<Basic1,Basic2,Ba
  *
  * @brief unit type manipulations
  */
-template<typename Unit1, typename Unit2> using        mul_unit_t = detail::apply_binary_t<std::ratio_add     ,Unit1,Unit2>;
-template<typename Unit1, typename Unit2> using        div_unit_t = detail::apply_binary_t<std::ratio_subtract,Unit1,Unit2>;
-template<typename Unit , int Power>      using        pow_unit_t = typename detail::pow_unit<Unit,Power>::type;
-template<typename Unit>                  using     square_unit_t = pow_unit_t<Unit,2>;
-template<typename Unit>                  using       cube_unit_t = pow_unit_t<Unit,3>;
-template<typename Unit>                  using reciprocal_unit_t = detail::apply_unary_t<ratio_negate_t,Unit>;
-template<typename Unit>                  using       sqrt_unit_t = detail::apply_binary_t<std::ratio_divide, Unit, detail::cube_unit>;
+template<typename Unit1, typename Unit2> using        mul_unit_t = typename detail::apply_binary<std::ratio_add     ,Unit1,Unit2>::type;
+template<typename Unit1, typename Unit2> using        div_unit_t = typename detail::apply_binary<std::ratio_subtract,Unit1,Unit2>::type;
+template<typename Unit , typename Ratio> using        pow_unit_t = typename detail::apply_binary<std::ratio_multiply,Unit ,Ratio>::type;
+template<typename Unit>                  using     square_unit_t = pow_unit_t<Unit,std::ratio<2,1>>;
+template<typename Unit>                  using       cube_unit_t = pow_unit_t<Unit,std::ratio<3,1>>;
+template<typename Unit>                  using reciprocal_unit_t = typename detail::apply_unary<ratio_negate_t,Unit>::type;
+template<typename Unit>                  using       sqrt_unit_t = pow_unit_t<Unit, std::ratio<1,2>>;
+template<typename Unit>                  using       cbrt_unit_t = pow_unit_t<Unit, std::ratio<1,3>>;
 /** @} */
 
 /**

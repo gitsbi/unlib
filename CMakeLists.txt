@@ -18,6 +18,7 @@ add_executable(unlib_test
         unlib/tag.hpp
         unlib/scaling.hpp
         quantity.hpp
+        absolute.hpp
         common.hpp
         math.hpp
         limits.hpp

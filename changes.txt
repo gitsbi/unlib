@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.10
+* added absolutes
+
 0.9.1
 * allow changing default value types of literal operator result types at
   compile-time

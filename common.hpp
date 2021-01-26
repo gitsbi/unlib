@@ -13,7 +13,7 @@
 
 #include <cinttypes>
 
-#include <unlib/quantity.hpp>
+#include <unlib/absolute.hpp>
 
 namespace unlib {
 
@@ -65,13 +65,13 @@ using floatpt_value_type = UNLIB_LITERAL_OPERATOR_FLOATPT_VALUE_TYPE; /**< value
  * @note For whatever reason, in the SI system, the base unit of mass is
  *       kilogram, not gram.
  */
-template<typename V> using                   second = quantity<time              , no_scaling, V>;
+template<typename V> using                   second = quantity<time              , no_scaling  , V>;
 template<typename V> using                 kilogram = quantity<mass              , no_scaling, V>;
-template<typename V> using                    meter = quantity<length            , no_scaling, V>;
-template<typename V> using                   ampere = quantity<current           , no_scaling, V>;
-template<typename V> using            degree_kelvin = quantity<temperature       , no_scaling, V>;
-template<typename V> using                      mol = quantity<substance_amount  , no_scaling, V>;
-template<typename V> using                  candela = quantity<luminous_intensity, no_scaling, V>;
+template<typename V> using                    meter = quantity<length            , no_scaling  , V>;
+template<typename V> using                   ampere = quantity<current           , no_scaling  , V>;
+template<typename V> using            degree_kelvin = quantity<temperature       , no_scaling  , V>;
+template<typename V> using                      mol = quantity<substance_amount  , no_scaling  , V>;
+template<typename V> using                  candela = quantity<luminous_intensity, no_scaling  , V>;
 /** @} */
 
 
@@ -274,24 +274,24 @@ using volumetric_flow_rate = liter_per_hour          <int>::dimension_type;
 
 /** @{ macro unit prefixes */
 /** define the literal operators for the macro unit prefixes deca-kilo  */
-#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_KILO(Qty_,UnitShort_)   UNLIB_DEFINE_SCALED_LITERAL(Qty_,deca ,dk##UnitShort_) \
-                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,hecto, h##UnitShort_) \
-                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,kilo , k##UnitShort_)
+#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_KILO(Qty_,UnitShort_)  UNLIB_DEFINE_SCALED_LITERAL(Qty_,deca ,dk##UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,hecto, h##UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,kilo , k##UnitShort_)
 /** define the literal operators for the macro unit prefixes deca-mega  */
-#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_MEGA(Qty_,UnitShort_)   UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_KILO(Qty_,UnitShort_) \
-                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,mega , M##UnitShort_)
+#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_MEGA(Qty_,UnitShort_)  UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_KILO(Qty_,UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,mega , M##UnitShort_)
 /** define the literal operators for the macro unit prefixes deca-giga  */
-#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_GIGA(Qty_,UnitShort_)   UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_MEGA(Qty_,UnitShort_) \
-                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,giga , G##UnitShort_)
+#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_GIGA(Qty_,UnitShort_)  UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_MEGA(Qty_,UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,giga , G##UnitShort_)
 /** define the literal operators for the macro unit prefixes deca-tera  */
-#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(Qty_,UnitShort_)   UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_GIGA(Qty_,UnitShort_) \
-                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,tera , T##UnitShort_)
+#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(Qty_,UnitShort_)  UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_GIGA(Qty_,UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,tera , T##UnitShort_)
 /** define the literal operators for the macro unit prefixes deca-peta  */
-#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_PETA(Qty_,UnitShort_)   UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(Qty_,UnitShort_) \
-                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,peta , P##UnitShort_)
+#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_PETA(Qty_,UnitShort_)  UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(Qty_,UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,peta , P##UnitShort_)
 /** define the literal operators for the macro unit prefixes deca-exa   */
-#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA(Qty_,UnitShort_)    UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_PETA(Qty_,UnitShort_) \
-                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,exa  , E##UnitShort_)
+#define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA(Qty_,UnitShort_)   UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_PETA(Qty_,UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,exa  , E##UnitShort_)
 /** @} */
 /** @} */
 
@@ -303,8 +303,8 @@ using volumetric_flow_rate = liter_per_hour          <int>::dimension_type;
  */
 
 /** @{ time */
-UNLIB_DEFINE_LITERAL(second                  , s       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (second           , s   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA  (second           , s   )
+UNLIB_DEFINE_LITERAL(second                  , s       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(second           , s   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA (second           , s   )
 UNLIB_DEFINE_LITERAL(minute                  , min     )
 UNLIB_DEFINE_LITERAL(hour                    , h       )
 UNLIB_DEFINE_LITERAL(day                     , d       )
@@ -313,21 +313,21 @@ UNLIB_DEFINE_LITERAL(week                    , week    )
 
 /** @{ mass */
 UNLIB_DEFINE_LITERAL(gram                    , g       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_FEMTO(gram             , g   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA  (gram             , g   )
-UNLIB_DEFINE_LITERAL(ton                     , t       ) UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (ton              , t   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA (gram             , g   )
+UNLIB_DEFINE_LITERAL(ton                     , t       ) UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(ton              , t   )
 /** @} */
 
 /** length */
-UNLIB_DEFINE_LITERAL(meter                   , m       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (meter            , m   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA  (meter            , m   )
+UNLIB_DEFINE_LITERAL(meter                   , m       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(meter            , m   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA (meter            , m   )
 
 /** current */
-UNLIB_DEFINE_LITERAL(ampere                  , A       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (ampere           , A   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA  (ampere           , A   )
+UNLIB_DEFINE_LITERAL(ampere                  , A       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(ampere           , A   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA (ampere           , A   )
 
 /** frequency */
-UNLIB_DEFINE_LITERAL(hertz                   , Hz      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (hertz            , Hz  )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA  (hertz            , Hz  )
+UNLIB_DEFINE_LITERAL(hertz                   , Hz      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(hertz            , Hz  )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA (hertz            , Hz  )
 
 /** @{ area */
 UNLIB_DEFINE_LITERAL(square_millimeter       , mm2     )
@@ -357,7 +357,7 @@ UNLIB_DEFINE_LITERAL(kilometer_per_hour      , km_per_h)
 UNLIB_DEFINE_LITERAL(meter_per_second_squared, m_per_s2)
 
 /** force */
-UNLIB_DEFINE_LITERAL(newton                  , N       ) UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (newton           , N   )
+UNLIB_DEFINE_LITERAL(newton                  , N       ) UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(newton           , N   )
 
 /** substance amount */
 UNLIB_DEFINE_LITERAL(mol                     , mol     )
@@ -366,59 +366,59 @@ UNLIB_DEFINE_LITERAL(mol                     , mol     )
 UNLIB_DEFINE_LITERAL(candela                 , cd      )
 
 /** @{ energy, work */
-UNLIB_DEFINE_LITERAL(joule                   , J       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (joule            , J   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (joule            , J   )
-UNLIB_DEFINE_LITERAL(watt_second             , Ws      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (watt_second      , Ws  )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (watt_second      , Ws  )
-UNLIB_DEFINE_LITERAL(watt_hour               , Wh      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (watt_hour        , Wh  )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (watt_hour        , Wh  )
+UNLIB_DEFINE_LITERAL(joule                   , J       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(joule            , J   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(joule            , J   )
+UNLIB_DEFINE_LITERAL(watt_second             , Ws      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(watt_second      , Ws  )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(watt_second      , Ws  )
+UNLIB_DEFINE_LITERAL(watt_hour               , Wh      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(watt_hour        , Wh  )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(watt_hour        , Wh  )
 /** @} */
 
 /** power */
-UNLIB_DEFINE_LITERAL(watt                    , W       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (watt             , W   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (watt             , W   )
+UNLIB_DEFINE_LITERAL(watt                    , W       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(watt             , W   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(watt             , W   )
 
 /** @{ electrical charge */
-UNLIB_DEFINE_LITERAL(ampere_second           , As      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (ampere_second    , As  )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA  (ampere_second    , As  )
-UNLIB_DEFINE_LITERAL(ampere_hour             , Ah      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (ampere_hour      , Ah  )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (ampere_hour      , Ah  )
+UNLIB_DEFINE_LITERAL(ampere_second           , As      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(ampere_second    , As  )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_EXA (ampere_second    , As  )
+UNLIB_DEFINE_LITERAL(ampere_hour             , Ah      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(ampere_hour      , Ah  )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(ampere_hour      , Ah  )
 /** @} */
 
 /** voltage */
-UNLIB_DEFINE_LITERAL(volt                    , V       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (volt             , V   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (volt             , V   )
+UNLIB_DEFINE_LITERAL(volt                    , V       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(volt             , V   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(volt             , V   )
 
 /** resistance */
-UNLIB_DEFINE_LITERAL(ohm                     , O       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (ohm              , O   )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (ohm              , O   )
+UNLIB_DEFINE_LITERAL(ohm                     , O       ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(ohm              , O   )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(ohm              , O   )
 
 /** @{ presure */
-UNLIB_DEFINE_LITERAL(pascal_                 , Pa      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (pascal_          , Pa  )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (pascal_          , Pa  )
-UNLIB_DEFINE_LITERAL(bar                     , bar     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (bar              , bar )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_GIGA (bar              , bar )
+UNLIB_DEFINE_LITERAL(pascal_                 , Pa      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(pascal_          , Pa  )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(pascal_          , Pa  )
+UNLIB_DEFINE_LITERAL(bar                     , bar     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(bar              , bar )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_GIGA(bar              , bar )
 /** @} */
 
 /** volumetric flow rate */
 UNLIB_DEFINE_LITERAL(liter_per_hour          , l_per_h )
 
 /** @{ AC reactive power and related units */
-UNLIB_DEFINE_LITERAL(var                     , VAr     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (var              , VAr )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (var              , VAr )
-UNLIB_DEFINE_LITERAL(var_second              , VArs    ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (var_second       , VArs)
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (var_second       , VArs)
-UNLIB_DEFINE_LITERAL(var_hour                , VArh    ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (var_hour         , VArh)
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (var_hour         , VArh)
+UNLIB_DEFINE_LITERAL(var                     , VAr     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(var              , VAr )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(var              , VAr )
+UNLIB_DEFINE_LITERAL(var_second              , VArs    ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(var_second       , VArs)
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(var_second       , VArs)
+UNLIB_DEFINE_LITERAL(var_hour                , VArh    ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(var_hour         , VArh)
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(var_hour         , VArh)
 /** @} */
 
 /** @{ AC apparent power and related units */
-UNLIB_DEFINE_LITERAL(voltampere              , VA      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (voltampere       , VA  )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (voltampere       , VA  )
-UNLIB_DEFINE_LITERAL(voltampere_second       , VAs     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (voltampere_second, VAs )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (voltampere_second, VAs )
-UNLIB_DEFINE_LITERAL(voltampere_hour         , VAh     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO (voltampere_hour  , VAh )
-                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA (voltampere_hour  , VAh )
+UNLIB_DEFINE_LITERAL(voltampere              , VA      ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(voltampere       , VA  )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(voltampere       , VA  )
+UNLIB_DEFINE_LITERAL(voltampere_second       , VAs     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(voltampere_second, VAs )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(voltampere_second, VAs )
+UNLIB_DEFINE_LITERAL(voltampere_hour         , VAh     ) UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL_ATTO(voltampere_hour  , VAh )
+                                                         UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL_TERA(voltampere_hour  , VAh )
 /** @} */
 
 /** @} */

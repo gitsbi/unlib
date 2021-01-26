@@ -359,6 +359,12 @@ public:
 	 */
 	constexpr quantity operator+() const                                  {return *this;}
 
+	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>& operator++()    {++value; return *this;}
+	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>& operator--()    {--value; return *this;}
+	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>  operator++(int) {return quantity(value++);}
+	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>  operator--(int) {return quantity(value--);}
+
+
 	/**
 	 * @brief Check whether two floating point quantities are almost equal
 	 *

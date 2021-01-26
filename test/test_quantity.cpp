@@ -514,6 +514,31 @@ SUBCASE("quantity mathematical operations") {
 		}
 	}
 
+	SUBCASE("integer quantities can be incremented and decremented") {
+		using test_qi = test_quantity::revalue<int>;
+		using test_qf = test_quantity;
+		test_qi qi{42};
+		test_qf qf{42.};
+
+		CHECK(++qi == test_qi{43});
+		CHECK(  qi == test_qi{43});
+		CHECK(qi++ == test_qi{43});
+		CHECK(qi   == test_qi{44});
+		CHECK(--qi == test_qi{43});
+		CHECK(  qi == test_qi{43});
+		CHECK(qi-- == test_qi{43});
+		CHECK(qi   == test_qi{42});
+
+		//CHECK(++qf == test_qf{43.});
+		//CHECK(  qf == test_qf{43.});
+		//CHECK(qf++ == test_qf{43.});
+		//CHECK(qf   == test_qf{44.});
+		//CHECK(--qf == test_qf{43.});
+		//CHECK(  qf == test_qf{43.});
+		//CHECK(qf-- == test_qf{43.});
+		//CHECK(qf   == test_qf{42.});
+	}
+
 }
 
 SUBCASE("quantity casts") {

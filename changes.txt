@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.7.5
+* added definitions for return types of literal operators, so users can refer to those
+
 0.7.4
 * fixed many individual issues found during an extensive code review
 * added increment/decrement operators for integral types

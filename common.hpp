@@ -11,6 +11,8 @@
  *
  */
 
+#include <cinttypes>
+
 #include <unlib/quantity.hpp>
 
 namespace unlib {
@@ -59,6 +61,11 @@ using           resistance =        div_unit_t< voltage, current >;
 using volumetric_flow_rate =        div_unit_t< volume , time    >;
 /** @} */
 
+namespace literals {
+using integer_value_type = std::int32_t; /**< value type of quantity return by integer literal operator */
+using floatpt_value_type = double;       /**< value type of quantity return by   float literal operator */
+}
+
 /** @{
  *
  * Macros to define literal operators for units and for their prefixed versions
@@ -72,9 +79,9 @@ using volumetric_flow_rate =        div_unit_t< volume , time    >;
 /** defines a literal operator; do not call this directly */
 #define UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,OpT_, R_)       inline constexpr auto operator""_##UnitShort_(OpT_ v) noexcept {return Sc_<Qty_<R_>>{static_cast<R_>(v)};}
 /** defines a set of literal operators for a unit return double and long long */
-#define UNLIB_DEFINE_SCALED_LITERAL(Qty_,Sc_,UnitShort_)                  namespace literals {                                                             \
-                                                                          UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,long double       , double   ) \
-                                                                          UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,unsigned long long, long long) \
+#define UNLIB_DEFINE_SCALED_LITERAL(Qty_,Sc_,UnitShort_)                  namespace literals {                                                                      \
+                                                                          UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,long double       , floatpt_value_type) \
+                                                                          UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,unsigned long long, integer_value_type) \
                                                                           }
 /** define the literal operators for all the micro unit prefixes (atto-deci) */
 #define UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL(Qty_,UnitShort_)       UNLIB_DEFINE_SCALED_LITERAL(Qty_,atto , a##UnitShort_) \

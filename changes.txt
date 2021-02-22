@@ -4,6 +4,7 @@ Changes
 0.7.5
 * added definitions for return types of literal operators, so users can refer to those
 * by default, use quantities for tolerance in quantity comparisons now (rather than value types)
+* added specializations of std::numeric_limits for quantities
 
 0.7.4
 * fixed many individual issues found during an extensive code review

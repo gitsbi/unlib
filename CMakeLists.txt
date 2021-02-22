@@ -16,6 +16,7 @@ add_executable(unlib_test
         tag.hpp
         scaling.hpp
         quantity.hpp
+        limits.hpp
         common.hpp
         math.hpp
         test/unlib_test.hpp
@@ -23,6 +24,7 @@ add_executable(unlib_test
         test/test_ratio.cpp
         test/test_unit.cpp
         test/test_quantity.cpp
+        test/test_limits.cpp
         test/test_common.cpp
         test/test_math.cpp
 )

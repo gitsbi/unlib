@@ -23,16 +23,17 @@ namespace unlib {
  *
  * Different kind of quantities of the same physical unit can be tagged in
  * order to make them incompatible, These tags consists of an ID and an
- * exponent. The ID is used to tell tags and, ultimately, quantities, from
- * each other. Any type, even an incomplete type, will do for the ID. The
- * exponent is used to track multiplication and division of tagged quantities
- * so that tags can be canceled automatically when dividing quantities.
+ * exponent. The ID is used to tell tags, tagged units and, ultimately, tagged
+ * quantities, from each other. Any type, even an incomplete type, will do for
+ * the ID. The exponent is used to track multiplication and division of tagged
+ * quantities so that tags can be canceled automatically when dividing
+ * quantities.
  *
- * @tparam  ID  tag ID
- * @tparam Num  tag exponent numerator
- * @tparam Den  tag exponent denominator
+ * @tparam       ID  tag ID
+ * @tparam Exponent  tag exponent
  *
- * @note Do not use this type directly. Use the tag_t meta function instead.
+ * @note Do not instantiate this template  directly. Use the tag_t<> meta
+ *       function instead.
  */
 template<typename ID, typename Exponent>
 struct tag;
@@ -50,9 +51,9 @@ using tag_ratio_t = ratio_t<Num,Den>;
 template<typename ID, std::intmax_t Num, std::intmax_t Den>
 struct tag<ID,std::ratio<Num,Den>> {
 	using id        = ID;
-	using is_no_tag = std::is_same<id,void>;
+	using is_no_tag = std::integral_constant<bool, detail::is_same_v<id,void> or Num==0>;
 	using exponent  = std::conditional_t< is_no_tag::value, tag_ratio_t<0,1>, typename tag_ratio_t<Num,Den>::type >;
-	using type      = tag< std::conditional_t<is_no_tag::value || Num==0, void, ID>, exponent >;
+	using type      = tag<std::conditional_t<is_no_tag::value || Num==0, void, ID>, exponent>;
 };
 
 /**

@@ -24,12 +24,6 @@
 
 namespace unlib {
 
-namespace detail {
-/* workaround for C++14 lacking this */
-template<typename T1, typename T2>
-constexpr bool is_same_v = std::is_same<T1,T2>::value;
-}
-
 /* quantities ****************************************************************/
 
 /**

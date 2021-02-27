@@ -154,16 +154,16 @@ class quantity< unit< std::ratio<           TimeNum,           TimeDen>
               , ValueType
               , tag<TagID,std::ratio<TagNum,TagDen>> > {
 public:
-	using unit_type  = unit< std::ratio<           TimeNum,           TimeDen>    /**< the quantity's unit type  */
+	using  unit_type = unit< std::ratio<           TimeNum,           TimeDen>
 	                       , std::ratio<           MassNum,           MassDen>
 	                       , std::ratio<         LengthNum,         LengthDen>
 	                       , std::ratio<        CurrentNum,        CurrentDen>
 	                       , std::ratio<     LuminosityNum,     LuminosityDen>
 	                       , std::ratio<    TemperatureNum,    TemperatureDen>
-	                       , std::ratio<SubstanceAmountNum,SubstanceAmountDen> >;
+	                       , std::ratio<SubstanceAmountNum,SubstanceAmountDen> >; /**< the quantity's unit type  */
 	using scale_type = scale_t<ScaleNum,ScaleDen>;                                /**< the quantity's scale      */
 	using value_type = ValueType;                                                 /**< the quantity's value type */
-	using tag_type   = tag_t<TagID,TagNum,TagDen>;                                /**< the quantity's tag        */
+	using   tag_type = tag_t<TagID,TagNum,TagDen>;                                /**< the quantity's tag        */
 
 	/**
 	 * @{
@@ -179,6 +179,10 @@ public:
 	using substance_amount_exponent = substance_amount_exponent_t<unit_type>;
 	/** @} */
 
+	/** shortcut zu simplify the syntax for a few member function */
+	template<typename Q>
+	using enable_if_int_t = std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>;
+
 	/** @{ create a quantity type with a different tag */
 	template<typename NewTag>       using      retag = quantity< unit_type, scale_type, value_type  , NewTag   >;
 	                                using      untag = quantity< unit_type, scale_type, value_type  , no_tag   >;
@@ -187,13 +191,13 @@ public:
 	/** create a quantity with a different value type */
 	template<typename NewValueType> using    revalue = quantity< unit_type, scale_type, NewValueType, tag_type >;
 
-	/** @{ create a quantity with a different value type */
+	/** @{ create a quantity with a different scale */
 	template<typename NewScale>     using rescale_to = quantity< unit_type, NewScale  , value_type  , tag_type >;
 	template<typename NewScale>     using rescale_by = rescale_to<std::ratio_multiply<NewScale,scale_type>>;
 	/** @} */
 
-	constexpr quantity()                                                : value{} {}
-	constexpr quantity(const quantity& rhs)                             = default;
+	constexpr quantity()                                      = default;
+	constexpr quantity(const quantity& rhs)                   = default;
 
 	/**
 	 * @brief Constructor
@@ -264,7 +268,7 @@ public:
 	constexpr quantity& operator=(const implicit_quantity_caster<U, S, V, T, IV, IS, IT>& rhs)
 	                                                                      {value = rhs.template cast_to<unit_type,scale_type,value_type,tag_type>(); return *this;}
 
-	constexpr quantity& operator=(const quantity& rhs)                  = default;
+	constexpr quantity& operator=(const quantity& rhs)        = default;
 
 	/**
 	 * @brief get value
@@ -283,7 +287,7 @@ public:
 	 * @note There is a free function of the same name.
 	 */
 	template<typename NewScale>
-	constexpr value_type get_scaled(NewScale = NewScale{}) const          {return detail::rescale_value<NewScale,scale_type>(value);}
+	constexpr value_type get_scaled(NewScale = NewScale{}) const          {return detail::rescale_value<NewScale,scale_type>(get());}
 
 	/**
 	 * @{
@@ -322,9 +326,8 @@ public:
 		                                                                      value /= rhs;
 		                                                                      return *this;
 	                                                                      }
-	template<typename V>
-	constexpr quantity& operator%=(const V& rhs)                          {
-		                                                                      static_assert(std::numeric_limits<value_type>::is_integer, "modulo on non-integer type"  );
+	template<typename V, typename Q=quantity>
+	constexpr enable_if_int_t<Q>& operator%=(const V& rhs)                {
 		                                                                      static_assert(std::numeric_limits<V         >::is_integer, "modulo with non-integer type");
 		                                                                      static_assert(detail::is_same_v<value_type,V>            , "different value types"       );
 		                                                                      value %= rhs;
@@ -351,10 +354,10 @@ public:
 	 */
 	constexpr quantity operator+() const                                  {return *this;}
 
-	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>& operator++()    {++value; return *this;}
-	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>& operator--()    {--value; return *this;}
-	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>  operator++(int) {return quantity(value++);}
-	template<typename Q=quantity> constexpr std::enable_if_t<std::numeric_limits<value_type>::is_integer, Q>  operator--(int) {return quantity(value--);}
+	template<typename Q=quantity> constexpr enable_if_int_t<Q>& operator++()   {++value; return *this;}
+	template<typename Q=quantity> constexpr enable_if_int_t<Q>& operator--()   {--value; return *this;}
+	template<typename Q=quantity> constexpr enable_if_int_t<Q>  operator++(int){return quantity(value++);}
+	template<typename Q=quantity> constexpr enable_if_int_t<Q>  operator--(int){return quantity(value--);}
 
 
 	/**
@@ -466,9 +469,9 @@ namespace detail {
 
 /* This allows quantities to be scaled using milli<q> and to_milli<q> */
 template<typename NewScale, typename U, typename S, typename V, typename T>
-struct scale_by<NewScale, quantity<U,S,V,T>>                    {using result = typename quantity<U,S,V,T>::template rescale_by<NewScale>;};
+struct scale_by<NewScale, quantity<U,S,V,T>>                    {using type = typename quantity<U,S,V,T>::template rescale_by<NewScale>;};
 template<typename NewScale, typename U, typename S, typename V, typename T>
-struct scale_to<NewScale, quantity<U,S,V,T>>                    {using result = typename quantity<U,S,V,T>::template rescale_to<NewScale>;};
+struct scale_to<NewScale, quantity<U,S,V,T>>                    {using type = typename quantity<U,S,V,T>::template rescale_to<NewScale>;};
 
 }
 

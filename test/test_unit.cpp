@@ -46,27 +46,27 @@ TEST_CASE("units") {
 	}
 
 	SUBCASE("get_exponent gets correct exponent") {
-		CHECK( typeid(exponent_t<1>) == typeid(detail::get_exponent_t<unit_a,unlib::detail::            time_unit>) );
-		CHECK( typeid(exponent_t<2>) == typeid(detail::get_exponent_t<unit_a,unlib::detail::            mass_unit>) );
-		CHECK( typeid(exponent_t<3>) == typeid(detail::get_exponent_t<unit_a,unlib::detail::          length_unit>) );
-		CHECK( typeid(exponent_t<4>) == typeid(detail::get_exponent_t<unit_a,unlib::detail::         current_unit>) );
-		CHECK( typeid(exponent_t<5>) == typeid(detail::get_exponent_t<unit_a,unlib::detail::      luminosity_unit>) );
-		CHECK( typeid(exponent_t<6>) == typeid(detail::get_exponent_t<unit_a,unlib::detail::     temperature_unit>) );
-		CHECK( typeid(exponent_t<7>) == typeid(detail::get_exponent_t<unit_a,unlib::detail::substance_amount_unit>) );
+		CHECK( typeid(exponent_t<1>) == typeid(detail::get_exponent_t<unit_a,unlib::            time>) );
+		CHECK( typeid(exponent_t<2>) == typeid(detail::get_exponent_t<unit_a,unlib::            mass>) );
+		CHECK( typeid(exponent_t<3>) == typeid(detail::get_exponent_t<unit_a,unlib::          length>) );
+		CHECK( typeid(exponent_t<4>) == typeid(detail::get_exponent_t<unit_a,unlib::         current>) );
+		CHECK( typeid(exponent_t<5>) == typeid(detail::get_exponent_t<unit_a,unlib::      luminosity>) );
+		CHECK( typeid(exponent_t<6>) == typeid(detail::get_exponent_t<unit_a,unlib::     temperature>) );
+		CHECK( typeid(exponent_t<7>) == typeid(detail::get_exponent_t<unit_a,unlib::substance_amount>) );
 	}
 
 	SUBCASE("find_first_exponent finds correct exponents") {
 		using unit_list = unsorted_unit_list_from_unit<unit_a>::type;
-		CHECK( typeid(exponent_t<1>) == typeid(detail::find_first_exponent_t<unlib::detail::            time_unit, unit_list>) );
-		CHECK( typeid(exponent_t<2>) == typeid(detail::find_first_exponent_t<unlib::detail::            mass_unit, unit_list>) );
-		CHECK( typeid(exponent_t<3>) == typeid(detail::find_first_exponent_t<unlib::detail::          length_unit, unit_list>) );
-		CHECK( typeid(exponent_t<4>) == typeid(detail::find_first_exponent_t<unlib::detail::         current_unit, unit_list>) );
-		CHECK( typeid(exponent_t<5>) == typeid(detail::find_first_exponent_t<unlib::detail::      luminosity_unit, unit_list>) );
-		CHECK( typeid(exponent_t<6>) == typeid(detail::find_first_exponent_t<unlib::detail::     temperature_unit, unit_list>) );
-		CHECK( typeid(exponent_t<7>) == typeid(detail::find_first_exponent_t<unlib::detail::substance_amount_unit, unit_list>) );
+		CHECK( typeid(exponent_t<1>) == typeid(detail::find_first_exponent_t<unlib::            time, unit_list>) );
+		CHECK( typeid(exponent_t<2>) == typeid(detail::find_first_exponent_t<unlib::            mass, unit_list>) );
+		CHECK( typeid(exponent_t<3>) == typeid(detail::find_first_exponent_t<unlib::          length, unit_list>) );
+		CHECK( typeid(exponent_t<4>) == typeid(detail::find_first_exponent_t<unlib::         current, unit_list>) );
+		CHECK( typeid(exponent_t<5>) == typeid(detail::find_first_exponent_t<unlib::      luminosity, unit_list>) );
+		CHECK( typeid(exponent_t<6>) == typeid(detail::find_first_exponent_t<unlib::     temperature, unit_list>) );
+		CHECK( typeid(exponent_t<7>) == typeid(detail::find_first_exponent_t<unlib::substance_amount, unit_list>) );
 
-		CHECK( typeid(exponent_t<2>) != typeid(detail::find_first_exponent_t<unlib::detail::            time_unit, unit_list>) );
-		CHECK( typeid(exponent_t<1>) != typeid(detail::find_first_exponent_t<unlib::detail::            mass_unit, unit_list>) );
+		CHECK( typeid(exponent_t<2>) != typeid(detail::find_first_exponent_t<unlib::            time, unit_list>) );
+		CHECK( typeid(exponent_t<1>) != typeid(detail::find_first_exponent_t<unlib::            mass, unit_list>) );
 	}
 }
 
@@ -74,13 +74,13 @@ SUBCASE("unit type manipulations") {
 	using namespace unlib;
 
 	SUBCASE("power") {
-		using unit_1 = pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>;
-		using unit_2 = pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>;
-		using unit_3 = pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>;
-		using unit_4 = pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>;
-		using unit_5 = pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>;
-		using unit_6 = pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>;
-		using unit_7 = pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>>;
+		using unit_1 = pow_unit_t<unlib::            time,std::ratio<1>>;
+		using unit_2 = pow_unit_t<unlib::            mass,std::ratio<2>>;
+		using unit_3 = pow_unit_t<unlib::          length,std::ratio<3>>;
+		using unit_4 = pow_unit_t<unlib::         current,std::ratio<4>>;
+		using unit_5 = pow_unit_t<unlib::      luminosity,std::ratio<5>>;
+		using unit_6 = pow_unit_t<unlib::     temperature,std::ratio<6>>;
+		using unit_7 = pow_unit_t<unlib::substance_amount,std::ratio<7>>;
 		CHECK( typeid(unit_1) == typeid(unit<exponent_t<1>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>>) );
 		CHECK( typeid(unit_2) == typeid(unit<exponent_t<0>,exponent_t<2>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>>) );
 		CHECK( typeid(unit_3) == typeid(unit<exponent_t<0>,exponent_t<0>,exponent_t<3>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>>) );
@@ -153,13 +153,13 @@ SUBCASE("unit type manipulations") {
 	}
 
 	SUBCASE("unit_t") {
-		using unit_a = unit_t<unlib::detail::            time_unit
-		                     ,unlib::detail::            mass_unit
-		                     ,unlib::detail::          length_unit
-		                     ,unlib::detail::         current_unit
-		                     ,unlib::detail::      luminosity_unit
-		                     ,unlib::detail::     temperature_unit
-		                     ,unlib::detail::substance_amount_unit >;
+		using unit_a = unit_t<unlib::            time
+		                     ,unlib::            mass
+		                     ,unlib::          length
+		                     ,unlib::         current
+		                     ,unlib::      luminosity
+		                     ,unlib::     temperature
+		                     ,unlib::substance_amount >;
 
 		CHECK( typeid(exponent_t<1,1>) == typeid(unit_a::            time_exponent) );
 		CHECK( typeid(exponent_t<1,1>) == typeid(unit_a::            mass_exponent) );
@@ -169,13 +169,13 @@ SUBCASE("unit type manipulations") {
 		CHECK( typeid(exponent_t<1,1>) == typeid(unit_a::     temperature_exponent) );
 		CHECK( typeid(exponent_t<1,1>) == typeid(unit_a::substance_amount_exponent) );
 
-		using unit_b = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
-		                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-		                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-		                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-		                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-		                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-		                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
+		using unit_b = unit_t<pow_unit_t<unlib::            time,std::ratio<1>>
+		                     ,pow_unit_t<unlib::            mass,std::ratio<2>>
+		                     ,pow_unit_t<unlib::          length,std::ratio<3>>
+		                     ,pow_unit_t<unlib::         current,std::ratio<4>>
+		                     ,pow_unit_t<unlib::      luminosity,std::ratio<5>>
+		                     ,pow_unit_t<unlib::     temperature,std::ratio<6>>
+		                     ,pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
 
 		CHECK( typeid(exponent_t<1>) == typeid(unit_b::            time_exponent) );
 		CHECK( typeid(exponent_t<2>) == typeid(unit_b::            mass_exponent) );
@@ -186,42 +186,42 @@ SUBCASE("unit type manipulations") {
 		CHECK( typeid(exponent_t<7>) == typeid(unit_b::substance_amount_exponent) );
 	}
 
-	using unit_a = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
-	                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-	                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-	                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-	                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-	                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-	                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
+	using unit_a = unit_t<pow_unit_t<unlib::            time,std::ratio<1>>
+	                     ,pow_unit_t<unlib::            mass,std::ratio<2>>
+	                     ,pow_unit_t<unlib::          length,std::ratio<3>>
+	                     ,pow_unit_t<unlib::         current,std::ratio<4>>
+	                     ,pow_unit_t<unlib::      luminosity,std::ratio<5>>
+	                     ,pow_unit_t<unlib::     temperature,std::ratio<6>>
+	                     ,pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
 
-	using unit_b = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<7>>
-	                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<6>>
-	                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<5>>
-	                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-	                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<3>>
-	                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<2>>
-	                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<1>> >;
+	using unit_b = unit_t<pow_unit_t<unlib::            time,std::ratio<7>>
+	                     ,pow_unit_t<unlib::            mass,std::ratio<6>>
+	                     ,pow_unit_t<unlib::          length,std::ratio<5>>
+	                     ,pow_unit_t<unlib::         current,std::ratio<4>>
+	                     ,pow_unit_t<unlib::      luminosity,std::ratio<3>>
+	                     ,pow_unit_t<unlib::     temperature,std::ratio<2>>
+	                     ,pow_unit_t<unlib::substance_amount,std::ratio<1>> >;
 
 	SUBCASE("multiplication") {
-		using unit_mul = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<8>>
-		                       ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<8>>
-		                       ,pow_unit_t<unlib::detail::          length_unit,std::ratio<8>>
-		                       ,pow_unit_t<unlib::detail::         current_unit,std::ratio<8>>
-		                       ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<8>>
-		                       ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<8>>
-		                       ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<8>> >;
+		using unit_mul = unit_t<pow_unit_t<unlib::            time,std::ratio<8>>
+		                       ,pow_unit_t<unlib::            mass,std::ratio<8>>
+		                       ,pow_unit_t<unlib::          length,std::ratio<8>>
+		                       ,pow_unit_t<unlib::         current,std::ratio<8>>
+		                       ,pow_unit_t<unlib::      luminosity,std::ratio<8>>
+		                       ,pow_unit_t<unlib::     temperature,std::ratio<8>>
+		                       ,pow_unit_t<unlib::substance_amount,std::ratio<8>> >;
 		using mul_unit = mul_unit_t<unit_a,unit_b>;
 		CHECK( typeid(mul_unit) == typeid(unit_mul) );
 	}
 
 	SUBCASE("division") {
-		using unit_div = unit_t<reciprocal_unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<6>>>
-		                       ,reciprocal_unit_t<pow_unit_t<unlib::detail::            mass_unit,std::ratio<4>>>
-		                       ,reciprocal_unit_t<pow_unit_t<unlib::detail::          length_unit,std::ratio<2>>>
-		                       ,                  pow_unit_t<unlib::detail::         current_unit,std::ratio<0>>
-		                       ,                  pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<2>>
-		                       ,                  pow_unit_t<unlib::detail::     temperature_unit,std::ratio<4>>
-		                       ,                  pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<6>> >;
+		using unit_div = unit_t<reciprocal_unit_t<pow_unit_t<unlib::            time,std::ratio<6>>>
+		                       ,reciprocal_unit_t<pow_unit_t<unlib::            mass,std::ratio<4>>>
+		                       ,reciprocal_unit_t<pow_unit_t<unlib::          length,std::ratio<2>>>
+		                       ,                  pow_unit_t<unlib::         current,std::ratio<0>>
+		                       ,                  pow_unit_t<unlib::      luminosity,std::ratio<2>>
+		                       ,                  pow_unit_t<unlib::     temperature,std::ratio<4>>
+		                       ,                  pow_unit_t<unlib::substance_amount,std::ratio<6>> >;
 
 		CHECK( typeid(div_unit_t<unit_a,unit_b>) == typeid(unit_div) );
 	}
@@ -229,29 +229,29 @@ SUBCASE("unit type manipulations") {
 
 SUBCASE("unit compatibility") {
 	using namespace unlib;
-	using unit_a = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
-	                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-	                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-	                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-	                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-	                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-	                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
+	using unit_a = unit_t<pow_unit_t<unlib::            time,std::ratio<1>>
+	                     ,pow_unit_t<unlib::            mass,std::ratio<2>>
+	                     ,pow_unit_t<unlib::          length,std::ratio<3>>
+	                     ,pow_unit_t<unlib::         current,std::ratio<4>>
+	                     ,pow_unit_t<unlib::      luminosity,std::ratio<5>>
+	                     ,pow_unit_t<unlib::     temperature,std::ratio<6>>
+	                     ,pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
 
-	using unit_b = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
-	                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-	                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-	                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-	                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-	                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>>
-	                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>> >;
+	using unit_b = unit_t<pow_unit_t<unlib::            time,std::ratio<1>>
+	                     ,pow_unit_t<unlib::            mass,std::ratio<2>>
+	                     ,pow_unit_t<unlib::     temperature,std::ratio<6>>
+	                     ,pow_unit_t<unlib::      luminosity,std::ratio<5>>
+	                     ,pow_unit_t<unlib::          length,std::ratio<3>>
+	                     ,pow_unit_t<unlib::substance_amount,std::ratio<7>>
+	                     ,pow_unit_t<unlib::         current,std::ratio<4>> >;
 
-	using unit_c = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<0>>
-	                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-	                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-	                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-	                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-	                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-	                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
+	using unit_c = unit_t<pow_unit_t<unlib::            time,std::ratio<0>>
+	                     ,pow_unit_t<unlib::            mass,std::ratio<2>>
+	                     ,pow_unit_t<unlib::          length,std::ratio<3>>
+	                     ,pow_unit_t<unlib::         current,std::ratio<4>>
+	                     ,pow_unit_t<unlib::      luminosity,std::ratio<5>>
+	                     ,pow_unit_t<unlib::     temperature,std::ratio<6>>
+	                     ,pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
 
 	CHECK(    are_units_compatible_v<unit_a, unit_b>);
 	CHECK(not are_units_compatible_v<unit_a, unit_c>);
@@ -268,26 +268,26 @@ SUBCASE("dimensionlessness") {
 	using unit_a = unit_t<>;
 	REQUIRE( typeid(unit_a) == typeid(unit<exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>,exponent_t<0>>) );
 	SUBCASE("is_unit_dimensionless") {
-		using unit_b = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
-		                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-		                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-		                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-		                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-		                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-		                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
+		using unit_b = unit_t<pow_unit_t<unlib::            time,std::ratio<1>>
+		                     ,pow_unit_t<unlib::            mass,std::ratio<2>>
+		                     ,pow_unit_t<unlib::          length,std::ratio<3>>
+		                     ,pow_unit_t<unlib::         current,std::ratio<4>>
+		                     ,pow_unit_t<unlib::      luminosity,std::ratio<5>>
+		                     ,pow_unit_t<unlib::     temperature,std::ratio<6>>
+		                     ,pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
 
 		CHECK(     is_unit_dimensionless_v<unit_a> );
 		CHECK( not is_unit_dimensionless_v<unit_b> );
 	}
 
 	SUBCASE("type comparison") {
-		using unit_c = unit_t<pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
-		                     ,pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-		                     ,pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-		                     ,pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-		                     ,pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-		                     ,pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-		                     ,pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
+		using unit_c = unit_t<pow_unit_t<unlib::            time,std::ratio<1>>
+		                     ,pow_unit_t<unlib::            mass,std::ratio<2>>
+		                     ,pow_unit_t<unlib::          length,std::ratio<3>>
+		                     ,pow_unit_t<unlib::         current,std::ratio<4>>
+		                     ,pow_unit_t<unlib::      luminosity,std::ratio<5>>
+		                     ,pow_unit_t<unlib::     temperature,std::ratio<6>>
+		                     ,pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
 		CHECK(not are_units_compatible_v<unit_a , unit_c>);
 	}
 }

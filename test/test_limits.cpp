@@ -8,13 +8,13 @@
 
 namespace {
 
-using some_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::detail::            time_unit,std::ratio<1>>
-                                    ,unlib::pow_unit_t<unlib::detail::            mass_unit,std::ratio<2>>
-                                    ,unlib::pow_unit_t<unlib::detail::          length_unit,std::ratio<3>>
-                                    ,unlib::pow_unit_t<unlib::detail::         current_unit,std::ratio<4>>
-                                    ,unlib::pow_unit_t<unlib::detail::      luminosity_unit,std::ratio<5>>
-                                    ,unlib::pow_unit_t<unlib::detail::     temperature_unit,std::ratio<6>>
-                                    ,unlib::pow_unit_t<unlib::detail::substance_amount_unit,std::ratio<7>> >;
+using some_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::            time,std::ratio<1>>
+                                    ,unlib::pow_unit_t<unlib::            mass,std::ratio<2>>
+                                    ,unlib::pow_unit_t<unlib::          length,std::ratio<3>>
+                                    ,unlib::pow_unit_t<unlib::         current,std::ratio<4>>
+                                    ,unlib::pow_unit_t<unlib::      luminosity,std::ratio<5>>
+                                    ,unlib::pow_unit_t<unlib::     temperature,std::ratio<6>>
+                                    ,unlib::pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
 
 template<typename V>
 using some_test_quantity = unlib::quantity<some_test_unit,unlib::no_scaling,V>;

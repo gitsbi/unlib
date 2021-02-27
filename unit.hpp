@@ -82,6 +82,24 @@ struct unit< std::ratio<           TimeNum,           TimeDen>
 
 /**
  * @{
+ * @brief the units representing the seven basic SI units
+ *
+ * @note They can be use to create other units:
+ * @code
+using velocity = unit_t<length, reciprocal_unit_t<time>>;
+ * @endcode
+ */
+using             time = unit<exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using             mass = unit<exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using           length = unit<exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using          current = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>, exponent_t<0>>;
+using       luminosity = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>, exponent_t<0>>;
+using      temperature = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>, exponent_t<0>>;
+using substance_amount = unit<exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<0>, exponent_t<1>>;
+/** @} */
+
+/**
+ * @{
  *
  * @brief access unit exponents
  */
@@ -108,35 +126,17 @@ using e2 = exponent_t<2>;
 
 /**
  * @{
- * @brief the seven basic SI units
- *
- * @note These are defined here, within `detail`, only because they are used
- *       here in order to access the exponents in unit in the following code.
- *       Definitions intended to be used by users are done elsewhere together
- *       with units derived from the basic units.
- */
-using             time_unit = unit< e1, e0, e0, e0, e0, e0, e0 >;
-using             mass_unit = unit< e0, e1, e0, e0, e0, e0, e0 >;
-using           length_unit = unit< e0, e0, e1, e0, e0, e0, e0 >;
-using          current_unit = unit< e0, e0, e0, e1, e0, e0, e0 >;
-using       luminosity_unit = unit< e0, e0, e0, e0, e1, e0, e0 >;
-using      temperature_unit = unit< e0, e0, e0, e0, e0, e1, e0 >;
-using substance_amount_unit = unit< e0, e0, e0, e0, e0, e0, e1 >;
-/** @} */
-
-/**
- * @{
  *
  * access the exponent for a specific basic unit in a unit
  */
 template<typename Unit, typename BasicUnit> struct get_exponent;
-template<typename Unit                    > struct get_exponent<Unit,            time_unit> { using type =             time_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,            mass_unit> { using type =             mass_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,          length_unit> { using type =           length_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,         current_unit> { using type =          current_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,      luminosity_unit> { using type =       luminosity_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,     temperature_unit> { using type =      temperature_exponent_t<Unit>; };
-template<typename Unit                    > struct get_exponent<Unit,substance_amount_unit> { using type = substance_amount_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,            time> { using type =             time_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,            mass> { using type =             mass_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,          length> { using type =           length_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,         current> { using type =          current_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,      luminosity> { using type =       luminosity_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,     temperature> { using type =      temperature_exponent_t<Unit>; };
+template<typename Unit                    > struct get_exponent<Unit,substance_amount> { using type = substance_amount_exponent_t<Unit>; };
 
 template<typename Unit, typename BasicUnit>
 using get_exponent_t = typename get_exponent<Unit,BasicUnit>::type;
@@ -175,13 +175,13 @@ struct find_first_exponent<BasicUnit,unsorted_unit_list<Head,Tail...>> {
 
 /** create a unit with the basic units being sorted into the correct order from a unsorted_unit_list */
 template< typename UnsortedUnitList >
-using create_unit_t = unit< typename find_first_exponent<            time_unit, UnsortedUnitList>::type
-                          , typename find_first_exponent<            mass_unit, UnsortedUnitList>::type
-                          , typename find_first_exponent<          length_unit, UnsortedUnitList>::type
-                          , typename find_first_exponent<         current_unit, UnsortedUnitList>::type
-                          , typename find_first_exponent<      luminosity_unit, UnsortedUnitList>::type
-                          , typename find_first_exponent<     temperature_unit, UnsortedUnitList>::type
-                          , typename find_first_exponent<substance_amount_unit, UnsortedUnitList>::type >;
+using create_unit_t = unit< typename find_first_exponent<            time, UnsortedUnitList>::type
+                          , typename find_first_exponent<            mass, UnsortedUnitList>::type
+                          , typename find_first_exponent<          length, UnsortedUnitList>::type
+                          , typename find_first_exponent<         current, UnsortedUnitList>::type
+                          , typename find_first_exponent<      luminosity, UnsortedUnitList>::type
+                          , typename find_first_exponent<     temperature, UnsortedUnitList>::type
+                          , typename find_first_exponent<substance_amount, UnsortedUnitList>::type >;
 
 /**
  * @{

@@ -7,6 +7,8 @@ Changes
 * added specializations of std::numeric_limits for quantities
 * fixed tag<>::is_no_tag to also be true_type when Num==0
 * fixed tag<> documentation
+* added license file
+* some minor refactoring, fixed and improved documentation
 
 0.7.4
 * fixed many individual issues found during an extensive code review

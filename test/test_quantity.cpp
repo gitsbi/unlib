@@ -8,13 +8,13 @@
 
 namespace {
 
-using default_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::            time,std::ratio<1>>
-                                       ,unlib::pow_unit_t<unlib::            mass,std::ratio<2>>
-                                       ,unlib::pow_unit_t<unlib::          length,std::ratio<3>>
-                                       ,unlib::pow_unit_t<unlib::         current,std::ratio<4>>
-                                       ,unlib::pow_unit_t<unlib::      luminosity,std::ratio<5>>
-                                       ,unlib::pow_unit_t<unlib::     temperature,std::ratio<6>>
-                                       ,unlib::pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
+using default_test_dimension = unlib::dimension<std::ratio<1>
+                                               ,std::ratio<2>
+                                               ,std::ratio<3>
+                                               ,std::ratio<4>
+                                               ,std::ratio<5>
+                                               ,std::ratio<6>
+                                               ,std::ratio<7> >;
 
 }
 
@@ -24,22 +24,22 @@ SUBCASE("quantities type operations") {
 	using namespace unlib;
 	using scale_type = scale_t<1,2>;
 	using value_type = double;
-	using test_quantity = quantity<default_test_unit, scale_type, value_type>;
+	using test_quantity = quantity<default_test_dimension, scale_type, value_type>;
 
 	SUBCASE("template parameters properly propagate to quantity") {
-		CHECK( typeid(default_test_unit) == typeid(test_quantity::unit_type)  );
+		CHECK( typeid(default_test_dimension) == typeid(test_quantity::dimension_type)  );
 		CHECK( typeid(value_type)        == typeid(test_quantity::value_type) );
 
 		CHECK( typeid(scale_type)        == typeid(test_quantity::scale_type) );
 		CHECK( typeid(no_tag)            == typeid(test_quantity::tag_type)   );
 
-		CHECK( typeid(exponent_t<1>)       == typeid(test_quantity::            time_exponent) );
-		CHECK( typeid(exponent_t<2>)       == typeid(test_quantity::            mass_exponent) );
-		CHECK( typeid(exponent_t<3>)       == typeid(test_quantity::          length_exponent) );
-		CHECK( typeid(exponent_t<4>)       == typeid(test_quantity::         current_exponent) );
-		CHECK( typeid(exponent_t<5>)       == typeid(test_quantity::      luminosity_exponent) );
-		CHECK( typeid(exponent_t<6>)       == typeid(test_quantity::     temperature_exponent) );
-		CHECK( typeid(exponent_t<7>)       == typeid(test_quantity::substance_amount_exponent) );
+		CHECK( typeid(exponent_t<1>)       == typeid(test_quantity::              time_exponent) );
+		CHECK( typeid(exponent_t<2>)       == typeid(test_quantity::              mass_exponent) );
+		CHECK( typeid(exponent_t<3>)       == typeid(test_quantity::            length_exponent) );
+		CHECK( typeid(exponent_t<4>)       == typeid(test_quantity::           current_exponent) );
+		CHECK( typeid(exponent_t<5>)       == typeid(test_quantity::       temperature_exponent) );
+		CHECK( typeid(exponent_t<6>)       == typeid(test_quantity::  substance_amount_exponent) );
+		CHECK( typeid(exponent_t<7>)       == typeid(test_quantity::luminous_intensity_exponent) );
 	}
 
 	SUBCASE("quantities can be retagged") {
@@ -57,23 +57,23 @@ SUBCASE("quantities type operations") {
 		CHECK  ( typeid(test_quantity_a::rescale_to<scale_t<47,11>>::scale_type) == typeid(scale_t<47,11>) );
 		CHECK  ( typeid(test_quantity_a::rescale_by<scale_t< 4, 1>>::scale_type) == typeid(scale_t< 2, 1>) );
 
-		using test_quantity_b = unlib::quantity<default_test_unit>;
-		CHECK( typeid( to_atto <test_quantity_b> ) == typeid( quantity<default_test_unit,  atto_scaling> ) );
-		CHECK( typeid( to_femto<test_quantity_b> ) == typeid( quantity<default_test_unit, femto_scaling> ) );
-		CHECK( typeid( to_pico <test_quantity_b> ) == typeid( quantity<default_test_unit,  pico_scaling> ) );
-		CHECK( typeid( to_nano <test_quantity_b> ) == typeid( quantity<default_test_unit,  nano_scaling> ) );
-		CHECK( typeid( to_micro<test_quantity_b> ) == typeid( quantity<default_test_unit, micro_scaling> ) );
-		CHECK( typeid( to_milli<test_quantity_b> ) == typeid( quantity<default_test_unit, milli_scaling> ) );
-		CHECK( typeid( to_centi<test_quantity_b> ) == typeid( quantity<default_test_unit, centi_scaling> ) );
-		CHECK( typeid( to_deci <test_quantity_b> ) == typeid( quantity<default_test_unit,  deci_scaling> ) );
-		CHECK( typeid( to_deca <test_quantity_b> ) == typeid( quantity<default_test_unit,  deca_scaling> ) );
-		CHECK( typeid( to_hecto<test_quantity_b> ) == typeid( quantity<default_test_unit, hecto_scaling> ) );
-		CHECK( typeid( to_kilo <test_quantity_b> ) == typeid( quantity<default_test_unit,  kilo_scaling> ) );
-		CHECK( typeid( to_mega <test_quantity_b> ) == typeid( quantity<default_test_unit,  mega_scaling> ) );
-		CHECK( typeid( to_giga <test_quantity_b> ) == typeid( quantity<default_test_unit,  giga_scaling> ) );
-		CHECK( typeid( to_tera <test_quantity_b> ) == typeid( quantity<default_test_unit,  tera_scaling> ) );
-		CHECK( typeid( to_peta <test_quantity_b> ) == typeid( quantity<default_test_unit,  peta_scaling> ) );
-		CHECK( typeid( to_exa  <test_quantity_b> ) == typeid( quantity<default_test_unit,   exa_scaling> ) );
+		using test_quantity_b = unlib::quantity<default_test_dimension>;
+		CHECK( typeid( to_atto <test_quantity_b> ) == typeid( quantity<default_test_dimension,  atto_scaling> ) );
+		CHECK( typeid( to_femto<test_quantity_b> ) == typeid( quantity<default_test_dimension, femto_scaling> ) );
+		CHECK( typeid( to_pico <test_quantity_b> ) == typeid( quantity<default_test_dimension,  pico_scaling> ) );
+		CHECK( typeid( to_nano <test_quantity_b> ) == typeid( quantity<default_test_dimension,  nano_scaling> ) );
+		CHECK( typeid( to_micro<test_quantity_b> ) == typeid( quantity<default_test_dimension, micro_scaling> ) );
+		CHECK( typeid( to_milli<test_quantity_b> ) == typeid( quantity<default_test_dimension, milli_scaling> ) );
+		CHECK( typeid( to_centi<test_quantity_b> ) == typeid( quantity<default_test_dimension, centi_scaling> ) );
+		CHECK( typeid( to_deci <test_quantity_b> ) == typeid( quantity<default_test_dimension,  deci_scaling> ) );
+		CHECK( typeid( to_deca <test_quantity_b> ) == typeid( quantity<default_test_dimension,  deca_scaling> ) );
+		CHECK( typeid( to_hecto<test_quantity_b> ) == typeid( quantity<default_test_dimension, hecto_scaling> ) );
+		CHECK( typeid( to_kilo <test_quantity_b> ) == typeid( quantity<default_test_dimension,  kilo_scaling> ) );
+		CHECK( typeid( to_mega <test_quantity_b> ) == typeid( quantity<default_test_dimension,  mega_scaling> ) );
+		CHECK( typeid( to_giga <test_quantity_b> ) == typeid( quantity<default_test_dimension,  giga_scaling> ) );
+		CHECK( typeid( to_tera <test_quantity_b> ) == typeid( quantity<default_test_dimension,  tera_scaling> ) );
+		CHECK( typeid( to_peta <test_quantity_b> ) == typeid( quantity<default_test_dimension,  peta_scaling> ) );
+		CHECK( typeid( to_exa  <test_quantity_b> ) == typeid( quantity<default_test_dimension,   exa_scaling> ) );
 
 		CHECK( typeid( to_milli<to_kilo<test_quantity_b>> ) == typeid( to_milli<test_quantity_b> ) );
 	}
@@ -83,7 +83,7 @@ SUBCASE("quantity values") {
 	using namespace unlib;
 
 	using value_type = double;
-	using test_quantity = quantity<default_test_unit, no_scaling, value_type>;
+	using test_quantity = quantity<default_test_dimension, no_scaling, value_type>;
 
 	SUBCASE("quantity is default-initialized") {
 		{
@@ -290,7 +290,7 @@ SUBCASE("quantity mathematical operations") {
 	using namespace unlib;
 
 	using value_type = double;
-	using test_quantity  = quantity<default_test_unit, no_scaling, value_type>;
+	using test_quantity  = quantity<default_test_dimension, no_scaling, value_type>;
 
 	SUBCASE("quantities can be added and subtracted") {
 		using test_mq = test_quantity::rescale_to<milli_scaling>;
@@ -327,36 +327,36 @@ SUBCASE("quantity mathematical operations") {
 	}
 
 	SUBCASE("quantities can be multiplied and divided") {
-		using test_unit_b   = unit_t<pow_unit_t<unlib::            time,std::ratio<7>>
-		                            ,pow_unit_t<unlib::            mass,std::ratio<6>>
-		                            ,pow_unit_t<unlib::          length,std::ratio<5>>
-		                            ,pow_unit_t<unlib::         current,std::ratio<4>>
-		                            ,pow_unit_t<unlib::      luminosity,std::ratio<3>>
-		                            ,pow_unit_t<unlib::     temperature,std::ratio<2>>
-		                            ,pow_unit_t<unlib::substance_amount,std::ratio<1>> >;
-		using test_unit_mab = unit_t<pow_unit_t<unlib::            time,std::ratio<8>>
-		                            ,pow_unit_t<unlib::            mass,std::ratio<8>>
-		                            ,pow_unit_t<unlib::          length,std::ratio<8>>
-		                            ,pow_unit_t<unlib::         current,std::ratio<8>>
-		                            ,pow_unit_t<unlib::      luminosity,std::ratio<8>>
-		                            ,pow_unit_t<unlib::     temperature,std::ratio<8>>
-		                            ,pow_unit_t<unlib::substance_amount,std::ratio<8>> >;
-		using test_unit_dab = unit_t<pow_unit_t<unlib::            time,std::ratio<-6>>
-		                            ,pow_unit_t<unlib::            mass,std::ratio<-4>>
-		                            ,pow_unit_t<unlib::          length,std::ratio<-2>>
-		                            ,pow_unit_t<unlib::         current,std::ratio<0>>
-		                            ,pow_unit_t<unlib::      luminosity,std::ratio<2>>
-		                            ,pow_unit_t<unlib::     temperature,std::ratio<4>>
-		                            ,pow_unit_t<unlib::substance_amount,std::ratio<6>> >;
+		using test_dimension_b   = dimension<exponent_t< 7>
+		                                    ,exponent_t< 6>
+		                                    ,exponent_t< 5>
+		                                    ,exponent_t< 4>
+		                                    ,exponent_t< 3>
+		                                    ,exponent_t< 2>
+		                                    ,exponent_t< 1> >;
+		using test_dimension_mab = dimension<exponent_t< 8>
+		                                    ,exponent_t< 8>
+		                                    ,exponent_t< 8>
+		                                    ,exponent_t< 8>
+		                                    ,exponent_t< 8>
+		                                    ,exponent_t< 8>
+		                                    ,exponent_t< 8> >;
+		using test_dimension_dab = dimension<exponent_t<-6>
+		                                    ,exponent_t<-4>
+		                                    ,exponent_t<-2>
+		                                    ,exponent_t< 0>
+		                                    ,exponent_t< 2>
+		                                    ,exponent_t< 4>
+		                                    ,exponent_t< 6> >;
 
 		using test_qa  = test_quantity::rescale_to<milli_scaling>;
-		using test_qb  = quantity<test_unit_b, kilo_scaling, value_type>;
+		using test_qb  = quantity<test_dimension_b, kilo_scaling, value_type>;
 
-		using test_q_mul_ab = mul_unit_t<default_test_unit, test_unit_b>;
-		CHECK( typeid(test_q_mul_ab) == typeid(test_unit_mab) );
+		using test_q_mul_ab = mul_dimension_t<default_test_dimension, test_dimension_b>;
+		CHECK( typeid(test_q_mul_ab) == typeid(test_dimension_mab) );
 
-		using test_q_div_ab = div_unit_t<default_test_unit, test_unit_b>;
-		CHECK( typeid(test_q_div_ab) == typeid(test_unit_dab) );
+		using test_q_div_ab = div_dimension_t<default_test_dimension, test_dimension_b>;
+		CHECK( typeid(test_q_div_ab) == typeid(test_dimension_dab) );
 
 		test_qa ua{42};
 		test_qb ub{110};
@@ -543,7 +543,7 @@ SUBCASE("quantity mathematical operations") {
 
 SUBCASE("quantity casts") {
 	using namespace unlib;
-	using test_quantity  = quantity<default_test_unit, no_scaling, double>;
+	using test_quantity  = quantity<default_test_dimension, no_scaling, double>;
 
 	SUBCASE("testing value_cast") {
 		using test_qd  = test_quantity;
@@ -604,11 +604,11 @@ SUBCASE("quantity casts") {
 	}
 
 	SUBCASE("testing quantity_cast") {
-		using test_qdka  = quantity<default_test_unit,  kilo_scaling, double, tag_t<struct tag_a>>;
-		using test_qika  = quantity<default_test_unit,  kilo_scaling, int   , tag_t<struct tag_a>>;
-		using test_qdma  = quantity<default_test_unit, milli_scaling, double, tag_t<struct tag_a>>;
-		using test_qdkb  = quantity<default_test_unit,  kilo_scaling, double, tag_t<struct tag_b>>;
-		using test_qimb  = quantity<default_test_unit, milli_scaling, double, tag_t<struct tag_b>>;
+		using test_qdka  = quantity<default_test_dimension,  kilo_scaling, double, tag_t<struct tag_a>>;
+		using test_qika  = quantity<default_test_dimension,  kilo_scaling, int   , tag_t<struct tag_a>>;
+		using test_qdma  = quantity<default_test_dimension, milli_scaling, double, tag_t<struct tag_a>>;
+		using test_qdkb  = quantity<default_test_dimension,  kilo_scaling, double, tag_t<struct tag_b>>;
+		using test_qimb  = quantity<default_test_dimension, milli_scaling, double, tag_t<struct tag_b>>;
 
 		test_qdka qdka{42};
 

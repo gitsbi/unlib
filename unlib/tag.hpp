@@ -14,25 +14,24 @@
 #include <cstdint>
 #include <type_traits>
 
-#include <unlib/ratio.hpp>
+#include <unlib/unlib/ratio.hpp>
 
 namespace unlib {
 
 /**
  * @brief Quantity tag
  *
- * Different kind of quantities of the same physical unit can be tagged in
- * order to make them incompatible, These tags consists of an ID and an
- * exponent. The ID is used to tell tags, tagged units and, ultimately, tagged
- * quantities, from each other. Any type, even an incomplete type, will do for
- * the ID. The exponent is used to track multiplication and division of tagged
- * quantities so that tags can be canceled automatically when dividing
- * quantities.
+ * Different kind of quantities of the same physical dimension can be tagged
+ * in order to make them incompatible, These tags consists of an ID and an
+ * exponent. The ID is used to tell tags and tagged quantities from each
+ * other. Any type, even an incomplete type, will do for the ID. The exponent
+ * is used to track multiplication and division of tagged quantities so that
+ * tags can be canceled automatically when dividing quantities.
  *
  * @tparam       ID  tag ID
  * @tparam Exponent  tag exponent
  *
- * @note Do not instantiate this template  directly. Use the tag_t<> meta
+ * @note Do not instantiate this template directly. Use the tag_t<> meta
  *       function instead.
  */
 template<typename ID, typename Exponent>
@@ -67,8 +66,7 @@ using no_tag = tag<void,tag_ratio_t<0>>;
  * @brief Create tag types
  *
  * This is a meta function to create tag types. The result will already be
- * cancelled, if possible. If either ID is void or Num is zero, this will
- * result in no_tag.
+ * cancelled. If either ID is void or Num is zero, this will result in no_tag.
  *
  * @see tag
  */
@@ -167,7 +165,7 @@ constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
  *     tag.
  *  3. If both tags are equal, the resulting tag ID will be the same, their
  *     exponents added/subtracted.
- *  4. If both units have differing tags and neither is `no_tag`, the
+ *  4. If both quantities have differing tags and neither is `no_tag`, the
  *     operation is not possible and will not compile.
  *
  * This means that, for example, you can multiply reactive power with time and

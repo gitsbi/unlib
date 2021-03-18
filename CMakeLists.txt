@@ -13,21 +13,25 @@ include_directories(..)
 include_directories(doctest)
 
 add_executable(unlib_test
-        ratio.hpp
-        unit.hpp
-        tag.hpp
-        scaling.hpp
+        unlib/ratio.hpp
+        unlib/dimension.hpp
+        unlib/tag.hpp
+        unlib/scaling.hpp
         quantity.hpp
-        limits.hpp
         common.hpp
         math.hpp
+        limits.hpp
         test/unlib_test.hpp
         test/unlib_test.cpp
         test/test_ratio.cpp
-        test/test_unit.cpp
+        test/test_dimension.cpp
         test/test_quantity.cpp
         test/test_limits.cpp
         test/test_common.cpp
+        test/test_common_literal_int.cpp
+        test/test_common_literal_long.cpp
+        test/test_common_literal_float.cpp
+        test/test_common_literal_double.cpp
         test/test_math.cpp
 )
 

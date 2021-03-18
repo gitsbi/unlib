@@ -1,6 +1,21 @@
 Changes
 =======
 
+0.9.1
+* allow changing default value types of literal operator result types at
+  compile-time
+
+0.9
+* major refactoring:
+ - luminosity is now (correctly) luminous intensity
+ - what used to be a unit is now split into base units and dimensions, the
+   latter describing the base unit exponents of derived units
+ - fixed mess created in 0.8.1 when tried to make kg, not g, the mass base unit
+ - quantities are now consistently derived either from base units or from
+   other quantities
+ - removed dimension_t and all the mechanics behind it
+ - moved all headers users shouldn't need to include into their own sub-folder
+
 0.8.1
 * silenced some compielr warnings
 * fixed a VC issue with quantity default ctor being defaulted
@@ -10,8 +25,10 @@ Changes
 * using kg also fixed erroneous definitions for voltage and pressure
 
 0.7.5
-* added definitions for return types of literal operators, so users can refer to those
-* by default, use quantities for tolerance in quantity comparisons now (rather than value types)
+* added definitions for return types of literal operators, so users can refer
+  to those
+* by default, use quantities for tolerance in quantity comparisons now (rather
+  than value types)
 * added specializations of std::numeric_limits for quantities
 * fixed tag<>::is_no_tag to also be true_type when Num==0
 * fixed tag<> documentation
@@ -35,7 +52,8 @@ Changes
 * added unlib/ratio.hpp, used by other headers
 
 0.7.0
-* allowed quantity multiplication and division of units with different tags under specific circumstances
+* allowed quantity multiplication and division of units with different tags
+  under specific circumstances
 * added pow function
 
 0.6.6

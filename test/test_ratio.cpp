@@ -1,4 +1,4 @@
-#include <unlib/ratio.hpp>
+#include <unlib/unlib/ratio.hpp>
 
 #include <string>
 #include <cmath>
@@ -7,7 +7,7 @@
 
 #include <unlib/test/unlib_test.hpp>
 
-#include <unlib/scaling.hpp>
+#include <unlib/unlib/scaling.hpp>
 
 namespace {
 

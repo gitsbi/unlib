@@ -8,16 +8,16 @@
 
 namespace {
 
-using some_test_unit = unlib::unit_t<unlib::pow_unit_t<unlib::            time,std::ratio<1>>
-                                    ,unlib::pow_unit_t<unlib::            mass,std::ratio<2>>
-                                    ,unlib::pow_unit_t<unlib::          length,std::ratio<3>>
-                                    ,unlib::pow_unit_t<unlib::         current,std::ratio<4>>
-                                    ,unlib::pow_unit_t<unlib::      luminosity,std::ratio<5>>
-                                    ,unlib::pow_unit_t<unlib::     temperature,std::ratio<6>>
-                                    ,unlib::pow_unit_t<unlib::substance_amount,std::ratio<7>> >;
+using some_test_dimension = unlib::dimension<std::ratio<1>
+                                            ,std::ratio<2>
+                                            ,std::ratio<3>
+                                            ,std::ratio<4>
+                                            ,std::ratio<5>
+                                            ,std::ratio<6>
+                                            ,std::ratio<7> >;
 
 template<typename V>
-using some_test_quantity = unlib::quantity<some_test_unit,unlib::no_scaling,V>;
+using some_test_quantity = unlib::quantity<some_test_dimension,unlib::no_scaling,V>;
 
 using unlib::detail::is_floating_point_v;
 

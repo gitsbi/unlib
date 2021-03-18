@@ -54,9 +54,11 @@ SUBCASE("time") {
 SUBCASE("mass") {
 	using VT = long long;
 
+	CHECK(typeid(unlib::kilo<unlib::gram<VT>>()) == typeid(unlib::quantity<unlib::mass, unlib::no_scaling, VT>()));
+
 	const unlib::kilo<unlib::gram<VT>> kg{ 1}; REQUIRE(kg.get() ==  1);
 
-	                unlib::gram<VT>   g{kg}; REQUIRE(kg.get()); CHECK( g.get() == kg.get() * 1000);
+	             unlib::gram<VT>   g{kg}; REQUIRE(kg.get()); CHECK( g.get() == kg.get() * 1000);
 	unlib::milli<unlib::gram<VT>> mg{ g}; REQUIRE( g.get()); CHECK(mg.get() ==  g.get() * 1000);
 	unlib::micro<unlib::gram<VT>> ug{mg}; REQUIRE(mg.get()); CHECK(ug.get() == mg.get() * 1000);
 	unlib::nano <unlib::gram<VT>> ng{ug}; REQUIRE(ug.get()); CHECK(ng.get() == ug.get() * 1000);
@@ -317,7 +319,7 @@ SUBCASE("voltage") {
 	CHECK( typeid( 1_V) == typeid(unlib::volt<integer_value_type>) );
 	CHECK( typeid(1._V) == typeid(unlib::volt<floatpt_value_type>) );
 
-	CHECK(typeid(unlib::volt<double>) == typeid((1._g * 1._m * 1._m) / (1._A * 1._s * 1._s * 1._s)) );
+	CHECK(typeid(unlib::volt<double>) == typeid((1._kg * 1._m * 1._m) / (1._A * 1._s * 1._s * 1._s)) );
 
 	CHECK(test::is_same_unit<unlib::volt<integer_value_type>>(1_fV) ); CHECK(1_fV == unlib::femto<unlib::volt<integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::volt<integer_value_type>>(1_pV) ); CHECK(1_pV == unlib::pico <unlib::volt<integer_value_type>>{1} );
@@ -653,7 +655,7 @@ SUBCASE("pressure") {
 	CHECK( typeid( 1_Pa) == typeid(unlib::pascal_<integer_value_type>) );
 	CHECK( typeid(1._Pa) == typeid(unlib::pascal_<floatpt_value_type>) );
 
-	CHECK(typeid(unlib::pascal_<double>) == typeid(1._g / (1._m * 1._s * 1._s)) );
+	CHECK(typeid(unlib::pascal_<double>) == typeid(1._kg / (1._m * 1._s * 1._s)) );
 
 	CHECK(test::is_same_unit<unlib::bar    <integer_value_type>::unit_type>(1_pbar) ); CHECK(1_pbar == unlib::pico <unlib::bar    <integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::bar    <integer_value_type>::unit_type>(1_nbar) ); CHECK(1_nbar == unlib::nano <unlib::bar    <integer_value_type>>{1} );

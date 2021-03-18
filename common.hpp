@@ -66,14 +66,14 @@ using floatpt_value_type = double;       /**< value type of quantity return by  
                                                                           UNLIB_DEFINE_LITERAL_OPERATOR(Qty_,Sc_,UnitShort_,unsigned long long, integer_value_type) \
                                                                           }
 /** define the literal operators for all the micro unit prefixes (atto-deci) */
-#define UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL(Qty_,UnitShort_)       UNLIB_DEFINE_SCALED_LITERAL(Qty_,atto , a##UnitShort_) \
-                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,femto, f##UnitShort_) \
-                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,pico , p##UnitShort_) \
-                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,nano , n##UnitShort_) \
-                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,micro, u##UnitShort_) \
-                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,milli, m##UnitShort_) \
+#define UNLIB_DEFINE_METRIC_MICRO_PREFIXED_LITERAL(Qty_,UnitShort_)       UNLIB_DEFINE_SCALED_LITERAL(Qty_,deci , d##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,centi, c##UnitShort_) \
-                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,deci , d##UnitShort_)
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,milli, m##UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,micro, u##UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,nano , n##UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,pico , p##UnitShort_) \
+                                                                          UNLIB_DEFINE_SCALED_LITERAL(Qty_,femto, f##UnitShort_) \
+                                                                        //UNLIB_DEFINE_SCALED_LITERAL(Qty_,atto , a##UnitShort_)
 /** define the literal operators for all the macro unit prefixes (deca-tera) */
 #define UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL(Qty_,UnitShort_)       UNLIB_DEFINE_SCALED_LITERAL(Qty_,deca ,dk##UnitShort_) \
                                                                           UNLIB_DEFINE_SCALED_LITERAL(Qty_,hecto, h##UnitShort_) \
@@ -112,8 +112,8 @@ template<typename V> using     week =   week_scale<second<V>>;                  
  *
  * @tparam V  value type
  */
-template<typename V> using     gram = quantity<mass, no_scaling, V>;                                             UNLIB_DEFINE_LITERAL(gram, g)                 UNLIB_DEFINE_METRIC_PREFIXED_LITERALS     (gram, g)
-template<typename V> using      ton = to_mega<gram<V>>;                                                          UNLIB_DEFINE_LITERAL( ton, t)                 UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL(ton, t)
+template<typename V> using     gram = quantity<mass, milli_scaling, V>;                                          UNLIB_DEFINE_LITERAL(gram, g)                 UNLIB_DEFINE_METRIC_PREFIXED_LITERALS     (gram, g)
+template<typename V> using      ton = kilo<kilo<gram<V>>>;                                                       UNLIB_DEFINE_LITERAL( ton, t)                 UNLIB_DEFINE_METRIC_MACRO_PREFIXED_LITERAL(ton, t)
 /** @} */
 
 /**

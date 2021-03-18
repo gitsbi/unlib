@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.8
+* make kg the base unit of mass
+* using kg also fixes erroneous definitions for voltage and pressure
+
 0.7.5
 * added definitions for return types of literal operators, so users can refer to those
 * by default, use quantities for tolerance in quantity comparisons now (rather than value types)

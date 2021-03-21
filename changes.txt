@@ -1,9 +1,13 @@
 Changes
 =======
 
+0.8.1
+* silenced some compielr warnings
+* fixed a VC issue with quantity default ctor being defaulted
+
 0.8
-* make kg the base unit of mass
-* using kg also fixes erroneous definitions for voltage and pressure
+* made kg the base unit of mass
+* using kg also fixed erroneous definitions for voltage and pressure
 
 0.7.5
 * added definitions for return types of literal operators, so users can refer to those

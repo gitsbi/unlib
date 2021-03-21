@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(unlib)
 
+enable_testing()
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   message("detected VC")
   add_compile_options("/permissive-" "/std:c++14")
@@ -31,3 +33,4 @@ add_executable(unlib_test
 
 target_compile_features(unlib_test PRIVATE cxx_std_14)
 
+add_test(NAME unlib_unit_tests COMMAND unlib_test)

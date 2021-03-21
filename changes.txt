@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.7.5.1
+* silenced some compielr warnings
+* fixed a VC issue with quantity default ctor being defaulted
+
 0.7.5
 * added definitions for return types of literal operators, so users can refer to those
 * by default, use quantities for tolerance in quantity comparisons now (rather than value types)

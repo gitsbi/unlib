@@ -196,7 +196,8 @@ public:
 	template<typename NewScale>     using rescale_by = rescale_to<std::ratio_multiply<NewScale,scale_type>>;
 	/** @} */
 
-	constexpr quantity()                                      = default;
+	constexpr quantity()                                                : value{} {} // VC tests fail if this is defaulted; *sigh*
+
 	constexpr quantity(const quantity& rhs)                   = default;
 
 	/**
@@ -354,11 +355,17 @@ public:
 	 */
 	constexpr quantity operator+() const                                  {return *this;}
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
 	template<typename Q=quantity> constexpr enable_if_int_t<Q>& operator++()   {++value; return *this;}
 	template<typename Q=quantity> constexpr enable_if_int_t<Q>& operator--()   {--value; return *this;}
 	template<typename Q=quantity> constexpr enable_if_int_t<Q>  operator++(int){return quantity(value++);}
 	template<typename Q=quantity> constexpr enable_if_int_t<Q>  operator--(int){return quantity(value--);}
-
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 	/**
 	 * @brief Check whether two floating point quantities are almost equal
@@ -581,30 +588,34 @@ template<typename U1, typename S1, typename V1, typename T1, typename U2, typena
 constexpr auto operator*(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
 	static_assert(detail::is_same_v    <V1, V2>, "different value types (use value_cast)");
 	static_assert(are_tags_compatible_v<T1, T2>, "incompatible tags (use tag_cast)"      );
-	return mul_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>{lhs.get() * rhs.get()};
+	using result_t = mul_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>;
+	return result_t{ static_cast<typename result_t::value_type>(lhs.get())
+	               * static_cast<typename result_t::value_type>(rhs.get()) };
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
 constexpr auto operator*(const quantity<U1,S1,V1,T1>& lhs, const V2& rhs) {
-	return quantity<U1,S1,mul_value_t<V1,V2>,T1>{lhs.get() * rhs};
+	return quantity<U1,S1,mul_value_t<V1,V2>,T1>{static_cast<mul_value_t<V1,V2>>(lhs.get()) * rhs};
 }
 template<typename V1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator*( const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	return quantity<U2,S2,mul_value_t<V1,V2>,T2>{lhs * rhs.get()};
+	return quantity<U2,S2,mul_value_t<V1,V2>,T2>{lhs * static_cast<mul_value_t<V1,V2>>(rhs.get())};
 }
 
 template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator/(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,V2,T2>& rhs) {
 	static_assert(detail::is_same_v    <V1, V2>, "different value types (use value_cast)");
 	static_assert(are_tags_compatible_v<T1, T2>, "incompatible tags (use tag_cast)"      );
-	return div_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>{lhs.get() / rhs.get()};
+	using result_t = div_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>;
+	return result_t{ static_cast<typename result_t::value_type>(lhs.get())
+	               / static_cast<typename result_t::value_type>(rhs.get()) };
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
 constexpr auto operator/(const quantity<U1,S1,V1,T1>& lhs, const V2& rhs) {
-	return quantity<U1,S1,div_value_t<V1,V2>,T1>{lhs.get() / rhs};
+	return quantity<U1,S1,div_value_t<V1,V2>,T1>{static_cast<div_value_t<V1,V2>>(lhs.get()) / rhs};
 }
 template<typename V1, typename U2, typename S2, typename T2, typename V2>
 constexpr auto operator/(const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
-	return quantity<reciprocal_unit_t<U2>,S2,div_value_t<V1,V2>,T2>{lhs / rhs.get()};
+	return quantity<reciprocal_unit_t<U2>,S2,div_value_t<V1,V2>,T2>{lhs / static_cast<div_value_t<V1,V2>>(rhs.get())};
 }
 
 template<typename U1, typename S1, typename V1, typename T1, typename U2, typename S2, typename V2, typename T2>
@@ -613,19 +624,21 @@ constexpr auto operator%(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2,
 	static_assert(are_tags_compatible_v<T1, T2>, "incompatible tags (use tag_cast)"      );
 	static_assert(std::numeric_limits<V1>::is_integer, "modulo on non-integer type"  );
 	static_assert(std::numeric_limits<V2>::is_integer, "modulo with non-integer type");
-	return div_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>{lhs.get() % rhs.get()};
+	using result_t = div_quantity_t<quantity<U1,S1,V1,T1>, quantity<U2,S2,V2,T2>>;
+	return result_t{ static_cast<typename result_t::value_type>(lhs.get())
+	               % static_cast<typename result_t::value_type>(rhs.get()) };
 }
 template<typename U1, typename S1, typename V1, typename T1, typename V2>
 constexpr auto operator%(const quantity<U1,S1,V1,T1>& lhs, const V2& rhs) {
 	static_assert(std::numeric_limits<V1>::is_integer, "modulo on non-integer type"  );
 	static_assert(std::numeric_limits<V2>::is_integer, "modulo with non-integer type");
-	return quantity<U1,S1,mod_value_t<V1,V2>,T1>{lhs.get() % rhs};
+	return quantity<U1,S1,mod_value_t<V1,V2>,T1>{static_cast<mod_value_t<V1,V2>>(lhs.get()) % rhs};
 }
 template<typename V1, typename U2, typename S2, typename V2, typename T2>
 constexpr auto operator%(const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
 	static_assert(std::numeric_limits<V1>::is_integer, "modulo with non-integer type");
 	static_assert(std::numeric_limits<V2>::is_integer, "modulo on non-integer type"  );
-	return quantity<reciprocal_unit_t<U2>,S2,mod_value_t<V1,V2>,T2>{lhs % rhs.get()};
+	return quantity<reciprocal_unit_t<U2>,S2,mod_value_t<V1,V2>,T2>{lhs % static_cast<mod_value_t<V1,V2>>(rhs.get())};
 }
 /** @} */
 

@@ -25,8 +25,8 @@ constexpr bool is_same_v = std::is_same<T1,T2>::value;
 /**
  * @brief an exponent of a basic SI unit
  *
- * An exponent with the numerator set to zero represents a unit that is not
- * present.
+ * An exponent with the numerator set to zero represents a base unit that is
+ * not present.
  */
 template< std::intmax_t Num
         , std::intmax_t Den = 1 >

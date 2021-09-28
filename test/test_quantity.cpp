@@ -584,7 +584,6 @@ SUBCASE("quantity casts") {
 	}
 
 	SUBCASE("testing tag_cast") {
-		using namespace unlib;
 		using test_qa  = test_quantity::retag<tag_t<struct tag_a>>;
 		using test_qb  = test_quantity::retag<tag_t<struct tag_b>>;
 
@@ -601,6 +600,13 @@ SUBCASE("quantity casts") {
 		CHECK(qa.get() == doctest::Approx(qb2.get()));
 		qa = tag_cast(qb3);
 		CHECK(qa.get() == doctest::Approx(qb3.get()));
+	}
+
+	SUBCASE("testing untag") {
+		test_quantity::retag<tag_t<struct tag_a>> qa{1};
+		auto q = untag(qa);
+		CHECK(typeid(q) == typeid(test_quantity));
+		CHECK(q.get() == qa.get());
 	}
 
 	SUBCASE("testing quantity_cast") {

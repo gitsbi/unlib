@@ -1,8 +1,14 @@
 Changes
 =======
 
+0.7.5.3
+* added an untag function to simplify tag_cast'ing to an untagged type
+
+0.7.5.2
+ (a merge gone wrong)
+
 0.7.5.1
-* silenced some compielr warnings
+* silenced some compiler warnings
 * fixed a VC issue with quantity default ctor being defaulted
 
 0.7.5

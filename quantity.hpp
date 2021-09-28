@@ -729,6 +729,10 @@ template<typename U, typename S, typename V, typename T>
 constexpr auto tag_cast(const quantity<U,S,V,T>& q)                       {return implicit_quantity_caster<U,S,V,T,false,false,true>{q};}
 template<typename NewTag, typename U, typename S, typename V, typename T>
 constexpr auto tag_cast(const quantity<U,S,V,T>& q)                       {return quantity<U,S,V,NewTag>{tag_cast(q)};}
+template<typename U, typename V>
+constexpr auto untag(const quantity<U,V>& q)                              {return tag_cast<typename quantity<U,V>::untag::tag_type>(q);}
+template<typename U, typename V>
+constexpr auto untag(const quantity<U,V>& q)                              {return tag_cast<typename quantity<U,V>::untag::tag_type>(q);}
 /** @} */
 
 

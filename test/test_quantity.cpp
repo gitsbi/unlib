@@ -91,7 +91,7 @@ SUBCASE("quantity values") {
 		}
 		{
 			test_quantity q;
-			CHECK(q.is_near_zero()); CHECK(is_near_zero(q));
+			CHECK(q.get() == value_type{});
 		}
 	}
 	SUBCASE("value is stored correctly") {
@@ -102,35 +102,10 @@ SUBCASE("quantity values") {
 		const test_quantity q2(q1);
 		CHECK( v == doctest::Approx(q2.get()) );
 		test_quantity q3;
-		CHECK( q3.is_near_zero() );     CHECK( is_near_zero(q3) );
+		CHECK( q3.get() == value_type{});
 		q3 = q1;
-		CHECK( not q3.is_near_zero() ); CHECK( not is_near_zero(q3) );
+		CHECK( q3.get() != value_type{});
 		CHECK( v == doctest::Approx(q3.get()) );
-	}
-
-	SUBCASE("is_near_zero") {
-		using test_q = test_quantity::rescale_to<scale_t<1,2>>;
-
-		const test_q q1{};
-		CHECK( q1.is_near_zero() ); CHECK( is_near_zero(q1) );
-
-		const value_type e1 = 101*std::numeric_limits<float>::epsilon();
-		const test_q q2{e1};
-		CHECK( not q2.is_near_zero()   ); CHECK( not is_near_zero(q2)         );
-		CHECK(     q2.is_near_zero(e1) ); CHECK(     is_near_zero(q2,e1) );
-
-		const value_type e2 = 100*std::numeric_limits<float>::epsilon();
-		const test_q q3{e2};
-		CHECK( q3.is_near_zero()   ); CHECK( is_near_zero(q3)    );
-		CHECK( q3.is_near_zero(e1) ); CHECK( is_near_zero(q3,e1) );
-		CHECK( q3.is_near_zero(e2) ); CHECK( is_near_zero(q3,e2) );
-
-		const value_type e3 = 99*std::numeric_limits<float>::epsilon();
-		const test_q q4{e3};
-		CHECK( q4.is_near_zero()   ); CHECK( is_near_zero(q4)    );
-		CHECK( q4.is_near_zero(e1) ); CHECK( is_near_zero(q4,e1) );
-		CHECK( q4.is_near_zero(e2) ); CHECK( is_near_zero(q4,e2) );
-		CHECK( q4.is_near_zero(e3) ); CHECK( is_near_zero(q4,e3) );
 	}
 
 	SUBCASE("values are rescaled properly") {
@@ -207,71 +182,41 @@ SUBCASE("quantity values") {
 		test_quantity q3{v*2};
 		test_mq mq1{q1};
 
-		CHECK( is_near(q1,q1) );
-		CHECK( is_near(q1,q2) );
-		CHECK( is_near(q2,q1) );
-		CHECK( is_near(q2,q2) );
+		CHECK( q1 == q1 );
+		CHECK( q1 == q2 );
+		CHECK( q2 == q1 );
+		CHECK( q2 == q2 );
 
 		CHECK( q1 <= q2 );
 		CHECK( q1 >= q2 );
 		CHECK( q2 <= q1 );
 		CHECK( q2 >= q1 );
 
-		CHECK( not is_near(q1,q3) );
-		CHECK( not is_near(q3,q1) );
+		CHECK( q1 != q3 );
+		CHECK( q3 != q1 );
 
 		CHECK( q1 <  q3 );
 		CHECK( q3 >  q1 );
 		CHECK( q1 <= q3 );
 		CHECK( q3 >= q1 );
 
-		CHECK( is_near(mq1, q1) );
-		CHECK( is_near( q1,mq1) );
-		CHECK( is_near(mq1, q2) );
-		CHECK( is_near( q2,mq1) );
+		CHECK( mq1 ==  q1 );
+		CHECK(  q1 == mq1 );
+		CHECK( mq1 ==  q2 );
+		CHECK(  q2 == mq1 );
 
 		CHECK( mq1 <=  q2 );
 		CHECK( mq1 >=  q2 );
 		CHECK(  q2 <= mq1 );
 		CHECK(  q2 >= mq1 );
 
-		CHECK( not is_near(mq1, q3) );
-		CHECK( not is_near( q3,mq1) );
+		CHECK( mq1 !=  q3 );
+		CHECK(  q3 != mq1 );
 
 		CHECK( mq1 <   q3 );
 		CHECK(  q3 >  mq1 );
 		CHECK( mq1 <=  q3 );
 		CHECK(  q3 >= mq1 );
-	}
-
-	SUBCASE("is_near") {
-		using local_value_type = double;
-		using test_q = test_quantity::rescale_to<scale_t<1,2>>;
-
-		const local_value_type e1 = 50*std::numeric_limits<float>::epsilon();
-
-		const test_q q0{}, q1{e1}, q2{42}, q3{42}, q4{42 + e1}, q5{2 * 42.};
-
-		CHECK(     q0.is_near(q1) ); CHECK(     is_near(q0,q1) );
-		CHECK( not q0.is_near(q2) ); CHECK( not is_near(q0,q2) );
-		CHECK( not q0.is_near(q3) ); CHECK( not is_near(q0,q3) );
-		CHECK( not q0.is_near(q4) ); CHECK( not is_near(q0,q4) );
-		CHECK( not q0.is_near(q5) ); CHECK( not is_near(q0,q5) );
-
-		CHECK( not q1.is_near(q2) ); CHECK( not is_near(q1,q2) );
-		CHECK( not q1.is_near(q3) ); CHECK( not is_near(q1,q3) );
-		CHECK( not q1.is_near(q3) ); CHECK( not is_near(q1,q3) );
-		CHECK( not q1.is_near(q4) ); CHECK( not is_near(q1,q4) );
-		CHECK( not q1.is_near(q5) ); CHECK( not is_near(q1,q5) );
-
-		CHECK(     q2.is_near(q3) ); CHECK(     is_near(q2,q3) );
-		CHECK(     q2.is_near(q4) ); CHECK(     is_near(q2,q4) );
-		CHECK( not q2.is_near(q5) ); CHECK( not is_near(q2,q5) );
-
-		CHECK(     q3.is_near(q4) ); CHECK(     is_near(q3,q4) );
-		CHECK( not q3.is_near(q5) ); CHECK( not is_near(q3,q5) );
-
-		CHECK( not q4.is_near(q5) ); CHECK( not is_near(q4,q5) );
 	}
 
 	SUBCASE("quantities can be signed") {
@@ -280,9 +225,9 @@ SUBCASE("quantity values") {
 		test_quantity q1{v};
 		test_quantity q2{-v};
 
-		CHECK(q1.is_near(+q1));
-		CHECK(q2.is_near(-q1));
-		CHECK(q1.is_near(-q2));
+		CHECK(q1 == +q1);
+		CHECK(q2 == -q1);
+		CHECK(q1 == -q2);
 	}
 }
 

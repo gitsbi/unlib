@@ -3,7 +3,17 @@
 
 #include <doctest/doctest.h>
 
+#include <unlib/math.hpp>
 #include <unlib/test/unlib_test.hpp>
+
+namespace {
+
+template<typename D, typename F, typename S1, typename S2, typename T>
+bool is_near_equal(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rhs) {
+	return unlib::is_near(lhs, rhs, unlib::tolerance_nominal(unlib::max(lhs,rhs)));
+}
+
+}
 
 TEST_CASE("common quantities") {
 SUBCASE("time") {
@@ -40,15 +50,15 @@ SUBCASE("time") {
 	CHECK( typeid(1_min) == typeid(             unlib::minute<integer_value_type> ) ); CHECK( 1_min ==              unlib::minute<integer_value_type> {1} );
 	CHECK( typeid(1_h  ) == typeid(             unlib::  hour<integer_value_type> ) ); CHECK( 1_h   ==              unlib::  hour<integer_value_type> {1} );
 
-	CHECK(1000_fs   ==  1_ps ); CHECK(is_near(1000._fs  , 1._ps ));
-	CHECK(1000_ps   ==  1_ns ); CHECK(is_near(1000._ps  , 1._ns ));
-	CHECK(1000_ns   ==  1_us ); CHECK(is_near(1000._ns  , 1._us ));
-	CHECK(1000_us   ==  1_ms ); CHECK(is_near(1000._us  , 1._ms ));
-	CHECK(1000_ms   ==  1_s  ); CHECK(is_near(1000._ms  , 1._s  ));
-	CHECK(   1_min  == 60_s  ); CHECK(is_near(   1._min ,60._s  ));
-	CHECK(   1_h    == 60_min); CHECK(is_near(   1._h   ,60._min));
-	CHECK(   1_d    == 24_h  ); CHECK(is_near(   1._d   ,24._h  ));
-	CHECK(   1_week ==  7_d  ); CHECK(is_near(   1._week, 7._d  ));
+	CHECK(1000_fs   ==  1_ps ); CHECK(is_near_equal(1000._fs  , 1._ps ));
+	CHECK(1000_ps   ==  1_ns ); CHECK(is_near_equal(1000._ps  , 1._ns ));
+	CHECK(1000_ns   ==  1_us ); CHECK(is_near_equal(1000._ns  , 1._us ));
+	CHECK(1000_us   ==  1_ms ); CHECK(is_near_equal(1000._us  , 1._ms ));
+	CHECK(1000_ms   ==  1_s  ); CHECK(is_near_equal(1000._ms  , 1._s  ));
+	CHECK(   1_min  == 60_s  ); CHECK(is_near_equal(   1._min ,60._s  ));
+	CHECK(   1_h    == 60_min); CHECK(is_near_equal(   1._h   ,60._min));
+	CHECK(   1_d    == 24_h  ); CHECK(is_near_equal(   1._d   ,24._h  ));
+	CHECK(   1_week ==  7_d  ); CHECK(is_near_equal(   1._week, 7._d  ));
 }
 
 SUBCASE("mass") {
@@ -84,15 +94,15 @@ SUBCASE("mass") {
 	CHECK( typeid(1_t ) == typeid(             unlib:: ton<integer_value_type> ) ); CHECK( 1_t  ==              unlib:: ton<integer_value_type> {1} );
 	CHECK( typeid(1_Mt) == typeid(unlib::mega <unlib:: ton<integer_value_type>>) ); CHECK( 1_Mt == unlib::mega <unlib:: ton<integer_value_type>>{1} );
 
-	CHECK(1000_fg == 1_pg ); CHECK(is_near(1000._fg,1._pg) );
-	CHECK(1000_pg == 1_ng ); CHECK(is_near(1000._pg,1._ng) );
-	CHECK(1000_ng == 1_ug ); CHECK(is_near(1000._ng,1._ug) );
-	CHECK(1000_ug == 1_mg ); CHECK(is_near(1000._ug,1._mg) );
-	CHECK(1000_mg == 1_g  ); CHECK(is_near(1000._mg,1._g ) );
-	CHECK(1000_g  == 1_kg ); CHECK(is_near(1000._g ,1._kg) );
-	CHECK(1000_kg == 1_t  ); CHECK(is_near(1000._kg,1._t ) );
-	CHECK(1000_t  == 1_kt ); CHECK(is_near(1000._t ,1._kt) );
-	CHECK(1000_kt == 1_Mt ); CHECK(is_near(1000._kt,1._Mt) );
+	CHECK(1000_fg == 1_pg ); CHECK(is_near_equal(1000._fg,1._pg) );
+	CHECK(1000_pg == 1_ng ); CHECK(is_near_equal(1000._pg,1._ng) );
+	CHECK(1000_ng == 1_ug ); CHECK(is_near_equal(1000._ng,1._ug) );
+	CHECK(1000_ug == 1_mg ); CHECK(is_near_equal(1000._ug,1._mg) );
+	CHECK(1000_mg == 1_g  ); CHECK(is_near_equal(1000._mg,1._g ) );
+	CHECK(1000_g  == 1_kg ); CHECK(is_near_equal(1000._g ,1._kg) );
+	CHECK(1000_kg == 1_t  ); CHECK(is_near_equal(1000._kg,1._t ) );
+	CHECK(1000_t  == 1_kt ); CHECK(is_near_equal(1000._t ,1._kt) );
+	CHECK(1000_kt == 1_Mt ); CHECK(is_near_equal(1000._kt,1._Mt) );
 }
 
 SUBCASE("length") {
@@ -123,14 +133,14 @@ SUBCASE("length") {
 	CHECK( typeid(1_m ) == typeid(             unlib::meter<integer_value_type> ) ); CHECK( 1_m  ==              unlib::meter<integer_value_type> {1} );
 	CHECK( typeid(1_km) == typeid(unlib::kilo <unlib::meter<integer_value_type>>) ); CHECK( 1_km == unlib::kilo <unlib::meter<integer_value_type>>{1} );
 
-	CHECK(1000_fm == 1_pm ); CHECK(is_near(1000._fm,1._pm) );
-	CHECK(1000_pm == 1_nm ); CHECK(is_near(1000._pm,1._nm) );
-	CHECK(1000_nm == 1_um ); CHECK(is_near(1000._nm,1._um) );
-	CHECK(1000_um == 1_mm ); CHECK(is_near(1000._um,1._mm) );
-	CHECK(1000_mm == 1_m  ); CHECK(is_near(1000._mm,1._m ) );
-	CHECK( 100_cm == 1_m  ); CHECK(is_near( 100._cm,1._m ) );
-	CHECK(  10_dm == 1_m  ); CHECK(is_near(  10._dm,1._m ) );
-	CHECK(1000_m  == 1_km ); CHECK(is_near(1000._m ,1._km) );
+	CHECK(1000_fm == 1_pm ); CHECK(is_near_equal(1000._fm,1._pm) );
+	CHECK(1000_pm == 1_nm ); CHECK(is_near_equal(1000._pm,1._nm) );
+	CHECK(1000_nm == 1_um ); CHECK(is_near_equal(1000._nm,1._um) );
+	CHECK(1000_um == 1_mm ); CHECK(is_near_equal(1000._um,1._mm) );
+	CHECK(1000_mm == 1_m  ); CHECK(is_near_equal(1000._mm,1._m ) );
+	CHECK( 100_cm == 1_m  ); CHECK(is_near_equal( 100._cm,1._m ) );
+	CHECK(  10_dm == 1_m  ); CHECK(is_near_equal(  10._dm,1._m ) );
+	CHECK(1000_m  == 1_km ); CHECK(is_near_equal(1000._m ,1._km) );
 }
 
 SUBCASE("area") {
@@ -147,11 +157,11 @@ SUBCASE("area") {
 	CHECK( typeid( 1_m2) == typeid(unlib::square_meter<integer_value_type>) );
 	CHECK( typeid(1._m2) == typeid(unlib::square_meter<floatpt_value_type>) );
 
-	CHECK(10000_cm2 ==       1_m2 );                         CHECK(is_near(10000._cm2,      1._m2 ));
-	CHECK(    1_ha  ==   10000_m2 );                         CHECK(is_near(    1._ha ,  10000._m2 ));
-	CHECK(    1_cm2 ==     100_mm2);                         CHECK(is_near(    1._cm2,    100._mm2));
-	CHECK(    1_m2  == 1000000_mm2);                         CHECK(is_near(    1._m2 ,1000000._mm2));
-	CHECK(    1_ha  == unlib::are<integer_value_type>{100}); CHECK(is_near(    1._ha ,unlib::are<floatpt_value_type>{100}));
+	CHECK(10000_cm2 ==       1_m2 );                         CHECK(is_near_equal(10000._cm2,      1._m2 ));
+	CHECK(    1_ha  ==   10000_m2 );                         CHECK(is_near_equal(    1._ha ,  10000._m2 ));
+	CHECK(    1_cm2 ==     100_mm2);                         CHECK(is_near_equal(    1._cm2,    100._mm2));
+	CHECK(    1_m2  == 1000000_mm2);                         CHECK(is_near_equal(    1._m2 ,1000000._mm2));
+	CHECK(    1_ha  == unlib::are<integer_value_type>{100}); CHECK(is_near_equal(    1._ha ,unlib::are<floatpt_value_type>{100}));
 }
 
 SUBCASE("volume") {
@@ -168,11 +178,11 @@ SUBCASE("volume") {
 	CHECK( typeid( 1_l) == typeid(unlib::liter<integer_value_type>) );
 	CHECK( typeid(1._l) == typeid(unlib::liter<floatpt_value_type>) );
 
-	CHECK(1_km3 == 1000000000_m3 ); CHECK(is_near(1._km3, 1000000000._m3 ));
-	CHECK(1_m3  ==       1000_l  ); CHECK(is_near(1._m3 ,       1000._l  ));
-	CHECK(1_l   ==       1000_ml ); CHECK(is_near(1._l  ,       1000._ml ));
-	CHECK(1_l   ==       1000_cm3); CHECK(is_near(1._l  ,       1000._cm3));
-	CHECK(1_ml  ==       1000_mm3); CHECK(is_near(1._ml ,       1000._mm3));
+	CHECK(1_km3 == 1000000000_m3 ); CHECK(is_near_equal(1._km3, 1000000000._m3 ));
+	CHECK(1_m3  ==       1000_l  ); CHECK(is_near_equal(1._m3 ,       1000._l  ));
+	CHECK(1_l   ==       1000_ml ); CHECK(is_near_equal(1._l  ,       1000._ml ));
+	CHECK(1_l   ==       1000_cm3); CHECK(is_near_equal(1._l  ,       1000._cm3));
+	CHECK(1_ml  ==       1000_mm3); CHECK(is_near_equal(1._ml ,       1000._mm3));
 }
 
 SUBCASE("temperature") {
@@ -223,15 +233,15 @@ SUBCASE("current") {
 	CHECK( typeid(1_GA) == typeid(unlib::giga <unlib::ampere<integer_value_type>>) ); CHECK( 1_GA == (unlib::giga <unlib::ampere<integer_value_type>>{1} ) );
 	CHECK( typeid(1_TA) == typeid(unlib::tera <unlib::ampere<integer_value_type>>) ); CHECK( 1_TA == (unlib::tera <unlib::ampere<integer_value_type>>{1} ) );
 
-	CHECK(1000_fA == 1_pA ); CHECK(is_near(1000._fA,1._pA) );
-	CHECK(1000_pA == 1_nA ); CHECK(is_near(1000._pA,1._nA) );
-	CHECK(1000_nA == 1_uA ); CHECK(is_near(1000._nA,1._uA) );
-	CHECK(1000_uA == 1_mA ); CHECK(is_near(1000._uA,1._mA) );
-	CHECK(1000_mA == 1_A  ); CHECK(is_near(1000._mA,1._A ) );
-	CHECK(1000_A  == 1_kA ); CHECK(is_near(1000._A ,1._kA) );
-	CHECK(1000_kA == 1_MA ); CHECK(is_near(1000._kA,1._MA) );
-	CHECK(1000_MA == 1_GA ); CHECK(is_near(1000._MA,1._GA) );
-	CHECK(1000_GA == 1_TA ); CHECK(is_near(1000._GA,1._TA) );
+	CHECK(1000_fA == 1_pA ); CHECK(is_near_equal(1000._fA,1._pA) );
+	CHECK(1000_pA == 1_nA ); CHECK(is_near_equal(1000._pA,1._nA) );
+	CHECK(1000_nA == 1_uA ); CHECK(is_near_equal(1000._nA,1._uA) );
+	CHECK(1000_uA == 1_mA ); CHECK(is_near_equal(1000._uA,1._mA) );
+	CHECK(1000_mA == 1_A  ); CHECK(is_near_equal(1000._mA,1._A ) );
+	CHECK(1000_A  == 1_kA ); CHECK(is_near_equal(1000._A ,1._kA) );
+	CHECK(1000_kA == 1_MA ); CHECK(is_near_equal(1000._kA,1._MA) );
+	CHECK(1000_MA == 1_GA ); CHECK(is_near_equal(1000._MA,1._GA) );
+	CHECK(1000_GA == 1_TA ); CHECK(is_near_equal(1000._GA,1._TA) );
 }
 
 SUBCASE("frequency") {
@@ -275,15 +285,15 @@ SUBCASE("frequency") {
 	CHECK(test::is_same_unit<unlib::hertz<integer_value_type>>(1_GHz) ); CHECK(1_GHz == unlib::giga <unlib::hertz<integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::hertz<integer_value_type>>(1_THz) ); CHECK(1_THz == unlib::tera <unlib::hertz<integer_value_type>>{1} );
 
-	CHECK(1000_fHz == 1_pHz ); CHECK(is_near(1000._fHz,1._pHz) );
-	CHECK(1000_pHz == 1_nHz ); CHECK(is_near(1000._pHz,1._nHz) );
-	CHECK(1000_nHz == 1_uHz ); CHECK(is_near(1000._nHz,1._uHz) );
-	CHECK(1000_uHz == 1_mHz ); CHECK(is_near(1000._uHz,1._mHz) );
-	CHECK(1000_mHz == 1_Hz  ); CHECK(is_near(1000._mHz,1._Hz ) );
-	CHECK(1000_Hz  == 1_kHz ); CHECK(is_near(1000._Hz ,1._kHz) );
-	CHECK(1000_kHz == 1_MHz ); CHECK(is_near(1000._kHz,1._MHz) );
-	CHECK(1000_MHz == 1_GHz ); CHECK(is_near(1000._MHz,1._GHz) );
-	CHECK(1000_GHz == 1_THz ); CHECK(is_near(1000._GHz,1._THz) );
+	CHECK(1000_fHz == 1_pHz ); CHECK(is_near_equal(1000._fHz,1._pHz) );
+	CHECK(1000_pHz == 1_nHz ); CHECK(is_near_equal(1000._pHz,1._nHz) );
+	CHECK(1000_nHz == 1_uHz ); CHECK(is_near_equal(1000._nHz,1._uHz) );
+	CHECK(1000_uHz == 1_mHz ); CHECK(is_near_equal(1000._uHz,1._mHz) );
+	CHECK(1000_mHz == 1_Hz  ); CHECK(is_near_equal(1000._mHz,1._Hz ) );
+	CHECK(1000_Hz  == 1_kHz ); CHECK(is_near_equal(1000._Hz ,1._kHz) );
+	CHECK(1000_kHz == 1_MHz ); CHECK(is_near_equal(1000._kHz,1._MHz) );
+	CHECK(1000_MHz == 1_GHz ); CHECK(is_near_equal(1000._MHz,1._GHz) );
+	CHECK(1000_GHz == 1_THz ); CHECK(is_near_equal(1000._GHz,1._THz) );
 }
 
 SUBCASE("voltage") {
@@ -330,15 +340,15 @@ SUBCASE("voltage") {
 	CHECK(test::is_same_unit<unlib::volt<integer_value_type>>(1_GV) ); CHECK(1_GV == unlib::giga <unlib::volt<integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::volt<integer_value_type>>(1_TV) ); CHECK(1_TV == unlib::tera <unlib::volt<integer_value_type>>{1} );
 
-	CHECK(1000_fV == 1_pV ); CHECK(is_near(1000._fV,1._pV) );
-	CHECK(1000_pV == 1_nV ); CHECK(is_near(1000._pV,1._nV) );
-	CHECK(1000_nV == 1_uV ); CHECK(is_near(1000._nV,1._uV) );
-	CHECK(1000_uV == 1_mV ); CHECK(is_near(1000._uV,1._mV) );
-	CHECK(1000_mV == 1_V  ); CHECK(is_near(1000._mV,1._V ) );
-	CHECK(1000_V  == 1_kV ); CHECK(is_near(1000._V ,1._kV) );
-	CHECK(1000_kV == 1_MV ); CHECK(is_near(1000._kV,1._MV) );
-	CHECK(1000_MV == 1_GV ); CHECK(is_near(1000._MV,1._GV) );
-	CHECK(1000_GV == 1_TV ); CHECK(is_near(1000._GV,1._TV) );
+	CHECK(1000_fV == 1_pV ); CHECK(is_near_equal(1000._fV,1._pV) );
+	CHECK(1000_pV == 1_nV ); CHECK(is_near_equal(1000._pV,1._nV) );
+	CHECK(1000_nV == 1_uV ); CHECK(is_near_equal(1000._nV,1._uV) );
+	CHECK(1000_uV == 1_mV ); CHECK(is_near_equal(1000._uV,1._mV) );
+	CHECK(1000_mV == 1_V  ); CHECK(is_near_equal(1000._mV,1._V ) );
+	CHECK(1000_V  == 1_kV ); CHECK(is_near_equal(1000._V ,1._kV) );
+	CHECK(1000_kV == 1_MV ); CHECK(is_near_equal(1000._kV,1._MV) );
+	CHECK(1000_MV == 1_GV ); CHECK(is_near_equal(1000._MV,1._GV) );
+	CHECK(1000_GV == 1_TV ); CHECK(is_near_equal(1000._GV,1._TV) );
 }
 
 SUBCASE("resistance") {
@@ -385,15 +395,15 @@ SUBCASE("resistance") {
 	CHECK(test::is_same_unit<unlib::ohm<integer_value_type>>(1_GO) ); CHECK(1_GO == unlib::giga <unlib::ohm<integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::ohm<integer_value_type>>(1_TO) ); CHECK(1_TO == unlib::tera <unlib::ohm<integer_value_type>>{1} );
 
-	CHECK(1000_fO == 1_pO ); CHECK(is_near(1000._fO,1._pO) );
-	CHECK(1000_pO == 1_nO ); CHECK(is_near(1000._pO,1._nO) );
-	CHECK(1000_nO == 1_uO ); CHECK(is_near(1000._nO,1._uO) );
-	CHECK(1000_uO == 1_mO ); CHECK(is_near(1000._uO,1._mO) );
-	CHECK(1000_mO == 1_O  ); CHECK(is_near(1000._mO,1._O ) );
-	CHECK(1000_O  == 1_kO ); CHECK(is_near(1000._O ,1._kO) );
-	CHECK(1000_kO == 1_MO ); CHECK(is_near(1000._kO,1._MO) );
-	CHECK(1000_MO == 1_GO ); CHECK(is_near(1000._MO,1._GO) );
-	CHECK(1000_GO == 1_TO ); CHECK(is_near(1000._GO,1._TO) );
+	CHECK(1000_fO == 1_pO ); CHECK(is_near_equal(1000._fO,1._pO) );
+	CHECK(1000_pO == 1_nO ); CHECK(is_near_equal(1000._pO,1._nO) );
+	CHECK(1000_nO == 1_uO ); CHECK(is_near_equal(1000._nO,1._uO) );
+	CHECK(1000_uO == 1_mO ); CHECK(is_near_equal(1000._uO,1._mO) );
+	CHECK(1000_mO == 1_O  ); CHECK(is_near_equal(1000._mO,1._O ) );
+	CHECK(1000_O  == 1_kO ); CHECK(is_near_equal(1000._O ,1._kO) );
+	CHECK(1000_kO == 1_MO ); CHECK(is_near_equal(1000._kO,1._MO) );
+	CHECK(1000_MO == 1_GO ); CHECK(is_near_equal(1000._MO,1._GO) );
+	CHECK(1000_GO == 1_TO ); CHECK(is_near_equal(1000._GO,1._TO) );
 }
 
 SUBCASE("power") {
@@ -470,25 +480,25 @@ SUBCASE("power") {
 	CHECK(test::is_same_unit<unlib::voltampere<integer_value_type>>(1_GVA ) ); CHECK(1_GVA  == unlib::giga <unlib::voltampere<integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::voltampere<integer_value_type>>(1_TVA ) ); CHECK(1_TVA  == unlib::tera <unlib::voltampere<integer_value_type>>{1} );
 
-	CHECK(1000_fW == 1_pW ); CHECK(is_near(1000._fW,1._pW) );
-	CHECK(1000_pW == 1_nW ); CHECK(is_near(1000._pW,1._nW) );
-	CHECK(1000_nW == 1_uW ); CHECK(is_near(1000._nW,1._uW) );
-	CHECK(1000_uW == 1_mW ); CHECK(is_near(1000._uW,1._mW) );
-	CHECK(1000_mW == 1_W  ); CHECK(is_near(1000._mW,1._W ) );
-	CHECK(1000_W  == 1_kW ); CHECK(is_near(1000._W ,1._kW) );
-	CHECK(1000_kW == 1_MW ); CHECK(is_near(1000._kW,1._MW) );
-	CHECK(1000_MW == 1_GW ); CHECK(is_near(1000._MW,1._GW) );
-	CHECK(1000_GW == 1_TW ); CHECK(is_near(1000._GW,1._TW) );
+	CHECK(1000_fW == 1_pW ); CHECK(is_near_equal(1000._fW,1._pW) );
+	CHECK(1000_pW == 1_nW ); CHECK(is_near_equal(1000._pW,1._nW) );
+	CHECK(1000_nW == 1_uW ); CHECK(is_near_equal(1000._nW,1._uW) );
+	CHECK(1000_uW == 1_mW ); CHECK(is_near_equal(1000._uW,1._mW) );
+	CHECK(1000_mW == 1_W  ); CHECK(is_near_equal(1000._mW,1._W ) );
+	CHECK(1000_W  == 1_kW ); CHECK(is_near_equal(1000._W ,1._kW) );
+	CHECK(1000_kW == 1_MW ); CHECK(is_near_equal(1000._kW,1._MW) );
+	CHECK(1000_MW == 1_GW ); CHECK(is_near_equal(1000._MW,1._GW) );
+	CHECK(1000_GW == 1_TW ); CHECK(is_near_equal(1000._GW,1._TW) );
 
-	CHECK(1000_VAr  == 1_kVAr ); CHECK(is_near(1000._VAr ,1._kVAr) );
-	CHECK(1000_kVAr == 1_MVAr ); CHECK(is_near(1000._kVAr,1._MVAr) );
-	CHECK(1000_MVAr == 1_GVAr ); CHECK(is_near(1000._MVAr,1._GVAr) );
-	CHECK(1000_GVAr == 1_TVAr ); CHECK(is_near(1000._GVAr,1._TVAr) );
+	CHECK(1000_VAr  == 1_kVAr ); CHECK(is_near_equal(1000._VAr ,1._kVAr) );
+	CHECK(1000_kVAr == 1_MVAr ); CHECK(is_near_equal(1000._kVAr,1._MVAr) );
+	CHECK(1000_MVAr == 1_GVAr ); CHECK(is_near_equal(1000._MVAr,1._GVAr) );
+	CHECK(1000_GVAr == 1_TVAr ); CHECK(is_near_equal(1000._GVAr,1._TVAr) );
 
-	CHECK(1000_VA  == 1_kVA ); CHECK(is_near(1000._VA ,1._kVA) );
-	CHECK(1000_kVA == 1_MVA ); CHECK(is_near(1000._kVA,1._MVA) );
-	CHECK(1000_MVA == 1_GVA ); CHECK(is_near(1000._MVA,1._GVA) );
-	CHECK(1000_GVA == 1_TVA ); CHECK(is_near(1000._GVA,1._TVA) );
+	CHECK(1000_VA  == 1_kVA ); CHECK(is_near_equal(1000._VA ,1._kVA) );
+	CHECK(1000_kVA == 1_MVA ); CHECK(is_near_equal(1000._kVA,1._MVA) );
+	CHECK(1000_MVA == 1_GVA ); CHECK(is_near_equal(1000._MVA,1._GVA) );
+	CHECK(1000_GVA == 1_TVA ); CHECK(is_near_equal(1000._GVA,1._TVA) );
 }
 
 SUBCASE("energy") {
@@ -544,18 +554,18 @@ SUBCASE("energy") {
 	CHECK(test::is_same_unit<unlib::watt_hour  <integer_value_type>>(1_GWh) ); CHECK(1_GWh == unlib::giga<unlib::watt_hour   <integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::watt_hour  <integer_value_type>>(1_TWh) ); CHECK(1_TWh == unlib::tera<unlib::watt_hour   <integer_value_type>>{1} );
 
-	CHECK(1_Ws == unlib::watt_second<integer_value_type>{unlib::tag_cast(1_J)}); CHECK(is_near(1._Ws,unlib::watt_second<double>{unlib::tag_cast(1._J)}));
+	CHECK(1_Ws == unlib::watt_second<integer_value_type>{unlib::tag_cast(1_J)}); CHECK(is_near_equal(1._Ws,unlib::watt_second<double>{unlib::tag_cast(1._J)}));
 
-	CHECK(1000_fWs == 1_pWs ); CHECK(is_near(1000._fWs,1._pWs) );
-	CHECK(1000_pWs == 1_nWs ); CHECK(is_near(1000._pWs,1._nWs) );
-	CHECK(1000_nWs == 1_uWs ); CHECK(is_near(1000._nWs,1._uWs) );
-	CHECK(1000_uWs == 1_mWs ); CHECK(is_near(1000._uWs,1._mWs) );
-	CHECK(1000_mWs == 1_Ws  ); CHECK(is_near(1000._mWs,1._Ws ) );
-	CHECK(3600_Ws  == 1_Wh  ); CHECK(is_near(3600._Ws ,1._Wh ) );
-	CHECK(1000_Wh  == 1_kWh ); CHECK(is_near(1000._Wh ,1._kWh) );
-	CHECK(1000_kWh == 1_MWh ); CHECK(is_near(1000._kWh,1._MWh) );
-	CHECK(1000_MWh == 1_GWh ); CHECK(is_near(1000._MWh,1._GWh) );
-	CHECK(1000_GWh == 1_TWh ); CHECK(is_near(1000._GWh,1._TWh) );
+	CHECK(1000_fWs == 1_pWs ); CHECK(is_near_equal(1000._fWs,1._pWs) );
+	CHECK(1000_pWs == 1_nWs ); CHECK(is_near_equal(1000._pWs,1._nWs) );
+	CHECK(1000_nWs == 1_uWs ); CHECK(is_near_equal(1000._nWs,1._uWs) );
+	CHECK(1000_uWs == 1_mWs ); CHECK(is_near_equal(1000._uWs,1._mWs) );
+	CHECK(1000_mWs == 1_Ws  ); CHECK(is_near_equal(1000._mWs,1._Ws ) );
+	CHECK(3600_Ws  == 1_Wh  ); CHECK(is_near_equal(3600._Ws ,1._Wh ) );
+	CHECK(1000_Wh  == 1_kWh ); CHECK(is_near_equal(1000._Wh ,1._kWh) );
+	CHECK(1000_kWh == 1_MWh ); CHECK(is_near_equal(1000._kWh,1._MWh) );
+	CHECK(1000_MWh == 1_GWh ); CHECK(is_near_equal(1000._MWh,1._GWh) );
+	CHECK(1000_GWh == 1_TWh ); CHECK(is_near_equal(1000._GWh,1._TWh) );
 }
 
 SUBCASE("electric charge") {
@@ -605,16 +615,16 @@ SUBCASE("electric charge") {
 	CHECK(test::is_same_unit<unlib::ampere_hour  <integer_value_type>::unit_type>(1_GAh) ); CHECK(1_GAh == unlib::giga <unlib::ampere_hour  <integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::ampere_hour  <integer_value_type>::unit_type>(1_TAh) ); CHECK(1_TAh == unlib::tera <unlib::ampere_hour  <integer_value_type>>{1} );
 
-	CHECK(1000_fAs == 1_pAs ); CHECK(is_near(1000._fAs,1._pAs) );
-	CHECK(1000_pAs == 1_nAs ); CHECK(is_near(1000._pAs,1._nAs) );
-	CHECK(1000_nAs == 1_uAs ); CHECK(is_near(1000._nAs,1._uAs) );
-	CHECK(1000_uAs == 1_mAs ); CHECK(is_near(1000._uAs,1._mAs) );
-	CHECK(1000_mAs == 1_As  ); CHECK(is_near(1000._mAs,1._As ) );
-	CHECK(3600_As  == 1_Ah  ); CHECK(is_near(3600._As ,1._Ah ) );
-	CHECK(1000_Ah  == 1_kAh ); CHECK(is_near(1000._Ah ,1._kAh) );
-	CHECK(1000_kAh == 1_MAh ); CHECK(is_near(1000._kAh,1._MAh) );
-	CHECK(1000_MAh == 1_GAh ); CHECK(is_near(1000._MAh,1._GAh) );
-	CHECK(1000_GAh == 1_TAh ); CHECK(is_near(1000._GAh,1._TAh) );
+	CHECK(1000_fAs == 1_pAs ); CHECK(is_near_equal(1000._fAs,1._pAs) );
+	CHECK(1000_pAs == 1_nAs ); CHECK(is_near_equal(1000._pAs,1._nAs) );
+	CHECK(1000_nAs == 1_uAs ); CHECK(is_near_equal(1000._nAs,1._uAs) );
+	CHECK(1000_uAs == 1_mAs ); CHECK(is_near_equal(1000._uAs,1._mAs) );
+	CHECK(1000_mAs == 1_As  ); CHECK(is_near_equal(1000._mAs,1._As ) );
+	CHECK(3600_As  == 1_Ah  ); CHECK(is_near_equal(3600._As ,1._Ah ) );
+	CHECK(1000_Ah  == 1_kAh ); CHECK(is_near_equal(1000._Ah ,1._kAh) );
+	CHECK(1000_kAh == 1_MAh ); CHECK(is_near_equal(1000._kAh,1._MAh) );
+	CHECK(1000_MAh == 1_GAh ); CHECK(is_near_equal(1000._MAh,1._GAh) );
+	CHECK(1000_GAh == 1_TAh ); CHECK(is_near_equal(1000._GAh,1._TAh) );
 }
 
 SUBCASE("pressure") {
@@ -668,16 +678,16 @@ SUBCASE("pressure") {
 	CHECK(test::is_same_unit<unlib::pascal_<integer_value_type>::unit_type>(1_GPa ) ); CHECK(1_GPa  == unlib::giga <unlib::pascal_<integer_value_type>>{1} );
 	CHECK(test::is_same_unit<unlib::pascal_<integer_value_type>::unit_type>(1_TPa ) ); CHECK(1_TPa  == unlib::tera <unlib::pascal_<integer_value_type>>{1} );
 
-	CHECK(1000_pbar == 1_nbar ); CHECK(is_near(1000._pbar,1._nbar) );
-	CHECK(1000_nbar == 1_ubar ); CHECK(is_near(1000._nbar,1._ubar) );
-	CHECK(1000_ubar == 1_mbar ); CHECK(is_near(1000._ubar,1._mbar) );
-	CHECK(1000_mbar == 1_bar  ); CHECK(is_near(1000._mbar,1._bar ) );
-	CHECK( 100_kPa  == 1_bar  ); CHECK(is_near( 100._kPa ,1._bar ) );
-	CHECK( 100_Pa   == 1_hPa  ); CHECK(is_near( 100._Pa  ,1._hPa ) );
-	CHECK(1000_Pa   == 1_kPa  ); CHECK(is_near(1000._Pa  ,1._kPa ) );
-	CHECK(1000_kPa  == 1_MPa  ); CHECK(is_near(1000._kPa ,1._MPa ) );
-	CHECK(1000_MPa  == 1_GPa  ); CHECK(is_near(1000._MPa ,1._GPa ) );
-	CHECK(1000_GPa  == 1_TPa  ); CHECK(is_near(1000._GPa ,1._TPa ) );
+	CHECK(1000_pbar == 1_nbar ); CHECK(is_near_equal(1000._pbar,1._nbar) );
+	CHECK(1000_nbar == 1_ubar ); CHECK(is_near_equal(1000._nbar,1._ubar) );
+	CHECK(1000_ubar == 1_mbar ); CHECK(is_near_equal(1000._ubar,1._mbar) );
+	CHECK(1000_mbar == 1_bar  ); CHECK(is_near_equal(1000._mbar,1._bar ) );
+	CHECK( 100_kPa  == 1_bar  ); CHECK(is_near_equal( 100._kPa ,1._bar ) );
+	CHECK( 100_Pa   == 1_hPa  ); CHECK(is_near_equal( 100._Pa  ,1._hPa ) );
+	CHECK(1000_Pa   == 1_kPa  ); CHECK(is_near_equal(1000._Pa  ,1._kPa ) );
+	CHECK(1000_kPa  == 1_MPa  ); CHECK(is_near_equal(1000._kPa ,1._MPa ) );
+	CHECK(1000_MPa  == 1_GPa  ); CHECK(is_near_equal(1000._MPa ,1._GPa ) );
+	CHECK(1000_GPa  == 1_TPa  ); CHECK(is_near_equal(1000._GPa ,1._TPa ) );
 }
 
 SUBCASE("velocity") {
@@ -704,7 +714,7 @@ SUBCASE("velocity") {
 	CHECK(test::is_same_unit<unlib::    meter_per_second<integer_value_type>>(1_m_per_s ) ); CHECK(1_m_per_s  == unlib::    meter_per_second<integer_value_type>{1} );
 	CHECK(test::is_same_unit<unlib::kilometer_per_hour  <integer_value_type>>(1_km_per_h) ); CHECK(1_km_per_h == unlib::kilometer_per_hour  <integer_value_type>{1} );
 
-	CHECK(10_m_per_s == 36_km_per_h); CHECK(is_near(1.0_m_per_s,3.6_km_per_h));
+	CHECK(10_m_per_s == 36_km_per_h); CHECK(is_near_equal(1.0_m_per_s,3.6_km_per_h));
 }
 
 SUBCASE("volumetric flow rate") {
@@ -716,7 +726,7 @@ SUBCASE("volumetric flow rate") {
 	CHECK(test::is_same_unit<unlib::liter_per_hour<double>>(1._l / 1._h) );
 	CHECK(test::is_same_unit<unlib::liter_per_hour<VT    >>(1_l_per_h  ));
 
-	CHECK(1_l_per_h == unlib::liter_per_hour<integer_value_type>{1}); CHECK(is_near(1._l_per_h,unlib::liter_per_hour<floatpt_value_type>{1}));
+	CHECK(1_l_per_h == unlib::liter_per_hour<integer_value_type>{1}); CHECK(is_near_equal(1._l_per_h,unlib::liter_per_hour<floatpt_value_type>{1}));
 }
 
 SUBCASE("scalar") {
@@ -742,4 +752,3 @@ SUBCASE("scalar") {
 }
 
 }
-

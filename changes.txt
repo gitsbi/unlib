@@ -3,6 +3,7 @@ Changes
 
 0.7.6
 * major redesign of floating point comparison
+* literal operator return types are now configurable (default is double and long)
 
 0.7.5.3
 * added an untag function to simplify tag_cast'ing to an untagged type

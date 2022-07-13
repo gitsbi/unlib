@@ -43,9 +43,16 @@ using           resistance =        div_unit_t< voltage, current >;
 using volumetric_flow_rate =        div_unit_t< volume , time    >;
 /** @} */
 
+#if !defined(UNLIB_LITERAL_OPERATOR_INTEGER_VALUE_TYPE)
+#   define UNLIB_LITERAL_OPERATOR_INTEGER_VALUE_TYPE  long
+#endif
+#if !defined(UNLIB_LITERAL_OPERATOR_FLOATPT_VALUE_TYPE)
+#   define UNLIB_LITERAL_OPERATOR_FLOATPT_VALUE_TYPE  double
+#endif
+
 namespace literals {
-using integer_value_type = std::int32_t; /**< value type of quantity return by integer literal operator */
-using floatpt_value_type = double;       /**< value type of quantity return by   float literal operator */
+using integer_value_type = UNLIB_LITERAL_OPERATOR_INTEGER_VALUE_TYPE; /**< value type of quantity return by integer literal operator */
+using floatpt_value_type = UNLIB_LITERAL_OPERATOR_FLOATPT_VALUE_TYPE; /**< value type of quantity return by float   literal operator */
 }
 
 /** @{

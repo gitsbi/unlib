@@ -15,14 +15,21 @@ inline void remove_substr(std::string& name, const std::string& substr) {
 	for(std::string::size_type idx = name.find(substr); idx != std::string::npos; idx = name.find(substr))
 		name.erase(idx, substr.size());
 }
+inline void replace_substr(std::string& name, const std::string& substr, const std::string& replacement) {
+	for(std::string::size_type idx = name.find(substr); idx != std::string::npos; idx = name.find(substr))
+		name.replace(idx, substr.size(), replacement);
+}
 inline void remove_prefix(std::string& name, std::string prefix) {
 	remove_substr(name, prefix + "::");
 }
 inline std::string filter_type_name(std::string name) {
 	remove_prefix(name, "unlib");
-	remove_prefix(name, "std");
-	remove_substr(name, "ll");
+	remove_prefix(name, "std"  );
+	remove_substr(name, "ll"   );
 	remove_substr(name, "ratio");
+
+	replace_substr(name, "> >", ">>");
+
 	return name;
 }
 

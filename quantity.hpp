@@ -48,9 +48,21 @@ class quantity;
 template<typename T>                                     struct is_quantity                    : std::false_type {};
 template<typename U, typename S, typename V, typename T> struct is_quantity<quantity<U,S,V,T>> : std::true_type {};
 
-template<typename T> constexpr bool is_quantity_v        = is_quantity<T>::value;
-
 namespace detail {
+
+template<typename TFloat>
+struct is_floating_point : std::is_floating_point<TFloat> {};
+template<typename TU, typename TS, typename TV, typename TT>
+struct is_floating_point<quantity<TU,TS,TV,TT>> : is_floating_point<TV> {};
+
+template<typename TFloat>
+struct is_integral: std::is_integral<TFloat> {};
+template<typename TU, typename TS, typename TV, typename TT>
+struct is_integral<quantity<TU,TS,TV,TT>> : is_integral<TV> {};
+
+template<typename T> constexpr bool is_quantity_v        = is_quantity<T>::value;
+template<typename T> constexpr bool is_floating_point_v  = is_floating_point<T>::value;
+template<typename T> constexpr bool is_integral_v        = is_integral<T>::value;
 
 template<typename NewScale, typename OldScale>
 struct value_rescaler {
@@ -72,16 +84,6 @@ struct value_rescaler<Scale,Scale> {
 
 template<typename NewScale, typename OldScale, typename ValueType>
 constexpr ValueType rescale_value(ValueType v)                            {return value_rescaler<NewScale,OldScale>::rescale_value(v);}
-
-template<typename T> constexpr bool is_floating_point_v  = std::is_floating_point<T>::value;
-template<typename T> constexpr bool is_integral_v        = std::is_integral<T>::value;
-
-template<typename T>
-constexpr std::enable_if_t<is_integral_v<T>,T>       get_tolerance()      {return T{};}
-template<typename F>
-constexpr std::enable_if_t<is_floating_point_v<F>,F> get_tolerance()      {return 100*std::numeric_limits<float>::epsilon();}
-template<typename Q>
-constexpr std::enable_if_t<is_quantity_v<Q>, Q>      get_tolerance()      {return Q{get_tolerance<typename Q::value_type>()};}
 
 }
 
@@ -379,14 +381,6 @@ public:
 	 *
 	 * @note There is a free function of the same name.
 	 */
-	template<typename U, typename S, typename V, typename T, typename D = quantity>
-	constexpr bool is_near(const quantity<U,S,V,T>& rhs, const D tolerance = detail::get_tolerance<D>()) const
-	                                                                      {
-		                                                                      static_assert(are_units_compatible_v<unit_type , U>, "fundamentally incompatible units"      );
-		                                                                      static_assert(detail::is_same_v     <value_type, V>, "different value types (use value_cast)");
-		                                                                      static_assert(detail::is_same_v     <tag_type  , T>, "incompatible tags (use tag_cast)"      );
-		                                                                      return (*this-rhs).is_near_zero(tolerance);
-	                                                                      }
 
 	/**
 	 * @brief Check whether a floating point quantity is near zero
@@ -400,16 +394,8 @@ public:
 	 *
 	 * @note There is a free function of the same name.
 	 */
-	template<typename D = quantity>
-	constexpr bool is_near_zero(const D tolerance = detail::get_tolerance<D>()) const
-	                                                                      {return is_near_zero_impl(tolerance);}
 
 private:
-	template<typename D>
-	constexpr bool is_near_zero_impl(const D tolerance) const             {return std::abs(value) <= tolerance;}
-	template<typename UD, typename SD, typename VD, typename TD>
-	constexpr bool is_near_zero_impl(const quantity<UD,SD,VD,TD>& tolerance) const
-	                                                                      {return quantity{std::abs(value)} <= tolerance;}
 
 	value_type                                        value;
 };
@@ -424,15 +410,6 @@ template<typename NewScale, typename U, typename S, typename V, typename T>
 constexpr typename quantity<U,S,V,T>::value_type get_scaled(const quantity<U,S,V,T>& q, NewScale = NewScale{})
                                                                           {return q.template get_scaled<NewScale>();}
 
-template< typename U1, typename S1, typename V1, typename T1
-        , typename U2, typename S2, typename V2, typename T2
-        , typename D = quantity<U1,S1,V1,T1> >
-constexpr bool is_near(quantity<U1,S1,V1,T1> lhs, const quantity<U2,S2,V2,T2>& rhs, const D tolerance = detail::get_tolerance<D>())
-                                                                          {return lhs.is_near(rhs,tolerance);}
-
-template< typename U, typename S, typename V, typename T, typename D = quantity<U,S,V,T>>
-constexpr bool is_near_zero(const quantity<U,S,V,T>& q, const D tolerance = detail::get_tolerance<D>())
-                                                                          {return q.is_near_zero(tolerance);}
 
 /**
  * @{

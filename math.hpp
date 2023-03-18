@@ -383,27 +383,27 @@ bool is_greater(F1 lval, F2 rval, detail::tolerance_aux<TT1,TF1,X1> tol1, detail
  *          given
  */
 template<typename F, typename TT, typename TF, typename X>
-bool is_near_zero   (F val, detail::tolerance_aux<TT,TF,X> tol) {return detail::is_near   (val,F{}, tol);}
+bool is_near_zero   (F val, detail::tolerance_aux<TT,TF,X> tol) {return detail::is_near   (val, F{}, tol);}
 template<typename F, typename TT1, typename TF1, typename TT2, typename TF2, typename X1, typename X2>
-bool is_near_zero   (F val, detail::tolerance_aux<TT1,TF1,X1> tol1, detail::tolerance_aux<TT2,TF2,X2> tol2) {return detail::is_near   (val,F{}, tol1, tol2);}
+bool is_near_zero   (F val, detail::tolerance_aux<TT1,TF1,X1> tol1, detail::tolerance_aux<TT2,TF2,X2> tol2) {return detail::is_near   (val, F{}, tol1, tol2);}
 /** @} */
 /* @{
  *  @return true if the quantity is smaller than zero within the tolerance
  *          given
  */
 template<typename F, typename TT, typename TF, typename X>
-bool is_smaller_zero(F val, detail::tolerance_aux<TT,TF,X> tol) {return detail::is_smaller(val,F{}, tol);}
+bool is_smaller_zero(F val, detail::tolerance_aux<TT,TF,X> tol) {return detail::is_smaller(val, F{}, tol);}
 template<typename F, typename TT1, typename TF1, typename TT2, typename TF2, typename X1, typename X2>
-bool is_smaller_zero(F val, detail::tolerance_aux<TT1,TF1,X1> tol1, detail::tolerance_aux<TT2,TF2,X2> tol2) {return detail::is_smaller(val,F{}, tol1, tol2);}
+bool is_smaller_zero(F val, detail::tolerance_aux<TT1,TF1,X1> tol1, detail::tolerance_aux<TT2,TF2,X2> tol2) {return detail::is_smaller(val, F{}, tol1, tol2);}
 /** @} */
 /* @{
  *  @return true if the quantity is greater than zero within the tolerance
  *          given
  */
 template<typename F, typename TT, typename TF, typename X>
-bool is_greater_zero(F val, detail::tolerance_aux<TT,TF,X> tol) {return detail::is_greater(val,F{}, tol);}
+bool is_greater_zero(F val, detail::tolerance_aux<TT,TF,X> tol) {return detail::is_greater(val, F{}, tol);}
 template<typename F, typename TT1, typename TF1, typename TT2, typename TF2, typename X1, typename X2>
-bool is_greater_zero(F val, detail::tolerance_aux<TT1,TF1,X1> tol1, detail::tolerance_aux<TT2,TF2,X2> tol2) {return detail::is_greater(val,F{}, tol1, tol2);}
+bool is_greater_zero(F val, detail::tolerance_aux<TT1,TF1,X1> tol1, detail::tolerance_aux<TT2,TF2,X2> tol2) {return detail::is_greater(val, F{}, tol1, tol2);}
 /** @} */
 /** @} */
 

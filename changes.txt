@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.7.8
+* bugfix: do not allow tolerance values with different tags than the values to be compared
+* bugfix: do not allow value_casts to compile between types with incompatible tags
+
 0.7.7
 * allow changing (at compile-time) of literal operator return types configurable
 * extended Readme.md

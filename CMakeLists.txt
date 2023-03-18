@@ -24,6 +24,7 @@ add_executable(unlib_test
         test/unlib_test.hpp
         test/unlib_test.cpp
         test/test_ratio.cpp
+        test/test_tag.cpp
         test/test_unit.cpp
         test/test_quantity.cpp
         test/test_limits.cpp

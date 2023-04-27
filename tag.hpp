@@ -121,35 +121,77 @@ struct div_tag<tag<ID,std::ratio<N1,D1>>,tag<ID,std::ratio<N2,D2>>>       {using
 
 
 template<typename Tag1, typename Tag2>
-struct are_tags_compatible;
+struct are_tags_comparable;
 template< typename ID1, std::intmax_t N1, std::intmax_t D1
         , typename ID2, std::intmax_t N2, std::intmax_t D2 >
-struct are_tags_compatible<tag<ID1,std::ratio<N1,D1>>,tag<ID2,std::ratio<N2,D2>>>
+struct are_tags_comparable<tag<ID1,std::ratio<N1,D1>>,tag<ID2,std::ratio<N2,D2>>>
+	: std::integral_constant<bool, std::is_same<ID1,ID2>::value> {};
+
+template<typename Tag1, typename Tag2>
+struct are_tags_multipliable;
+template< typename ID1, std::intmax_t N1, std::intmax_t D1
+        , typename ID2, std::intmax_t N2, std::intmax_t D2 >
+struct are_tags_multipliable<tag<ID1,std::ratio<N1,D1>>,tag<ID2,std::ratio<N2,D2>>>
 	: std::integral_constant<bool, tag<ID1,tag_ratio_t<N1,D1>>::is_no_tag::value
 	                            or tag<ID2,tag_ratio_t<N2,D2>>::is_no_tag::value
-	                            or std::is_same<ID1,ID2>::value > {};
+	                            or std::is_same<ID1,ID2>::value> {};
+
+template<typename Tag1, typename Tag2>
+struct are_tags_castable;
+template< typename ID1, std::intmax_t N1, std::intmax_t D1
+        , typename ID2, std::intmax_t N2, std::intmax_t D2 >
+struct are_tags_castable<tag<ID1,std::ratio<N1,D1>>,tag<ID2,std::ratio<N2,D2>>>
+	: std::integral_constant<bool, std::is_same<ID1,ID2>::value> {};
 
 }
 
 /**
  * @{
  *
- * @brief Tag compatibility
+ * @brief Tag comparability
  *
- * Check whether two tags are compatible for multiplication and division. Two
- * tags are compatible if they have the same ID or if either is the no_name
- * tag.
- *
- * @note If either or both parameters are tag IDs, rather than tags, tags will
- *       be created from them before checking them.
+ * Check whether two tags are comparable. Only identical tags are comparable.
  *
  * @tparam Tag1  tag to check for compatibility
  * @tparam Tag2  tag to check for compatibility
  */
 template<typename Tag1, typename Tag2>
-using are_tags_compatible = detail::are_tags_compatible<Tag1, Tag2>;
+using are_tags_comparable = detail::are_tags_comparable<Tag1, Tag2>;
 template<typename Tag1, typename Tag2>
-constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
+constexpr bool are_tags_comparable_v = are_tags_comparable<Tag1, Tag2>::value;
+/** @} */
+/**
+ * @{
+ *
+ * @brief Tag multiplyability
+ *
+ * Check whether two tags are compatible for multiplication and division. Two
+ * tags are compatible if they have the same ID or if either is the no_name
+ * tag.
+ *
+ * @tparam Tag1  tag to check for compatibility
+ * @tparam Tag2  tag to check for compatibility
+ */
+template<typename Tag1, typename Tag2>
+using are_tags_multipliable = detail::are_tags_multipliable<Tag1, Tag2>;
+template<typename Tag1, typename Tag2>
+constexpr bool are_tags_multipliable_v = are_tags_multipliable<Tag1, Tag2>::value;
+/** @} */
+/**
+ * @{
+ *
+ * @brief Tag castability
+ *
+ * Check whether two tags are compatible for casting between different
+ * quantities. Only identical tags are compatible.
+ *
+ * @tparam Tag1  tag to check for compatibility
+ * @tparam Tag2  tag to check for compatibility
+ */
+template<typename Tag1, typename Tag2>
+using are_tags_castable = detail::are_tags_castable<Tag1, Tag2>;
+template<typename Tag1, typename Tag2>
+constexpr bool are_tags_castable_v = are_tags_castable<Tag1, Tag2>::value;
 /** @} */
 
 
@@ -173,9 +215,6 @@ constexpr bool are_tags_compatible_v = are_tags_compatible<Tag1, Tag2>::value;
  * This means that, for example, you can multiply reactive power with time and
  * the result will be reactive energy. If you divide reactive energy by
  * reactive power, you get time, with the reactive tag removed.
- *
- * @note If either or both parameters are tag IDs, rather than tags, tags will
- *       be created from them before the operation.
  */
 template<typename Tag1, typename Tag2>
 using mul_tag_t = typename detail:: mul_tag<Tag1, Tag2>::type;
@@ -187,9 +226,6 @@ using div_tag_t = typename detail:: div_tag<Tag1, Tag2>::type;
  * @{
  *
  * @brief Get tag resulting from quantity sqrt/pow operations
- *
- * @note If the parameter is a tag IDs, rather than a tag, a tag will be
- *       created from it before the operation.
  */
 template<typename Tag, typename Ratio>
 using pow_tag_t = typename tag<typename Tag::id, std::ratio_multiply<typename Tag::exponent,Ratio>>::type;

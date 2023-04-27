@@ -50,7 +50,7 @@ unlib::kilo<unlib::watt_hour<double>> kWh = nrg;
 
 # Known bugs
 
-The library does not currently deal with the fact that the base unit of _mass_ is not _gram_, but _kilogrom_. As a result, units such as _Newton_, defined as `kg * m * s²`, will get they scale from the units they are calculated from, resulting in _Newton_ to have a _kilo_ scaling, rather than no scaling.
+The library does not currently deal with the fact that the base unit of _mass_ is not _gram_, but _kilogram_. As a result, units such as _Newton_, defined as `kg * m * s²`, will get they scale from the units they are calculated from, resulting in _Newton_ to have a _kilo_ scaling, rather than no scaling.
 
 Since the work I currently do is not affected by this bug, I have not yet taken the time to redesign the library to fix this.
 

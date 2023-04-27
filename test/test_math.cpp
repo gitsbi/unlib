@@ -641,13 +641,13 @@ TEST_CASE("math") {
 
 TEST_CASE_TEMPLATE("is_near, is_smaller, is_greater", Float, float, double, long double) {
 
-	const auto  f_tiny       = Float{  0.0000001f};
-	const auto  f_0_0        = Float{  0.0f      };
-	const auto  f_0_001      = Float{  0.001f    };
-	const auto  f_0_01       = Float{  0.01f     };
-	const auto  f_1_0        = Float{  1.0f      };
-	const auto  f_1_1        = Float{  1.1f      };
-	const auto  f_3_0        = Float{  3.0f      };
+	const auto f_tiny        = Float{  0.0000001f};
+	const auto f_0_0         = Float{  0.0f      };
+	const auto f_0_001       = Float{  0.001f    };
+	const auto f_0_01        = Float{  0.01f     };
+	const auto f_1_0         = Float{  1.0f      };
+	const auto f_1_1         = Float{  1.1f      };
+	const auto f_3_0         = Float{  3.0f      };
 	const auto f_49_99999    = Float{ 49.99999f  };
 	const auto f_50_0        = Float{ 50.0f      };
 	const auto f_50_1        = Float{ 50.1f      };

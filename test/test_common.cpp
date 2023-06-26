@@ -10,7 +10,8 @@ namespace {
 
 template<typename D, typename F, typename S1, typename S2, typename T>
 bool is_near_equal(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rhs) {
-	return unlib::is_near(lhs, rhs, unlib::tolerance_nominal(unlib::max(lhs,rhs)));
+	using std::max;
+	return unlib::is_near(lhs, rhs, unlib::tolerance_nominal(max(lhs,rhs)));
 }
 
 }

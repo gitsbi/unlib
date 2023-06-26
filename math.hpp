@@ -141,7 +141,8 @@ auto cbrt(quantity<U,S,T,V> q)                                            {retur
  * @return minimum value of @p lhs and @p rhs
  */
 template<typename D, typename F, typename S1, typename S2, typename T>
-auto min(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rhs) {
+std::enable_if_t<not std::is_same<S1,S2>::value, unlib::quantity<D,S1,F,T>>
+min(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rhs) {
 	using std::min;
 	return unlib::quantity<D,S1,F,T>{min(lhs.get(), rhs.template get_scaled<S1>())};
 }
@@ -154,7 +155,8 @@ auto min(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rh
  * @return maximum value of @p lhs and @p rhs
  */
 template<typename D, typename F, typename S1, typename S2, typename T>
-auto max(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rhs) {
+std::enable_if_t<not std::is_same<S1,S2>::value, unlib::quantity<D,S1,F,T>>
+max(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rhs) {
 	using std::max;
 	return unlib::quantity<D,S1,F,T>{max(lhs.get(), rhs.template get_scaled<S1>())};
 }

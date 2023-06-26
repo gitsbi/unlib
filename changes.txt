@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.7.9
+* bugfix: only enable unlib::min/max if the scales of their arguments differ
+
 0.7.8
 * bugfix: do not allow tolerance values with different tags than the values to be compared
 * bugfix: do not allow value_casts to compile between types with incompatible tags

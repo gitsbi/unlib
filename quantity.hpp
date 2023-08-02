@@ -12,9 +12,10 @@
  */
 
 #include <cstdint>
-#include <ostream>
 #include <istream>
 #include <limits>
+#include <ostream>
+#include <string>
 #include <type_traits>
 
 #include <unlib/unit.hpp>
@@ -511,36 +512,6 @@ constexpr auto operator!=(const quantity<U1,S1,V1,T1>& lhs, const quantity<U2,S2
 /** @} */
 
 /**
- * @brief Stream output operator
- *
- * Streams the stored value into os.
- *
- * @param os  the stream
- * @param  q  the quantity
- * @return os
- */
-template<typename U, typename S, typename V, typename T>
-std::ostream& operator<<(std::ostream& os, const quantity<U, S, V, T>& q) {return os << q.get();}
-
-/**
- * @brief Stream input operator
- *
- * Reads from the stream into q.
- *
- * @param is  the stream
- * @param  q  the quantity
- *
- * @return is
- */
-template<typename U, typename S, typename V, typename T>
-std::istream& operator>>(std::istream& is, quantity<U, S, V, T>& q)       {
-	                                                                          V v;
-	                                                                          if (is >> v)
-		                                                                          q = quantity<U, S, V, T>{v};
-	                                                                          return is;
-                                                                          }
-
-/**
  * @{
  * @brief Non-member binary arithmetic operators
  *
@@ -737,6 +708,233 @@ constexpr auto quantity_cast(const quantity<U,S,V,T>& q)                  {retur
 template<typename NewQuantity, typename U, typename S, typename V, typename T>
 constexpr NewQuantity quantity_cast(const quantity<U,S,V,T>& q)           {return NewQuantity{quantity_cast(q)};}
 /** @} */
+
+/* I/O ***********************************************************************/
+
+namespace literals {
+
+/**
+ * Specializations of this template define the prefixes applied to unit
+ * strings for different scaling (e.g., "k" for kilo or "M" for mega).
+ * Prefixes for all ISO scalings are pre-defined using the @sq
+ * UNLIB_DEFINE_SCALE_LITERAL_TRAITS() macro.
+ *
+ * Except when inventing a proprietary scaling, users should have no need to
+ * define their own specializations of this template. Usually it's better to
+ * define a @sq quantity_traits specialization.
+ *
+ * @tparam S  Scaling to define a prefix string for
+ */
+template<typename S>
+struct scaling_traits {
+	using is_specialized = std::false_type;
+};
+
+/** Find out whether scaling_traits is specialized for a specific scaling */
+template<typename S>
+using is_scaling_string_specialized = typename scaling_traits<S>::is_specialized;
+
+/**
+ * Specializations of this template define the unit strings for different
+ * units (like "m" for meter). Units who invent their own units can
+ * specialize this to define unit strings for those.
+ *
+ * @note Specializations of this must have a static function `get_string()`.
+ *       (The @sa UNLIB_DEFINE_UNIT_LITERAL_TRAITS() macro is a convenient way
+ *       to create fully conforming specializations.)
+ *
+ * @tparam U  Unit to define string for
+ * @tparam T  Tag to define string for
+ */
+template<typename U, typename T>
+struct unit_traits {
+	using is_specialized = std::false_type;
+};
+
+/** Find out whether unit_traits is specialized for a specific unit and tag */
+template<typename U, typename T>
+using is_unit_string_specialized = typename unit_traits<U,T>::is_specialized;
+
+
+namespace detail {
+
+/* a C++14 static string. */
+template<std::size_t StrLen>
+struct static_string {
+	char array[StrLen+1];
+};
+
+/* a C++14 constexpr string copy */
+template<std::size_t StrSize>
+inline constexpr auto copy_static_string(char* to, const char (&from)[StrSize]) {
+	for(std::size_t idx=0; idx<StrSize-1; ++idx)
+		to[idx] = from[idx];
+	return to + StrSize-1;
+}
+
+/* constexpr-creating the unit string for a quantity */
+template<std::size_t QuantityStrLen, std::size_t ScalingStrSize, std::size_t UnitStrSize>
+constexpr auto make_quantity_string( const char (&scaling_str)[ScalingStrSize]
+                                   , const char (&   unit_str)[   UnitStrSize] ) {
+	static_string<QuantityStrLen> quantity_str{};
+	char* it = quantity_str.array;
+	it = copy_static_string(it, scaling_str);
+	     copy_static_string(it,    unit_str);
+	return quantity_str;
+}
+
+template<typename U, typename S, typename T>
+struct quantity_string_traits {
+	using  unit_type = U;
+	using scale_type = S;
+	using   tag_type = T;
+
+	using scaling_tr = scaling_traits<scale_type>;
+	using    unit_tr =    unit_traits<unit_type, tag_type>;
+
+	static constexpr std::size_t scaling_strlen = sizeof(scaling_tr::get_string()) - 1;
+	static constexpr std::size_t    unit_strlen = sizeof(   unit_tr::get_string()) - 1;
+	static constexpr std::size_t         strlen = scaling_strlen + unit_strlen;
+
+	static constexpr static_string<strlen> string{ make_quantity_string<strlen>(scaling_tr::get_string()
+	                                                                           ,   unit_tr::get_string()) };
+};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated"
+// in C++14, this is still necessary
+template<typename U, typename S, typename T>
+constexpr static_string<quantity_string_traits<U,S,T>::strlen> quantity_string_traits<U,S,T>::string;
+#pragma GCC diagnostic pop
+
+}
+
+/**
+ * The generic version of this template obtains a compile-time string
+ * representing the unit, scale, and tag of a quantity by referring to @sa
+ * scale_traits and @sa unit_traits.
+ *
+ * Specializations of this define the strings for quantities (like "nm" for
+ * nanometer and "kt" for kilotons). Usually, specializing @sa unit_traits
+ * will be more convenient than specializing this, because it allows the
+ * automatic combination with scaling prefixes. But sometimes units scale
+ * irregularly (kilotons), and then this template can be specialized.
+ *
+ * @note Specializations of this must have a static_string member named
+ *       `get_string()`. (The @sa UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS() and
+ *       the @sa UNLIB_DEFINE_SCALED_QUANTITY_LITERAL_TRAITS() macros are
+ *       convenient ways to create such specializations.)
+ *
+ * @tparam U  the quantity's unit type
+ * @tparam S  the quantity's scale type
+ * @tparam V  the quantity's value type
+ * @tparam T  the quantity's tag type
+ */
+template<typename U, typename S, typename T>
+struct quantity_traits {
+	using is_specialized = std::integral_constant<bool, is_scaling_string_specialized<S  >::value
+                                                       and is_unit_string_specialized<U,T>::value>;
+	static constexpr const auto& get_string() {return detail::quantity_string_traits<U,S,T>::string.array;}
+};
+
+/** Find out whether quantity_traits is specialized for a specific unit, scaling, and tag */
+template<typename U, typename S, typename T>
+using is_quantity_string_specialized = typename quantity_traits<U,S,T>::is_specialized;
+
+
+/**
+ * @{
+ *
+ * Get a reference to a char array or a C++ string containing the unit string
+ * for a quantity.
+ *
+ * @tparam Q  the quantity
+ * @tparam U  the quantity's unit type
+ * @tparam S  the quantity's scale type
+ * @tparam V  the quantity's value type
+ * @tparam T  the quantity's tag type
+ *
+ * @param q  a quantity (its value is irrelevant)
+ *
+ * @return String for the unit, scale, and tag of the quantity
+ */
+template<typename U, typename S, typename V, typename T>
+const auto& get_quantity_c_str(const quantity<U,S,V,T>&)                  {return literals::quantity_traits<U,S,T>::get_string();}
+template<typename Q>
+const auto& get_quantity_c_str()                                          {return get_quantity_c_str(Q{});}
+
+template<typename U, typename S, typename V, typename T>
+std::string get_quantity_string(const quantity<U,S,V,T>& q)               {return get_quantity_c_str(q);}
+template<typename Q>
+std::string get_quantity_string()                                         {return get_quantity_c_str<Q>();}
+/** @} */
+
+}
+
+namespace detail {
+
+template<typename U, typename S, typename V, typename T>
+std::ostream& stream(std::ostream& os, const quantity<U,S,V,T>& q, std::false_type)
+                                                                          {return os << q.get();}
+template<typename U, typename S, typename V, typename T>
+std::ostream& stream(std::ostream& os, const quantity<U,S,V,T>& q, std::true_type)
+	                                                                      {
+	                                                                          return stream(os, q, std::false_type{})
+	                                                                       << ' '
+	                                                                       << literals::get_quantity_string(q);
+	                                                                      }
+
+template<typename U, typename S, typename V, typename T>
+std::string to_string(const quantity<U,S,V,T>& q, std::false_type)        {using std::to_string; return to_string(q.get());}
+template<typename U, typename S, typename V, typename T>
+std::string to_string(const quantity<U,S,V,T>& q, std::true_type)         {
+	                                                                          return detail::to_string( q
+	                                                                                                  , std::false_type{})
+	                                                                        + ' '
+	                                                                        + literals::get_quantity_string(q);
+	                                                                      }
+
+}
+
+template<typename U, typename S, typename V, typename T>
+std::string to_string(const quantity<U,S,V,T>& q)                         {
+	                                                                          return detail::to_string( q
+	                                                                                                  , literals::is_quantity_string_specialized<U,S,T>{} );
+	                                                                      }
+
+
+/**
+ * @brief Stream output operator
+ *
+ * Streams the stored value into os.
+ *
+ * @param os  the stream
+ * @param  q  the quantity
+ * @return os
+ */
+template<typename U, typename S, typename V, typename T>
+std::ostream& operator<<(std::ostream& os, const quantity<U,S,V,T>& q)    {
+	                                                                          return detail::stream( os
+	                                                                                               , q
+	                                                                                               , literals::is_quantity_string_specialized<U,S,T>{} );
+	                                                                      }
+
+/**
+ * @brief Stream input operator
+ *
+ * Reads from the stream into q.
+ *
+ * @param is  the stream
+ * @param  q  the quantity
+ *
+ * @return is
+ */
+template<typename U, typename S, typename V, typename T>
+std::istream& operator>>(std::istream& is, quantity<U,S,V,T>& q)          {
+	                                                                          V v;
+	                                                                          if (is >> v)
+		                                                                          q = quantity<U,S,V,T>{v};
+	                                                                          return is;
+                                                                          }
 
 }
 

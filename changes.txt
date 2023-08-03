@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.9
+* added ability to print known quantity types ("km")
+
+0.8
+(dead branch, no further deveulopment)
+
 0.7.9
 * bugfix: only enable unlib::min/max if the scales of their arguments differ
 

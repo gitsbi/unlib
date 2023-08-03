@@ -1,4 +1,6 @@
 #include <unlib/common.hpp>
+
+#include <algorithm>
 #include <string>
 
 #include <doctest/doctest.h>
@@ -17,25 +19,64 @@ bool is_near_equal(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,
 }
 
 TEST_CASE("common quantities") {
+	SUBCASE("quantity strings traits") {
+		SUBCASE("static_string") {
+			constexpr char test_str_1[] = "0123456789ABCDEF";
+			constexpr char test_str_2[] = "GHIJKLMNOPQRSTUV";
+			constexpr std::size_t size_1 = sizeof(test_str_1)-1;
+			constexpr std::size_t size_2 = sizeof(test_str_2)-1;
+
+			unlib::literals::detail::static_string<size_1 + size_2> s_str{};
+
+			unlib::literals::detail::copy_static_string(s_str.array, test_str_1);
+			CHECK( s_str.array == std::string(test_str_1) );
+
+			s_str = unlib::literals::detail::make_quantity_string<size_1 + size_2>(test_str_1, test_str_2);
+			CHECK( s_str.array == std::string(test_str_1) + test_str_2);
+		}
+
+		using     meter = unlib::meter<double>;
+		using nanometer = unlib::nano<meter>;
+		using kilometer = unlib::kilo<meter>;
+
+		SUBCASE("scaling_traits") {
+			CHECK(std::string(unlib::literals::scaling_traits<    meter::scale_type>::get_string()) == "");
+			CHECK(std::string(unlib::literals::scaling_traits<nanometer::scale_type>::get_string()) == "n");
+			CHECK(std::string(unlib::literals::scaling_traits<kilometer::scale_type>::get_string()) == "k");
+		}
+		SUBCASE("unit_traits") {
+			CHECK(std::string(unlib::literals::unit_traits<    meter::unit_type,     meter::tag_type>::get_string()) == "m");
+			CHECK(std::string(unlib::literals::unit_traits<nanometer::unit_type, nanometer::tag_type>::get_string()) == "m");
+			CHECK(std::string(unlib::literals::unit_traits<kilometer::unit_type, kilometer::tag_type>::get_string()) == "m");
+		}
+		SUBCASE("quantity_traits") {
+			CHECK(std::string(unlib::literals::quantity_traits<    meter::unit_type,     meter::scale_type,     meter::tag_type>::get_string()) =="m");
+			CHECK(std::string(unlib::literals::quantity_traits<nanometer::unit_type, nanometer::scale_type, nanometer::tag_type>::get_string()) =="nm");
+			CHECK(std::string(unlib::literals::quantity_traits<kilometer::unit_type, kilometer::scale_type, kilometer::tag_type>::get_string()) =="km");
+		}
+	}
+
+	using unlib::literals::get_quantity_string;
+
 	SUBCASE("time") {
 		using VT = long long;
 
-		const unlib::second<VT>  s{ 1}; REQUIRE(s.get() ==  1);
+		const         unlib::second<VT>  s{ 1}; CHECK(get_quantity_string( s) ==  "s"); REQUIRE(s.get() ==  1);
 
-		unlib::milli<unlib::second<VT>> ms{ s}; CHECK(ms.get() ==  s.get() * 1000);
-		unlib::micro<unlib::second<VT>> us{ms}; CHECK(us.get() == ms.get() * 1000);
-		unlib::nano <unlib::second<VT>> ns{us}; CHECK(ns.get() == us.get() * 1000);
-		unlib::pico <unlib::second<VT>> ps{ns}; CHECK(ps.get() == ns.get() * 1000);
-		unlib::femto<unlib::second<VT>> fs{ps}; CHECK(fs.get() == ps.get() * 1000);
-		             unlib::second<VT>  s2{fs}; CHECK( s == s2);
+		unlib::milli<unlib::second<VT>> ms{ s}; CHECK(get_quantity_string(ms) == "ms"); CHECK(ms.get() ==  s.get() * 1000);
+		unlib::micro<unlib::second<VT>> us{ms}; CHECK(get_quantity_string(us) == "us"); CHECK(us.get() == ms.get() * 1000);
+		unlib::nano <unlib::second<VT>> ns{us}; CHECK(get_quantity_string(ns) == "ns"); CHECK(ns.get() == us.get() * 1000);
+		unlib::pico <unlib::second<VT>> ps{ns}; CHECK(get_quantity_string(ps) == "ps"); CHECK(ps.get() == ns.get() * 1000);
+		unlib::femto<unlib::second<VT>> fs{ps}; CHECK(get_quantity_string(fs) == "fs"); CHECK(fs.get() == ps.get() * 1000);
+		             unlib::second<VT>  s2{fs}; CHECK(get_quantity_string(s2) ==  "s"); CHECK( s == s2);
 
 		const VT seconds_per_week = 60*60*24*7;
 
 		s2 = unlib::second<VT>{seconds_per_week}; REQUIRE(s2.get()  == seconds_per_week);
-		unlib::minute<VT> min{ s2}; REQUIRE(min.get()); CHECK(min.get() == 60*24*7);
-		unlib::  hour<VT>   h{min}; REQUIRE(  h.get()); CHECK(  h.get() ==    24*7);
-		unlib::   day<VT>   d{  h}; REQUIRE(  d.get()); CHECK(  d.get() ==       7);
-		unlib::  week<VT>   w{  d}; REQUIRE(  w.get()); CHECK(  w.get() ==       1);
+		unlib::minute<VT> min{ s2}; CHECK(get_quantity_string(min) == "min"); REQUIRE(min.get()); CHECK(min.get() == 60*24*7);
+		unlib::  hour<VT>   h{min}; CHECK(get_quantity_string(  h) ==   "h"); REQUIRE(  h.get()); CHECK(  h.get() ==    24*7);
+		unlib::   day<VT>   d{  h}; CHECK(get_quantity_string(  d) ==   "d"); REQUIRE(  d.get()); CHECK(  d.get() ==       7);
+		unlib::  week<VT>   w{  d};                                              REQUIRE(  w.get()); CHECK(  w.get() ==       1);
 		s2 = w; CHECK(s2.get() == seconds_per_week);
 
 		using namespace unlib::literals;
@@ -65,20 +106,20 @@ TEST_CASE("common quantities") {
 	SUBCASE("mass") {
 		using VT = long long;
 
-		const unlib::kilo<unlib::gram<VT>> kg{ 1}; REQUIRE(kg.get() ==  1);
+		unlib::kilo <unlib::gram<VT>> kg{ 1}; CHECK(get_quantity_string(kg) == "kg"); REQUIRE(kg.get() ==  1);
 
-		                unlib::gram<VT>   g{kg}; REQUIRE(kg.get()); CHECK( g.get() == kg.get() * 1000);
-		unlib::milli<unlib::gram<VT>> mg{ g}; REQUIRE( g.get()); CHECK(mg.get() ==  g.get() * 1000);
-		unlib::micro<unlib::gram<VT>> ug{mg}; REQUIRE(mg.get()); CHECK(ug.get() == mg.get() * 1000);
-		unlib::nano <unlib::gram<VT>> ng{ug}; REQUIRE(ug.get()); CHECK(ng.get() == ug.get() * 1000);
-		unlib::pico <unlib::gram<VT>> pg{ng}; REQUIRE(ng.get()); CHECK(pg.get() == ng.get() * 1000);
-		unlib::femto<unlib::gram<VT>> fg{pg}; REQUIRE(pg.get()); CHECK(fg.get() == pg.get() * 1000);
-		unlib::kilo <unlib::gram<VT>> k2{fg}; REQUIRE(fg.get()); CHECK(kg == k2);
+		             unlib::gram<VT>   g{kg}; CHECK(get_quantity_string( g) ==  "g"); REQUIRE(kg.get()); CHECK( g.get() == kg.get() * 1000);
+		unlib::milli<unlib::gram<VT>> mg{ g}; CHECK(get_quantity_string(mg) == "mg"); REQUIRE( g.get()); CHECK(mg.get() ==  g.get() * 1000);
+		unlib::micro<unlib::gram<VT>> ug{mg}; CHECK(get_quantity_string(ug) == "ug"); REQUIRE(mg.get()); CHECK(ug.get() == mg.get() * 1000);
+		unlib::nano <unlib::gram<VT>> ng{ug}; CHECK(get_quantity_string(ng) == "ng"); REQUIRE(ug.get()); CHECK(ng.get() == ug.get() * 1000);
+		unlib::pico <unlib::gram<VT>> pg{ng}; CHECK(get_quantity_string(pg) == "pg"); REQUIRE(ng.get()); CHECK(pg.get() == ng.get() * 1000);
+		unlib::femto<unlib::gram<VT>> fg{pg}; CHECK(get_quantity_string(fg) == "fg"); REQUIRE(pg.get()); CHECK(fg.get() == pg.get() * 1000);
+		unlib::kilo <unlib::gram<VT>> k2{fg};                                            REQUIRE(fg.get()); CHECK(kg == k2);
 
 		k2 = kg * 1'000'000'000;
-		            unlib::ton<VT>   t{k2}; REQUIRE( t.get()); CHECK( t.get() == (k2.get() /       1000));
-		unlib::kilo<unlib::ton<VT>> kt{ t}; REQUIRE(kt.get()); CHECK(kt.get() == ( t.get() /       1000));
-		unlib::mega<unlib::ton<VT>> Mt{kt}; REQUIRE(Mt.get()); CHECK(Mt.get() == (kt.get() /       1000));
+		             unlib::ton<VT>    t{k2}; CHECK(get_quantity_string( t) ==  "t"); REQUIRE( t.get()); CHECK( t.get() == (k2.get() /       1000));
+		unlib::kilo <unlib::ton<VT> > kt{ t}; CHECK(get_quantity_string(kt) == "kt"); REQUIRE(kt.get()); CHECK(kt.get() == ( t.get() /       1000));
+		unlib::mega <unlib::ton<VT> > Mt{kt}; CHECK(get_quantity_string(Mt) == "Mt"); REQUIRE(Mt.get()); CHECK(Mt.get() == (kt.get() /       1000));
 		k2 = Mt;                            REQUIRE(k2.get()); CHECK(k2.get() == (kg.get() * 1000000000));
 
 		using namespace unlib::literals;
@@ -109,16 +150,16 @@ TEST_CASE("common quantities") {
 	SUBCASE("length") {
 		using VT = long long;
 
-		const unlib::kilo<unlib::meter<VT>> km{ 1}; REQUIRE(km.get() ==  1);
+		const unlib::kilo<unlib::meter<VT>> km{ 1}; CHECK(get_quantity_string(km) == "km"); REQUIRE(km.get() ==  1);
 
-		unlib::femto<unlib::meter<VT>> fm{km}; REQUIRE(km.get()); CHECK(fm.get() == km.get() * 1000'000'000'000'000'000);
-		unlib::pico <unlib::meter<VT>> pm{fm}; REQUIRE(fm.get()); CHECK(pm.get() == fm.get() / 1000);
-		unlib::nano <unlib::meter<VT>> nm{pm}; REQUIRE(pm.get()); CHECK(nm.get() == pm.get() / 1000);
-		unlib::micro<unlib::meter<VT>> um{nm}; REQUIRE(nm.get()); CHECK(um.get() == nm.get() / 1000);
-		unlib::milli<unlib::meter<VT>> mm{um}; REQUIRE(um.get()); CHECK(mm.get() == um.get() / 1000);
-		unlib::centi<unlib::meter<VT>> cm{mm}; REQUIRE(mm.get()); CHECK(cm.get() == mm.get() /   10);
-		unlib::deci <unlib::meter<VT>> dm{cm}; REQUIRE(cm.get()); CHECK(dm.get() == cm.get() /   10);
-		             unlib::meter<VT>   m{dm}; REQUIRE(dm.get()); CHECK( m.get() == dm.get() /   10);
+		unlib::femto<unlib::meter<VT>> fm{km}; CHECK(get_quantity_string(fm) == "fm"); REQUIRE(km.get()); CHECK(fm.get() == km.get() * 1000'000'000'000'000'000);
+		unlib::pico <unlib::meter<VT>> pm{fm}; CHECK(get_quantity_string(pm) == "pm"); REQUIRE(fm.get()); CHECK(pm.get() == fm.get() / 1000);
+		unlib::nano <unlib::meter<VT>> nm{pm}; CHECK(get_quantity_string(nm) == "nm"); REQUIRE(pm.get()); CHECK(nm.get() == pm.get() / 1000);
+		unlib::micro<unlib::meter<VT>> um{nm}; CHECK(get_quantity_string(um) == "um"); REQUIRE(nm.get()); CHECK(um.get() == nm.get() / 1000);
+		unlib::milli<unlib::meter<VT>> mm{um}; CHECK(get_quantity_string(mm) == "mm"); REQUIRE(um.get()); CHECK(mm.get() == um.get() / 1000);
+		unlib::centi<unlib::meter<VT>> cm{mm}; CHECK(get_quantity_string(cm) == "cm"); REQUIRE(mm.get()); CHECK(cm.get() == mm.get() /   10);
+		unlib::deci <unlib::meter<VT>> dm{cm}; CHECK(get_quantity_string(dm) == "dm"); REQUIRE(cm.get()); CHECK(dm.get() == cm.get() /   10);
+		             unlib::meter<VT>   m{dm};                                            REQUIRE(dm.get()); CHECK( m.get() == dm.get() /   10);
 
 		unlib::kilo <unlib::meter<VT>> k2{m};  CHECK( k2 == km );
 
@@ -147,12 +188,12 @@ TEST_CASE("common quantities") {
 	SUBCASE("area") {
 		using VT = long long;
 
-		CHECK(typeid(unlib::area) == typeid(unlib::square_meter     <VT>::unit_type));
-		CHECK(typeid(unlib::area) == typeid(unlib::square_kilometer <VT>::unit_type));
+		CHECK(typeid(unlib::area) == typeid(unlib::square_meter     <VT>::unit_type)); CHECK(get_quantity_string(unlib::square_meter     <VT>{}) ==  "m2");
+		CHECK(typeid(unlib::area) == typeid(unlib::square_kilometer <VT>::unit_type)); CHECK(get_quantity_string(unlib::square_kilometer <VT>{}) == "km2");
 		CHECK(typeid(unlib::area) == typeid(unlib::             are <VT>::unit_type));
-		CHECK(typeid(unlib::area) == typeid(unlib::         hectare <VT>::unit_type));
-		CHECK(typeid(unlib::area) == typeid(unlib::square_centimeter<VT>::unit_type));
-		CHECK(typeid(unlib::area) == typeid(unlib::square_millimeter<VT>::unit_type));
+		CHECK(typeid(unlib::area) == typeid(unlib::         hectare <VT>::unit_type)); CHECK(get_quantity_string(unlib::         hectare <VT>{}) ==  "ha");
+		CHECK(typeid(unlib::area) == typeid(unlib::square_centimeter<VT>::unit_type)); CHECK(get_quantity_string(unlib::square_centimeter<VT>{}) == "cm2");
+		CHECK(typeid(unlib::area) == typeid(unlib::square_millimeter<VT>::unit_type)); CHECK(get_quantity_string(unlib::square_millimeter<VT>{}) == "mm2");
 
 		using namespace unlib::literals;
 		CHECK( typeid( 1_m2) == typeid(unlib::square_meter<integer_value_type>) );
@@ -168,12 +209,12 @@ TEST_CASE("common quantities") {
 	SUBCASE("volume") {
 		using VT = long long;
 
-		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_millimeter<VT>::unit_type));
-		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_centimeter<VT>::unit_type));
-		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_meter     <VT>::unit_type));
-		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_kilometer <VT>::unit_type));
-		CHECK(typeid(unlib::volume) == typeid(unlib::           liter<VT>::unit_type));
-		CHECK(typeid(unlib::volume) == typeid(unlib::      milliliter<VT>::unit_type));
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_millimeter<VT>::unit_type)); CHECK(get_quantity_string(unlib::cubic_millimeter<VT>{}) == "mm3");
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_centimeter<VT>::unit_type)); CHECK(get_quantity_string(unlib::cubic_centimeter<VT>{}) ==  "ml");
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_meter     <VT>::unit_type)); CHECK(get_quantity_string(unlib::cubic_meter     <VT>{}) ==  "m3");
+		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_kilometer <VT>::unit_type)); CHECK(get_quantity_string(unlib::cubic_kilometer <VT>{}) == "km3");
+		CHECK(typeid(unlib::volume) == typeid(unlib::           liter<VT>::unit_type)); CHECK(get_quantity_string(unlib::           liter<VT>{}) ==   "l");
+		CHECK(typeid(unlib::volume) == typeid(unlib::      milliliter<VT>::unit_type)); CHECK(get_quantity_string(unlib::      milliliter<VT>{}) ==  "ml");
 
 		using namespace unlib::literals;
 		CHECK( typeid( 1_l) == typeid(unlib::liter<integer_value_type>) );
@@ -189,33 +230,33 @@ TEST_CASE("common quantities") {
 	SUBCASE("temperature") {
 		using VT = long long;
 
-		const unlib::degree_kelvin    <VT> d_k{ 1}; REQUIRE(d_k.get() ==  1);
-		const unlib::degree_celsius   <VT> d_c{ 1}; REQUIRE(d_c.get() ==  1);
-		const unlib::degree_fahrenheit<VT> d_f{ 1}; REQUIRE(d_f.get() ==  1);
+		const unlib::degree_kelvin    <VT> d_k{ 1}; CHECK(get_quantity_string(d_k) == "K"); REQUIRE(d_k.get() ==  1);
+		const unlib::degree_celsius   <VT> d_c{ 1}; CHECK(get_quantity_string(d_c) == "C"); REQUIRE(d_c.get() ==  1);
+		const unlib::degree_fahrenheit<VT> d_f{ 1}; CHECK(get_quantity_string(d_f) == "F"); REQUIRE(d_f.get() ==  1);
 
 		using namespace unlib::literals;
 
-		CHECK( unlib::scale_cast<unlib::degree_fahrenheit<VT>::scale_type>(unlib::degree_kelvin <VT>(10)) == unlib::degree_fahrenheit<VT>(18) );
-		CHECK( unlib::scale_cast<unlib::degree_fahrenheit<VT>::scale_type>(unlib::degree_celsius<VT>(10)) == unlib::degree_fahrenheit<VT>(18) );
+		CHECK( unlib::scale_cast<unlib::degree_fahrenheit<VT>::scale_type>(unlib::degree_kelvin <VT>(10)).get() == unlib::degree_fahrenheit<VT>(18).get() );
+		CHECK( unlib::scale_cast<unlib::degree_fahrenheit<VT>::scale_type>(unlib::degree_celsius<VT>(10)).get() == unlib::degree_fahrenheit<VT>(18).get() );
 
 	}
 
 	SUBCASE("current") {
 		using VT = long long;
 
-		const unlib::ampere<VT> A{ 1}; REQUIRE(A.get() ==  1);
+		const        unlib::ampere<VT>   A{ 1}; CHECK(get_quantity_string( A) ==  "A"); REQUIRE( A.get() ==  1);
 
-		unlib::femto<unlib::ampere<VT>> fA{ A}; REQUIRE( A.get()); CHECK(fA.get() ==  A.get() * 1000'000'000'000'000);
-		unlib::pico <unlib::ampere<VT>> pA{fA}; REQUIRE(fA.get()); CHECK(pA.get() == fA.get() / 1000);
-		unlib::nano <unlib::ampere<VT>> nA{pA}; REQUIRE(pA.get()); CHECK(nA.get() == pA.get() / 1000);
-		unlib::micro<unlib::ampere<VT>> uA{nA}; REQUIRE(nA.get()); CHECK(uA.get() == nA.get() / 1000);
-		unlib::milli<unlib::ampere<VT>> mA{uA}; REQUIRE(uA.get()); CHECK(mA.get() == uA.get() / 1000);
+		unlib::femto<unlib::ampere<VT>> fA{ A}; CHECK(get_quantity_string(fA) == "fA"); REQUIRE( A.get()); CHECK(fA.get() ==  A.get() * 1000'000'000'000'000);
+		unlib::pico <unlib::ampere<VT>> pA{fA}; CHECK(get_quantity_string(pA) == "pA"); REQUIRE(fA.get()); CHECK(pA.get() == fA.get() / 1000);
+		unlib::nano <unlib::ampere<VT>> nA{pA}; CHECK(get_quantity_string(nA) == "nA"); REQUIRE(pA.get()); CHECK(nA.get() == pA.get() / 1000);
+		unlib::micro<unlib::ampere<VT>> uA{nA}; CHECK(get_quantity_string(uA) == "uA"); REQUIRE(nA.get()); CHECK(uA.get() == nA.get() / 1000);
+		unlib::milli<unlib::ampere<VT>> mA{uA}; CHECK(get_quantity_string(mA) == "mA"); REQUIRE(uA.get()); CHECK(mA.get() == uA.get() / 1000);
 		             unlib::ampere<VT>  A2{mA}; REQUIRE(mA.get()); CHECK(A2.get() ==  A.get());
 
 		A2 *= 1000'000'000ll;
-		unlib::kilo <unlib::ampere<VT>> kA{A2}; REQUIRE(A2.get()); CHECK(kA.get() == A2.get() / 1000);
-		unlib::mega <unlib::ampere<VT>> MA{kA}; REQUIRE(kA.get()); CHECK(MA.get() == kA.get() / 1000);
-		unlib::giga <unlib::ampere<VT>> GA{MA}; REQUIRE(MA.get()); CHECK(GA.get() == MA.get() / 1000);
+		unlib::kilo <unlib::ampere<VT>> kA{A2}; CHECK(get_quantity_string(kA) == "kA"); REQUIRE(A2.get()); CHECK(kA.get() == A2.get() / 1000);
+		unlib::mega <unlib::ampere<VT>> MA{kA}; CHECK(get_quantity_string(MA) == "MA"); REQUIRE(kA.get()); CHECK(MA.get() == kA.get() / 1000);
+		unlib::giga <unlib::ampere<VT>> GA{MA}; CHECK(get_quantity_string(GA) == "GA"); REQUIRE(MA.get()); CHECK(GA.get() == MA.get() / 1000);
 
 		A2 = GA;  CHECK( A2 == unlib::ampere<VT>{mA}*1000'000'000 );
 
@@ -252,19 +293,19 @@ TEST_CASE("common quantities") {
 		using frequency = unlib::unit_t< unlib::reciprocal_unit_t<unlib::time> >;
 		CHECK( typeid(frequency) == typeid(unlib::hertz<VT>::unit_type) );
 
-		const unlib::hertz<VT> Hz{ 1}; REQUIRE(Hz.get() ==  1);
+		const        unlib::hertz<VT>   Hz{  1}; CHECK(get_quantity_string( Hz) ==  "Hz"); REQUIRE(Hz.get() ==  1);
 
-		unlib::femto<unlib::hertz<VT>> fHz{ Hz}; REQUIRE( Hz.get()); CHECK(fHz.get() ==  Hz.get() * 1000'000'000'000'000);
-		unlib::pico <unlib::hertz<VT>> pHz{fHz}; REQUIRE(fHz.get()); CHECK(pHz.get() == fHz.get() / 1000);
-		unlib::nano <unlib::hertz<VT>> nHz{pHz}; REQUIRE(pHz.get()); CHECK(nHz.get() == pHz.get() / 1000);
-		unlib::micro<unlib::hertz<VT>> uHz{nHz}; REQUIRE(nHz.get()); CHECK(uHz.get() == nHz.get() / 1000);
-		unlib::milli<unlib::hertz<VT>> mHz{uHz}; REQUIRE(uHz.get()); CHECK(mHz.get() == uHz.get() / 1000);
-		             unlib::hertz<VT>   H2{mHz}; REQUIRE(mHz.get()); CHECK( H2.get() ==  Hz.get());
+		unlib::femto<unlib::hertz<VT>> fHz{ Hz}; CHECK(get_quantity_string(fHz) == "fHz"); REQUIRE( Hz.get()); CHECK(fHz.get() ==  Hz.get() * 1000'000'000'000'000);
+		unlib::pico <unlib::hertz<VT>> pHz{fHz}; CHECK(get_quantity_string(pHz) == "pHz"); REQUIRE(fHz.get()); CHECK(pHz.get() == fHz.get() / 1000);
+		unlib::nano <unlib::hertz<VT>> nHz{pHz}; CHECK(get_quantity_string(nHz) == "nHz"); REQUIRE(pHz.get()); CHECK(nHz.get() == pHz.get() / 1000);
+		unlib::micro<unlib::hertz<VT>> uHz{nHz}; CHECK(get_quantity_string(uHz) == "uHz"); REQUIRE(nHz.get()); CHECK(uHz.get() == nHz.get() / 1000);
+		unlib::milli<unlib::hertz<VT>> mHz{uHz}; CHECK(get_quantity_string(mHz) == "mHz"); REQUIRE(uHz.get()); CHECK(mHz.get() == uHz.get() / 1000);
+		             unlib::hertz<VT>   H2{mHz};                                              REQUIRE(mHz.get()); CHECK( H2.get() ==  Hz.get());
 
 		H2 *= 1000'000'000ll;
-		unlib::kilo <unlib::hertz<VT>> kHz{ H2}; REQUIRE( H2.get()); CHECK(kHz.get() ==  H2.get() / 1000);
-		unlib::mega <unlib::hertz<VT>> MHz{kHz}; REQUIRE(kHz.get()); CHECK(MHz.get() == kHz.get() / 1000);
-		unlib::giga <unlib::hertz<VT>> GHz{MHz}; REQUIRE(MHz.get()); CHECK(GHz.get() == MHz.get() / 1000);
+		unlib::kilo <unlib::hertz<VT>> kHz{ H2}; CHECK(get_quantity_string(kHz) == "kHz"); REQUIRE( H2.get()); CHECK(kHz.get() ==  H2.get() / 1000);
+		unlib::mega <unlib::hertz<VT>> MHz{kHz}; CHECK(get_quantity_string(MHz) == "MHz"); REQUIRE(kHz.get()); CHECK(MHz.get() == kHz.get() / 1000);
+		unlib::giga <unlib::hertz<VT>> GHz{MHz}; CHECK(get_quantity_string(GHz) == "GHz"); REQUIRE(MHz.get()); CHECK(GHz.get() == MHz.get() / 1000);
 
 		H2 = GHz;  CHECK( H2 == unlib::hertz<VT>{mHz}*1000'000'000 );
 
@@ -307,19 +348,19 @@ TEST_CASE("common quantities") {
 		                             , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
 		CHECK(typeid(voltage) == typeid(unlib::volt<VT>::unit_type));
 
-		const unlib::volt<VT> V{ 1}; REQUIRE(V.get() ==  1);
+		const        unlib::volt<VT>   V{ 1}; CHECK(get_quantity_string( V) ==  "V"); REQUIRE(V.get() ==  1);
 
-		unlib::femto<unlib::volt<VT>> fV{ V}; REQUIRE( V.get()); CHECK(fV.get() ==  V.get() * 1000'000'000'000'000);
-		unlib::pico <unlib::volt<VT>> pV{fV}; REQUIRE(fV.get()); CHECK(pV.get() == fV.get() / 1000);
-		unlib::nano <unlib::volt<VT>> nV{pV}; REQUIRE(pV.get()); CHECK(nV.get() == pV.get() / 1000);
-		unlib::micro<unlib::volt<VT>> uV{nV}; REQUIRE(nV.get()); CHECK(uV.get() == nV.get() / 1000);
-		unlib::milli<unlib::volt<VT>> mV{uV}; REQUIRE(uV.get()); CHECK(mV.get() == uV.get() / 1000);
-		             unlib::volt<VT>  V2{mV}; REQUIRE(mV.get()); CHECK(V2.get() ==  V.get());
+		unlib::femto<unlib::volt<VT>> fV{ V}; CHECK(get_quantity_string(fV) == "fV"); REQUIRE( V.get()); CHECK(fV.get() ==  V.get() * 1000'000'000'000'000);
+		unlib::pico <unlib::volt<VT>> pV{fV}; CHECK(get_quantity_string(pV) == "pV"); REQUIRE(fV.get()); CHECK(pV.get() == fV.get() / 1000);
+		unlib::nano <unlib::volt<VT>> nV{pV}; CHECK(get_quantity_string(nV) == "nV"); REQUIRE(pV.get()); CHECK(nV.get() == pV.get() / 1000);
+		unlib::micro<unlib::volt<VT>> uV{nV}; CHECK(get_quantity_string(uV) == "uV"); REQUIRE(nV.get()); CHECK(uV.get() == nV.get() / 1000);
+		unlib::milli<unlib::volt<VT>> mV{uV}; CHECK(get_quantity_string(mV) == "mV"); REQUIRE(uV.get()); CHECK(mV.get() == uV.get() / 1000);
+		             unlib::volt<VT>  V2{mV};                                            REQUIRE(mV.get()); CHECK(V2.get() ==  V.get());
 
 		V2 *= 1000'000'000ll;
-		unlib::kilo <unlib::volt<VT>> kV{V2}; REQUIRE(V2.get()); CHECK(kV.get() == V2.get() / 1000);
-		unlib::mega <unlib::volt<VT>> MV{kV}; REQUIRE(kV.get()); CHECK(MV.get() == kV.get() / 1000);
-		unlib::giga <unlib::volt<VT>> GV{MV}; REQUIRE(MV.get()); CHECK(GV.get() == MV.get() / 1000);
+		unlib::kilo <unlib::volt<VT>> kV{V2}; CHECK(get_quantity_string(kV) == "kV"); REQUIRE(V2.get()); CHECK(kV.get() == V2.get() / 1000);
+		unlib::mega <unlib::volt<VT>> MV{kV}; CHECK(get_quantity_string(MV) == "MV"); REQUIRE(kV.get()); CHECK(MV.get() == kV.get() / 1000);
+		unlib::giga <unlib::volt<VT>> GV{MV}; CHECK(get_quantity_string(GV) == "GV"); REQUIRE(MV.get()); CHECK(GV.get() == MV.get() / 1000);
 
 		V2 = GV;  CHECK( V2 == unlib::volt<VT>{mV}*1000'000'000 );
 
@@ -415,15 +456,15 @@ TEST_CASE("common quantities") {
 		                           , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
 		CHECK(typeid(power) == typeid(unlib::watt<VT>::unit_type) );
 
-		const unlib::      watt<VT>    W{1}; REQUIRE(  W.get() == 1);
-		const unlib::       var<VT> va_r{1}; REQUIRE(va_r.get() == 1);
-		const unlib::voltampere<VT>   va{1}; REQUIRE( va.get() == 1);
+		const unlib::      watt<VT>   W { 1}; CHECK(get_quantity_string( W ) ==   "W" ); REQUIRE(  W.get() == 1);
+		const unlib::       var<VT>  var{ 1}; CHECK(get_quantity_string(var) ==  "VAr"); REQUIRE(var.get() == 1);
+		const unlib::voltampere<VT>  va { 1}; CHECK(get_quantity_string(va ) ==  "VA" ); REQUIRE( va.get() == 1);
 
-		unlib::femto<unlib::watt<VT>> fW{ W}; REQUIRE( W.get()); CHECK(fW.get() ==  W.get() * 1000'000'000'000'000);
-		unlib::pico <unlib::watt<VT>> pW{fW}; REQUIRE(fW.get()); CHECK(pW.get() == fW.get() / 1000);
-		unlib::nano <unlib::watt<VT>> nW{pW}; REQUIRE(pW.get()); CHECK(nW.get() == pW.get() / 1000);
-		unlib::micro<unlib::watt<VT>> uW{nW}; REQUIRE(nW.get()); CHECK(uW.get() == nW.get() / 1000);
-		unlib::milli<unlib::watt<VT>> mW{uW}; REQUIRE(uW.get()); CHECK(mW.get() == uW.get() / 1000);
+		unlib::femto<unlib::watt<VT>> fW{ W}; CHECK(get_quantity_string( fW) ==   "fW"); REQUIRE( W.get()); CHECK(fW.get() ==  W.get() * 1000'000'000'000'000);
+		unlib::pico <unlib::watt<VT>> pW{fW}; CHECK(get_quantity_string( pW) ==   "pW"); REQUIRE(fW.get()); CHECK(pW.get() == fW.get() / 1000);
+		unlib::nano <unlib::watt<VT>> nW{pW}; CHECK(get_quantity_string( nW) ==   "nW"); REQUIRE(pW.get()); CHECK(nW.get() == pW.get() / 1000);
+		unlib::micro<unlib::watt<VT>> uW{nW}; CHECK(get_quantity_string( uW) ==   "uW"); REQUIRE(nW.get()); CHECK(uW.get() == nW.get() / 1000);
+		unlib::milli<unlib::watt<VT>> mW{uW}; CHECK(get_quantity_string( mW) ==   "mW"); REQUIRE(uW.get()); CHECK(mW.get() == uW.get() / 1000);
 
 		unlib::      watt<VT>   W2{mW};                  REQUIRE(  W2.get()); CHECK(  W2.get() == W.get());
 		unlib::       var<VT> var2{unlib::tag_cast(W2)}; REQUIRE(var2.get()); CHECK(var2.get() == W.get());
@@ -435,9 +476,9 @@ TEST_CASE("common quantities") {
 
 
 		W2 *= 1000'000'000ll;
-		unlib::kilo <unlib::watt<VT>> kW{W2}; REQUIRE(W2.get()); CHECK(kW.get() == W2.get() / 1000);
-		unlib::mega <unlib::watt<VT>> MW{kW}; REQUIRE(kW.get()); CHECK(MW.get() == kW.get() / 1000);
-		unlib::giga <unlib::watt<VT>> GW{MW}; REQUIRE(MW.get()); CHECK(GW.get() == MW.get() / 1000);
+		unlib::kilo <unlib::watt<VT>> kW{W2}; CHECK(get_quantity_string(kW) == "kW"); REQUIRE(W2.get()); CHECK(kW.get() == W2.get() / 1000);
+		unlib::mega <unlib::watt<VT>> MW{kW}; CHECK(get_quantity_string(MW) == "MW"); REQUIRE(kW.get()); CHECK(MW.get() == kW.get() / 1000);
+		unlib::giga <unlib::watt<VT>> GW{MW}; CHECK(get_quantity_string(GW) == "GW"); REQUIRE(MW.get()); CHECK(GW.get() == MW.get() / 1000);
 
 		 W2 = GW;  CHECK(W2 == unlib::watt<VT>{mW}*1000'000'000 );
 
@@ -512,23 +553,23 @@ TEST_CASE("common quantities") {
 		CHECK(typeid(energy) == typeid(unlib::energy) );
 		CHECK(typeid(energy) == typeid(unlib::watt_hour<VT>::unit_type) );
 
-		const unlib::watt_hour  <VT> Wh{1 };           REQUIRE(Wh.get() == 1);
-		const unlib::watt_second<VT> Ws{Wh};           REQUIRE(Ws.get() == Wh.get()*3600);
-		const unlib::      joule<VT>  J{tag_cast(Ws)}; REQUIRE( J.get() == Ws.get());
+		const unlib::watt_hour  <VT> Wh{1 };           CHECK(get_quantity_string(Wh) == "Wh"); REQUIRE(Wh.get() == 1);
+		const unlib::watt_second<VT> Ws{Wh};           CHECK(get_quantity_string(Ws) == "Ws"); REQUIRE(Ws.get() == Wh.get()*3600);
+		const unlib::      joule<VT>  J{tag_cast(Ws)}; CHECK(get_quantity_string( J) ==  "J"); REQUIRE( J.get() == Ws.get());
 
-		unlib::femto<unlib::watt_second<VT>> fWs{ Ws};           REQUIRE( Ws.get()); CHECK(fWs.get() ==  Ws.get() * 1000'000'000'000'000);
-		unlib::pico <unlib::watt_second<VT>> pWs{fWs};           REQUIRE(fWs.get()); CHECK(pWs.get() == fWs.get() / 1000);
-		unlib::nano <unlib::watt_second<VT>> nWs{pWs};           REQUIRE(pWs.get()); CHECK(nWs.get() == pWs.get() / 1000);
-		unlib::micro<unlib::watt_second<VT>> uWs{nWs};           REQUIRE(nWs.get()); CHECK(uWs.get() == nWs.get() / 1000);
-		unlib::milli<unlib::watt_second<VT>> mWs{uWs};           REQUIRE(uWs.get()); CHECK(mWs.get() == uWs.get() / 1000);
-		             unlib::watt_second<VT>  Ws2{mWs};           REQUIRE(mWs.get()); CHECK(Ws2.get() ==  Ws.get());
-		             unlib::watt_hour  <VT>  Wh2{Ws2};           REQUIRE(Ws2.get()); CHECK(Ws2.get() ==  Ws.get());
+		unlib::femto<unlib::watt_second<VT>> fWs{ Ws}; CHECK(get_quantity_string(fWs) == "fWs"); REQUIRE( Ws.get()); CHECK(fWs.get() ==  Ws.get() * 1000'000'000'000'000);
+		unlib::pico <unlib::watt_second<VT>> pWs{fWs}; CHECK(get_quantity_string(pWs) == "pWs"); REQUIRE(fWs.get()); CHECK(pWs.get() == fWs.get() / 1000);
+		unlib::nano <unlib::watt_second<VT>> nWs{pWs}; CHECK(get_quantity_string(nWs) == "nWs"); REQUIRE(pWs.get()); CHECK(nWs.get() == pWs.get() / 1000);
+		unlib::micro<unlib::watt_second<VT>> uWs{nWs}; CHECK(get_quantity_string(uWs) == "uWs"); REQUIRE(nWs.get()); CHECK(uWs.get() == nWs.get() / 1000);
+		unlib::milli<unlib::watt_second<VT>> mWs{uWs}; CHECK(get_quantity_string(mWs) == "mWs"); REQUIRE(uWs.get()); CHECK(mWs.get() == uWs.get() / 1000);
+		             unlib::watt_second<VT>  Ws2{mWs};                                              REQUIRE(mWs.get()); CHECK(Ws2.get() ==  Ws.get());
+		             unlib::watt_hour  <VT>  Wh2{Ws2};                                              REQUIRE(Ws2.get()); CHECK(Ws2.get() ==  Ws.get());
 		             unlib::      joule<VT>   J2{tag_cast(Ws2)}; REQUIRE( J2.get()); CHECK( J2.get() == Ws.get());
 
 		Wh2 *= 1000000000ll;
-		unlib::kilo <unlib::watt_hour  <VT>> kWh{Wh2}; REQUIRE(Wh2.get()); CHECK(kWh.get() == Wh2.get() / 1000);
-		unlib::mega <unlib::watt_hour  <VT>> MWh{kWh}; REQUIRE(kWh.get()); CHECK(MWh.get() == kWh.get() / 1000);
-		unlib::giga <unlib::watt_hour  <VT>> GWh{MWh}; REQUIRE(MWh.get()); CHECK(GWh.get() == MWh.get() / 1000);
+		unlib::kilo <unlib::watt_hour  <VT>> kWh{Wh2}; CHECK(get_quantity_string(kWh) == "kWh"); REQUIRE(Wh2.get()); CHECK(kWh.get() == Wh2.get() / 1000);
+		unlib::mega <unlib::watt_hour  <VT>> MWh{kWh}; CHECK(get_quantity_string(MWh) == "MWh"); REQUIRE(kWh.get()); CHECK(MWh.get() == kWh.get() / 1000);
+		unlib::giga <unlib::watt_hour  <VT>> GWh{MWh}; CHECK(get_quantity_string(GWh) == "GWh"); REQUIRE(MWh.get()); CHECK(GWh.get() == MWh.get() / 1000);
 
 		Wh2 = GWh;
 		CHECK(Wh2 == Wh*1000000000ll);
@@ -577,21 +618,21 @@ TEST_CASE("common quantities") {
 		                            , unlib::time >;
 		CHECK(typeid(charge) == typeid(unlib::ampere_hour<VT>::unit_type) );
 
-		const unlib::ampere_hour  <VT> Ah{1 }; REQUIRE(Ah.get() == 1);
-		const unlib::ampere_second<VT> As{Ah}; REQUIRE(As.get() == Ah.get()*3600);
+		const        unlib::ampere_hour  <VT>   Ah{ 1 }; CHECK(get_quantity_string( Ah) ==  "Ah"); REQUIRE(Ah.get() == 1);
+		const        unlib::ampere_second<VT>   As{ Ah}; CHECK(get_quantity_string( As) ==  "As"); REQUIRE(As.get() == Ah.get()*3600);
 
-		unlib::femto<unlib::ampere_second<VT>> fAs{ As}; REQUIRE( As.get()); CHECK(fAs.get() ==  As.get() * 1000'000'000'000'000);
-		unlib::pico <unlib::ampere_second<VT>> pAs{fAs}; REQUIRE(fAs.get()); CHECK(pAs.get() == fAs.get() / 1000);
-		unlib::nano <unlib::ampere_second<VT>> nAs{pAs}; REQUIRE(pAs.get()); CHECK(nAs.get() == pAs.get() / 1000);
-		unlib::micro<unlib::ampere_second<VT>> uAs{nAs}; REQUIRE(nAs.get()); CHECK(uAs.get() == nAs.get() / 1000);
-		unlib::milli<unlib::ampere_second<VT>> mAs{uAs}; REQUIRE(uAs.get()); CHECK(mAs.get() == uAs.get() / 1000);
-		             unlib::ampere_second<VT>  As2{mAs}; REQUIRE(mAs.get()); CHECK(As2.get() ==  As.get());
+		unlib::femto<unlib::ampere_second<VT>> fAs{ As}; CHECK(get_quantity_string(fAs) == "fAs"); REQUIRE( As.get()); CHECK(fAs.get() ==  As.get() * 1000'000'000'000'000);
+		unlib::pico <unlib::ampere_second<VT>> pAs{fAs}; CHECK(get_quantity_string(pAs) == "pAs"); REQUIRE(fAs.get()); CHECK(pAs.get() == fAs.get() / 1000);
+		unlib::nano <unlib::ampere_second<VT>> nAs{pAs}; CHECK(get_quantity_string(nAs) == "nAs"); REQUIRE(pAs.get()); CHECK(nAs.get() == pAs.get() / 1000);
+		unlib::micro<unlib::ampere_second<VT>> uAs{nAs}; CHECK(get_quantity_string(uAs) == "uAs"); REQUIRE(nAs.get()); CHECK(uAs.get() == nAs.get() / 1000);
+		unlib::milli<unlib::ampere_second<VT>> mAs{uAs}; CHECK(get_quantity_string(mAs) == "mAs"); REQUIRE(uAs.get()); CHECK(mAs.get() == uAs.get() / 1000);
+		             unlib::ampere_second<VT>  As2{mAs};                                              REQUIRE(mAs.get()); CHECK(As2.get() ==  As.get());
 
-		             unlib::ampere_hour  <VT>  Ah2{As2}; REQUIRE(As2.get()); CHECK(As2.get() ==  As.get());
+		             unlib::ampere_hour  <VT>  Ah2{As2};                                              REQUIRE(As2.get()); CHECK(As2.get() ==  As.get());
 		Ah2 *= 1000000000ll;
-		unlib::kilo <unlib::ampere_hour  <VT>> kAh{Ah2}; REQUIRE(Ah2.get()); CHECK(kAh.get() == Ah2.get() / 1000);
-		unlib::mega <unlib::ampere_hour  <VT>> MAh{kAh}; REQUIRE(kAh.get()); CHECK(MAh.get() == kAh.get() / 1000);
-		unlib::giga <unlib::ampere_hour  <VT>> GAh{MAh}; REQUIRE(MAh.get()); CHECK(GAh.get() == MAh.get() / 1000);
+		unlib::kilo <unlib::ampere_hour  <VT>> kAh{Ah2}; CHECK(get_quantity_string(kAh) == "kAh"); REQUIRE(Ah2.get()); CHECK(kAh.get() == Ah2.get() / 1000);
+		unlib::mega <unlib::ampere_hour  <VT>> MAh{kAh}; CHECK(get_quantity_string(MAh) == "MAh"); REQUIRE(kAh.get()); CHECK(MAh.get() == kAh.get() / 1000);
+		unlib::giga <unlib::ampere_hour  <VT>> GAh{MAh}; CHECK(get_quantity_string(GAh) == "GAh"); REQUIRE(MAh.get()); CHECK(GAh.get() == MAh.get() / 1000);
 
 		Ah2 = GAh;
 		CHECK(Ah2 == Ah*1000000000ll);
@@ -638,8 +679,8 @@ TEST_CASE("common quantities") {
 		CHECK(typeid(pressure) == typeid(unlib::pressure) );
 		CHECK(typeid(pressure) == typeid(unlib::bar<VT>::unit_type) );
 
-		const unlib::    bar<VT> bar1{1   }; REQUIRE(bar1.get() == 1);
-		const unlib::pascal_<VT>   Pa{bar1}; REQUIRE(  Pa.get() == bar1.get()*100000);
+		const unlib::    bar<VT> bar1{1   }; CHECK(get_quantity_string(bar1) == "bar"); REQUIRE(bar1.get() == 1);
+		const unlib::pascal_<VT>   Pa{bar1}; CHECK(get_quantity_string(Pa  ) == "Pa" ); REQUIRE(  Pa.get() == bar1.get()*100000);
 
 		unlib::femto<unlib::bar    <VT>> fbar{bar1}; REQUIRE(bar1.get()); CHECK(fbar.get() == bar1.get() * 1000'000'000'000'000);
 		unlib::pico <unlib::bar    <VT>> pbar{fbar}; REQUIRE(fbar.get()); CHECK(pbar.get() == fbar.get() / 1000);
@@ -651,10 +692,10 @@ TEST_CASE("common quantities") {
 		             unlib::pascal_<VT>   Pa2{bar2}; REQUIRE(bar2.get()); CHECK(bar2.get() == bar1.get());
 
 		Pa2 *= 1000000000ll;
-		unlib::kilo <unlib::pascal_<VT>> kPa{Pa2}; REQUIRE(Pa2.get()); CHECK(kPa.get() == Pa2.get() / 1000);
-		unlib::hecto<unlib::pascal_<VT>> hPa{Pa2}; REQUIRE(Pa2.get()); CHECK(hPa.get() == Pa2.get() / 100 );
-		unlib::mega <unlib::pascal_<VT>> MPa{kPa}; REQUIRE(kPa.get()); CHECK(MPa.get() == kPa.get() / 1000);
-		unlib::giga <unlib::pascal_<VT>> GPa{MPa}; REQUIRE(MPa.get()); CHECK(GPa.get() == MPa.get() / 1000);
+		unlib::kilo <unlib::pascal_<VT>> kPa{Pa2}; CHECK(get_quantity_string(kPa) == "kPa" ); REQUIRE(Pa2.get()); CHECK(kPa.get() == Pa2.get() / 1000);
+		unlib::hecto<unlib::pascal_<VT>> hPa{Pa2}; CHECK(get_quantity_string(hPa) == "hPa" ); REQUIRE(Pa2.get()); CHECK(hPa.get() == Pa2.get() / 100 );
+		unlib::mega <unlib::pascal_<VT>> MPa{kPa}; CHECK(get_quantity_string(MPa) == "MPa" ); REQUIRE(kPa.get()); CHECK(MPa.get() == kPa.get() / 1000);
+		unlib::giga <unlib::pascal_<VT>> GPa{MPa}; CHECK(get_quantity_string(GPa) == "GPa" ); REQUIRE(MPa.get()); CHECK(GPa.get() == MPa.get() / 1000);
 
 		Pa2 = GPa;
 		CHECK(Pa2 == Pa*1000000000ll);
@@ -701,8 +742,8 @@ TEST_CASE("common quantities") {
 		CHECK(typeid(unlib::velocity) == typeid(unlib::meter_per_second<VT>::unit_type) );
 		CHECK(typeid(unlib::velocity) == typeid(unlib::kilometer_per_hour<VT>::unit_type) );
 
-		const unlib::    meter_per_second<VT> mps {100}; REQUIRE( mps.get() == 100            );
-		const unlib::kilometer_per_hour  <VT> kmph{mps}; CHECK  (kmph.get() == mps.get()*36/10);
+		const unlib::    meter_per_second<VT> mps {100}; CHECK(get_quantity_string(mps ) ==  "m/s" ); REQUIRE( mps.get() == 100            );
+		const unlib::kilometer_per_hour  <VT> kmph{mps}; CHECK(get_quantity_string(kmph) == "km/h" ); CHECK  (kmph.get() == mps.get()*36/10);
 
 		using namespace unlib::literals;
 
@@ -722,6 +763,8 @@ TEST_CASE("common quantities") {
 		using VT = long long;
 
 		CHECK(typeid(unlib::liter_per_hour<VT>::unit_type) == typeid(unlib::volumetric_flow_rate));
+
+		CHECK(get_quantity_string(unlib::liter_per_hour<VT>{}) == "l/h");
 
 		using namespace unlib::literals;
 		CHECK(test::is_same_unit<unlib::liter_per_hour<double>>(1._l / 1._h) );

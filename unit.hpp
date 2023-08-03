@@ -237,7 +237,7 @@ template<typename Unit, typename Ratio>
 struct pow_unit;
 template<typename Unit, std::intmax_t Nom, std::intmax_t Den>
 struct pow_unit<Unit, std::ratio<Nom,Den>> {
-	using type = typename apply_binary<std::ratio_multiply, Unit, std::ratio<Nom,Den>>::type;
+	using type = apply_binary_t<std::ratio_multiply, Unit, std::ratio<Nom,Den>>;
 };
 /** @} */
 
@@ -295,12 +295,12 @@ template<typename Unit>                  using       cbrt_unit_t = pow_unit_t<Un
 template<typename Unit1, typename Unit2>
 using are_units_compatible = std::integral_constant< bool
                                                    , ratio_equal_v<            time_exponent_t<Unit1>,             time_exponent_t<Unit2>>
-                                                  && ratio_equal_v<            mass_exponent_t<Unit1>,             mass_exponent_t<Unit2>>
-                                                  && ratio_equal_v<          length_exponent_t<Unit1>,           length_exponent_t<Unit2>>
-                                                  && ratio_equal_v<         current_exponent_t<Unit1>,          current_exponent_t<Unit2>>
-                                                  && ratio_equal_v<      luminosity_exponent_t<Unit1>,       luminosity_exponent_t<Unit2>>
-                                                  && ratio_equal_v<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
-                                                  && ratio_equal_v<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
+                                                 and ratio_equal_v<            mass_exponent_t<Unit1>,             mass_exponent_t<Unit2>>
+                                                 and ratio_equal_v<          length_exponent_t<Unit1>,           length_exponent_t<Unit2>>
+                                                 and ratio_equal_v<         current_exponent_t<Unit1>,          current_exponent_t<Unit2>>
+                                                 and ratio_equal_v<      luminosity_exponent_t<Unit1>,       luminosity_exponent_t<Unit2>>
+                                                 and ratio_equal_v<     temperature_exponent_t<Unit1>,      temperature_exponent_t<Unit2>>
+                                                 and ratio_equal_v<substance_amount_exponent_t<Unit1>, substance_amount_exponent_t<Unit2>> >;
 
 template<typename Unit1, typename Unit2>
 constexpr bool are_units_compatible_v = are_units_compatible<Unit1,Unit2>::value;

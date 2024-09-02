@@ -10,6 +10,8 @@
 
 namespace {
 
+using unlib::literals::get_quantity_string;
+
 template<typename D, typename F, typename S1, typename S2, typename T>
 bool is_near_equal(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,S2,F,T> rhs) {
 	using std::max;
@@ -57,8 +59,6 @@ TEST_CASE("common quantities") {
 			CHECK(std::string(unlib::literals::quantity_traits<kilometer::unit_type, kilometer::scale_type, kilometer::tag_type>::get_string()) =="km");
 		}
 	}
-
-	using unlib::literals::get_quantity_string;
 
 	SUBCASE("time") {
 		const         unlib::second<VT>  s{ 1}; CHECK(get_quantity_string( s) ==  "s"); REQUIRE(s.get() ==  1);
@@ -755,6 +755,11 @@ TEST_CASE("common quantities") {
 		CHECK(typeid(unlib::permill <VT              >) == typeid(unlib::scalar<VT, unlib::no_tag, unlib::milli_scaling>));
 
 		CHECK(std::is_same<unlib::percent<VT>::tag_type, unlib::no_tag>::value);
+
+		CHECK(get_quantity_string(unlib::scalar  <VT,unlib::no_tag>{}) == "");
+		CHECK(get_quantity_string(unlib::fraction<VT              >{}) == "");
+		CHECK(get_quantity_string(unlib::percent <VT              >{}) == "%");
+		CHECK(get_quantity_string(unlib::permill <VT              >{}) == "");
 
 		using namespace unlib::literals;
 

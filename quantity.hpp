@@ -749,6 +749,7 @@ using is_scaling_string_specialized = typename scaling_traits<S>::is_specialized
 template<typename U, typename T>
 struct unit_traits {
 	using is_specialized = std::false_type;
+	static constexpr const auto& get_string() {return "";}
 };
 
 /** Find out whether unit_traits is specialized for a specific unit and tag */
@@ -826,13 +827,12 @@ constexpr static_string<quantity_string_traits<U,S,T>::strlen> quantity_string_t
  *
  * @tparam U  the quantity's unit type
  * @tparam S  the quantity's scale type
- * @tparam V  the quantity's value type
  * @tparam T  the quantity's tag type
  */
 template<typename U, typename S, typename T>
 struct quantity_traits {
 	using is_specialized = std::integral_constant<bool, is_scaling_string_specialized<S  >::value
-                                                       and is_unit_string_specialized<U,T>::value>;
+	                                                   and is_unit_string_specialized<U,T>::value>;
 	static constexpr const auto& get_string() {return detail::quantity_string_traits<U,S,T>::string.array;}
 };
 

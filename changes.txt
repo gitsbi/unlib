@@ -1,6 +1,10 @@
 Changes
 =======
 
+0.9.1
+* no compiler error when printing quantities without units
+* do not print permill as milli_scale "m"
+
 0.9
 * added ability to print known quantity types ("km")
 

@@ -445,6 +445,7 @@ UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_SCALED (mega ,     ampere_hour     ,   "MAh
 UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_SCALED (giga ,     ampere_hour     ,   "GAh")
 
 UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(       percent             ,    "%" )
+UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(       permill             ,    "" ) //"‰"
 
 UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(       bar                 ,   "bar")
 

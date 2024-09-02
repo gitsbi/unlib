@@ -16,6 +16,8 @@ bool is_near_equal(const unlib::quantity<D,S1,F,T> lhs, const unlib::quantity<D,
 	return unlib::is_near(lhs, rhs, unlib::tolerance_nominal(max(lhs,rhs)));
 }
 
+using VT = long long;
+
 }
 
 TEST_CASE("common quantities") {
@@ -59,8 +61,6 @@ TEST_CASE("common quantities") {
 	using unlib::literals::get_quantity_string;
 
 	SUBCASE("time") {
-		using VT = long long;
-
 		const         unlib::second<VT>  s{ 1}; CHECK(get_quantity_string( s) ==  "s"); REQUIRE(s.get() ==  1);
 
 		unlib::milli<unlib::second<VT>> ms{ s}; CHECK(get_quantity_string(ms) == "ms"); CHECK(ms.get() ==  s.get() * 1000);
@@ -104,8 +104,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("mass") {
-		using VT = long long;
-
 		unlib::kilo <unlib::gram<VT>> kg{ 1}; CHECK(get_quantity_string(kg) == "kg"); REQUIRE(kg.get() ==  1);
 
 		             unlib::gram<VT>   g{kg}; CHECK(get_quantity_string( g) ==  "g"); REQUIRE(kg.get()); CHECK( g.get() == kg.get() * 1000);
@@ -148,8 +146,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("length") {
-		using VT = long long;
-
 		const unlib::kilo<unlib::meter<VT>> km{ 1}; CHECK(get_quantity_string(km) == "km"); REQUIRE(km.get() ==  1);
 
 		unlib::femto<unlib::meter<VT>> fm{km}; CHECK(get_quantity_string(fm) == "fm"); REQUIRE(km.get()); CHECK(fm.get() == km.get() * 1000'000'000'000'000'000);
@@ -186,8 +182,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("area") {
-		using VT = long long;
-
 		CHECK(typeid(unlib::area) == typeid(unlib::square_meter     <VT>::unit_type)); CHECK(get_quantity_string(unlib::square_meter     <VT>{}) ==  "m2");
 		CHECK(typeid(unlib::area) == typeid(unlib::square_kilometer <VT>::unit_type)); CHECK(get_quantity_string(unlib::square_kilometer <VT>{}) == "km2");
 		CHECK(typeid(unlib::area) == typeid(unlib::             are <VT>::unit_type));
@@ -207,8 +201,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("volume") {
-		using VT = long long;
-
 		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_millimeter<VT>::unit_type)); CHECK(get_quantity_string(unlib::cubic_millimeter<VT>{}) == "mm3");
 		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_centimeter<VT>::unit_type)); CHECK(get_quantity_string(unlib::cubic_centimeter<VT>{}) ==  "ml");
 		CHECK(typeid(unlib::volume) == typeid(unlib::cubic_meter     <VT>::unit_type)); CHECK(get_quantity_string(unlib::cubic_meter     <VT>{}) ==  "m3");
@@ -228,8 +220,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("temperature") {
-		using VT = long long;
-
 		const unlib::degree_kelvin    <VT> d_k{ 1}; CHECK(get_quantity_string(d_k) == "K"); REQUIRE(d_k.get() ==  1);
 		const unlib::degree_celsius   <VT> d_c{ 1}; CHECK(get_quantity_string(d_c) == "C"); REQUIRE(d_c.get() ==  1);
 		const unlib::degree_fahrenheit<VT> d_f{ 1}; CHECK(get_quantity_string(d_f) == "F"); REQUIRE(d_f.get() ==  1);
@@ -242,8 +232,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("current") {
-		using VT = long long;
-
 		const        unlib::ampere<VT>   A{ 1}; CHECK(get_quantity_string( A) ==  "A"); REQUIRE( A.get() ==  1);
 
 		unlib::femto<unlib::ampere<VT>> fA{ A}; CHECK(get_quantity_string(fA) == "fA"); REQUIRE( A.get()); CHECK(fA.get() ==  A.get() * 1000'000'000'000'000);
@@ -287,8 +275,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("frequency") {
-		using VT = long long;
-
 		// Wikipedia: F = T^-1
 		using frequency = unlib::unit_t< unlib::reciprocal_unit_t<unlib::time> >;
 		CHECK( typeid(frequency) == typeid(unlib::hertz<VT>::unit_type) );
@@ -339,8 +325,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("voltage") {
-		using VT = long long;
-
 		// Wikipedia: U = M?L^2?I^-1?T^-3
 		using voltage = unlib::unit_t< unlib::mass
 		                             , unlib::square_unit_t<unlib::length>
@@ -394,8 +378,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("resistance") {
-		using VT = long long;
-
 		// Wikipedia: R = M?L^2?I^-2?T^-3
 		using resistance = unlib::unit_t< unlib::mass
 		                                , unlib::square_unit_t<unlib::length>
@@ -449,8 +431,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("power") {
-		using VT = long long;
-
 		using power = unlib::unit_t< unlib::mass
 		                           , unlib::square_unit_t<unlib::length>
 		                           , unlib::reciprocal_unit_t<unlib::cube_unit_t<unlib::time>> >;
@@ -544,8 +524,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("energy") {
-		using VT = long long;
-
 		// Wikipedia: E = L^2?M?T^-2
 		using energy = unlib::unit_t< unlib::square_unit_t<unlib::length>
 		                            , unlib::mass
@@ -611,8 +589,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("electric charge") {
-		using VT = long long;
-
 		// Wikipedia: Q = I?T
 		using charge = unlib::unit_t< unlib::current
 		                            , unlib::time >;
@@ -670,8 +646,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("pressure") {
-		using VT = long long;
-
 		// Wikipedia: P =  	M?L^-1?T^-2
 		using pressure = unlib::unit_t< unlib::mass
 		                              , unlib::reciprocal_unit_t<unlib::length>
@@ -733,8 +707,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("velocity") {
-		using VT = long long;
-
 		// Wikipedia: a =  	L?T^-1
 		using velocity = unlib::unit_t< unlib::length
 		                              , unlib::reciprocal_unit_t<unlib::time> >;
@@ -760,8 +732,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("volumetric flow rate") {
-		using VT = long long;
-
 		CHECK(typeid(unlib::liter_per_hour<VT>::unit_type) == typeid(unlib::volumetric_flow_rate));
 
 		CHECK(get_quantity_string(unlib::liter_per_hour<VT>{}) == "l/h");
@@ -774,8 +744,6 @@ TEST_CASE("common quantities") {
 	}
 
 	SUBCASE("scalar") {
-		using VT = long long;
-
 		CHECK(typeid(unlib::scalar  <VT,unlib::no_tag>::unit_type) == typeid(unlib::dimensionless));
 		CHECK(typeid(unlib::fraction<VT              >::unit_type) == typeid(unlib::dimensionless));
 		CHECK(typeid(unlib::percent <VT              >::unit_type) == typeid(unlib::dimensionless));

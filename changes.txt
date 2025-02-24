@@ -2,6 +2,9 @@ Changes
 =======
 
 0.9.1
+* do not define quantities per retag or rescale to prevent overloading failing due to non-deducable contexts
+
+0.9.1
 * no compiler error when printing quantities without units
 * do not print permill as milli_scale "m"
 

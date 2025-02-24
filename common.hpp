@@ -291,10 +291,10 @@ template<typename V> using       liter_per_hour = div_quantity_t<liter<V>, hour<
  * @tparam T  tag
  * @tparam S  scale
  */
-template<typename V, typename T, typename S=scale_t<1>> using scalar   = quantity<dimensionless, S, V, T>;
-template<typename V, typename S=scale_t<1>>             using fraction = scalar<V, no_tag, S>;
-template<typename V>                                    using percent  = typename fraction<V>::template rescale_by<centi_scaling>;
-template<typename V>                                    using permill  = typename fraction<V>::template rescale_by<milli_scaling>;
+template<typename V, typename T       , typename S=scale_t<1>> using scalar   = quantity<dimensionless, S, V, T>;
+template<typename V, typename T=no_tag, typename S=scale_t<1>> using fraction = scalar<V, T, S>;
+template<typename V, typename T=no_tag>                        using percent  = scalar<V, T, centi_scaling>;
+template<typename V, typename T=no_tag>                        using permill  = scalar<V, T, milli_scaling>;
 /** @} */
 
 /** @{
@@ -415,7 +415,7 @@ UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(        square_kilometer   ,  "km2"
 UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(                 hectare   ,   "ha" )
 
 UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(        cubic_millimeter   ,  "mm3" )
-//UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(        cubic_centimet   er,  "cm3" ) // alias of ml
+//UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(        cubic_centimeter   ,  "cm3" ) // alias of ml
 UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(         cubic_kilometer   ,  "km3" )
 
 UNLIB_DEFINE_QUANTITY_LITERAL_TRAITS_NOSCALE(              milliliter   ,   "ml" )

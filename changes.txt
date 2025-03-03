@@ -1,7 +1,10 @@
 Changes
 =======
 
-0.9.1
+0.9.3
+* fix overload resolution problem for casts
+
+0.9.2
 * do not define quantities per retag or rescale to prevent overloading failing due to non-deducable contexts
 
 0.9.1

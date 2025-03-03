@@ -616,7 +616,7 @@ constexpr auto operator%(const V1& lhs, const quantity<U2,S2,V2,T2>& rhs) {
  * seconds<std::int16_t> value = value_cast              (1_s); // OK
  *
  */
-template<typename V, typename U, typename S, typename T>
+template<typename U, typename S, typename V, typename T>
 constexpr auto value_cast(const quantity<U,S,V,T>& q)                     {return implicit_quantity_caster<U,S,V,T,true,false,false>{q};}
 template<typename NewValueType, typename U, typename S, typename T, typename V>
 constexpr auto value_cast(const quantity<U,S,V,T>& q)                     {return quantity<U,S,NewValueType,T>{value_cast(q)};}
@@ -645,7 +645,7 @@ constexpr auto value_cast(const quantity<U,S,V,T>& q)                     {retur
  * seconds<unsigned long long> value = scale_cast<second_scaling>(1_h); // OK
  * seconds<unsigned long long> value = scale_cast                (1_h); // OK
  */
-template<typename S, typename U, typename V, typename T>
+template<typename U, typename S, typename V, typename T>
 constexpr auto scale_cast(const quantity<U,S,V,T>& q)                     {return implicit_quantity_caster<U,S,V,T,false,true,false>{q};}
 template<typename NewScale, typename U, typename S, typename V, typename T>
 constexpr auto scale_cast(const quantity<U,S,V,T>& q)                     {return quantity<U,NewScale,V,T>{scale_cast(q)};}
